@@ -1,0 +1,8 @@
+{
+  "name":"db",
+  "db_connection":"jdbc:sqlite:novocolcovo.s3db",
+  "tables": [
+    "CREATE TABLE if not exists 'users' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'username' text, 'phone' INT, 'description' text)",
+    "CREATE TABLE if not exists 'logged_users' ('id' INT, 'platform' text, 'id_on_platform' int)"
+  ]
+}
