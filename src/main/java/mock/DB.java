@@ -1,4 +1,4 @@
-package Mock;
+package mock;
 
 import db.DBinterface;
 import models.User;
