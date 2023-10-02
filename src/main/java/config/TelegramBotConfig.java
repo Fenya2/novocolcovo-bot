@@ -1,5 +1,6 @@
 package config;
 
+
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -7,13 +8,11 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 
-public class SQLiteDBconfig {
+public class TelegramBotConfig {
     private final String name;
-    private final ArrayList<String> tables;
-    private final String location;
-    public SQLiteDBconfig(String configFile) {
+    private final String token;
+    public TelegramBotConfig(String configFile){
         String str;
         try {
             str = FileUtils.readFileToString(new File(configFile), StandardCharsets.UTF_8);
@@ -22,23 +21,15 @@ public class SQLiteDBconfig {
             throw new RuntimeException("file not founded");
         }
         JSONObject jo = new JSONObject(str);
-        tables = new ArrayList<>();
         name = jo.getString("name");
-        location = jo.getString("db_connection");
-        JSONArray ja = jo.getJSONArray("tables");
-        for(int i = 0; i < ja.length(); ++i)
-            tables.add(ja.get(i).toString());
+        token = jo.getString("token");
     }
 
     public String getName() {
         return name;
     }
 
-    public ArrayList<String> getTables() {
-        return tables;
-    }
-
-    public String getLocation() {
-        return location;
+    public String getToken() {
+        return token;
     }
 }
