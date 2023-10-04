@@ -1,7 +1,5 @@
-import config.SQLiteDBconfig;
 import db.DBinterface;
-import db.SQLiteDB;
-import mock.DB;
+import db.stubDB;
 import ui.UserInterface;
 
 import java.sql.SQLException;
@@ -12,7 +10,7 @@ public class App {
     ArrayList<UserInterface> uis;
     App() throws SQLException, ClassNotFoundException {
         uis = new ArrayList<UserInterface>();
-        db = new DB();
+        db = new stubDB();
     }
 
     public void addUI(UserInterface ui) {

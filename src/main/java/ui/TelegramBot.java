@@ -2,11 +2,13 @@ package ui;
 
 import core.TelegramMessageHandler;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import config.TelegramBotConfig;
 
+/**
+ * Класс для связи с telegram через бота. telegram ui.
+ */
 public class TelegramBot extends TelegramLongPollingBot implements UserInterface{
     TelegramBotConfig botConfig;
     TelegramMessageHandler tmh;
@@ -30,6 +32,6 @@ public class TelegramBot extends TelegramLongPollingBot implements UserInterface
         }
     }
     @Override
-    public void sendTextMessage(Long userID, String text) throws RuntimeException {
+    public void sendTextMessage(long recipient_id, String text) {
     }
 }

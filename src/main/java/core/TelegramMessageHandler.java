@@ -3,17 +3,18 @@ package core;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+/**
+ * Обрабатывает сообщения, поступающие через TelegramBot в методе onUpdateReceived. Возвращает сообщение для отправки.
+ */
 public class TelegramMessageHandler {
     public SendMessage parse(Message msg){
-        Long userID = msg.getFrom().getId();
-        String text = msg.getText();
-        SendMessage sm = SendMessage.builder()
-        .chatId(userID.toString()).text(text).build();
+        SendMessage.SendMessageBuilder smb = SendMessage.builder()
+            .chatId(msg.getFrom().getId());
         switch (msg.getText()) {
-            case "/greetings" -> sm.setText("Hello!");
-            case "/help" -> sm.setText("");
-            default -> sm.setText(text);
+            case "/greetings", "/start" -> smb.text("Hello!");
+            case "/help" -> smb.text("It is a help message.");
+            default -> smb.text(msg.getText());
         }
-        return sm;
+        return smb.build();
     }
 }
