@@ -9,8 +9,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-/*
-    Реализация интерфейса DBinterface
+/**
+ * Реализация интерфейса DBinterface на базе sqlite
  */
 public class SQLiteDB implements DBinterface {
     private final Connection conn;
