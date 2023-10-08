@@ -11,8 +11,8 @@ public class TelegramMessageHandler {
         SendMessage.SendMessageBuilder smb = SendMessage.builder()
             .chatId(msg.getFrom().getId());
         switch (msg.getText()) {
-            case "/greetings", "/start" -> smb.text("Hello!");
-            case "/help" -> smb.text("It is a help message.");
+            case "/start" -> smb.text(String.format("Привет, %s! Я эхо бот. Отправь /help, чтобы узнать, что я умею", msg.getFrom().getUserName()));
+            case "/help" -> smb.text("Я эхо бот. Отправь мне любой текст и я отправлю тебе его же в ответ.");
             default -> smb.text(msg.getText());
         }
         return smb.build();
