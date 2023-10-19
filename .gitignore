@@ -1,4 +1,5 @@
 .idea
-logs
 target
-novocolcovo.s3db
+logs
+novocolcovo.sqlite
+src/main/resources/sql_requests.txt
