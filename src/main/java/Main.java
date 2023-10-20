@@ -1,5 +1,13 @@
+import java.sql.SQLException;
+
+/**
+ * Main class
+ */
 public class Main {
-    public static void main(String[] args) {
-        // todo здесь будет запускаться программа
+    /**
+     * Entry point
+     */
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        // main
     }
 }

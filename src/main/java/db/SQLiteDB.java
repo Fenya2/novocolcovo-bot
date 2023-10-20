@@ -2,6 +2,7 @@
 package db;
 
 import config.SQLiteDBconfig;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.sql.Connection;
@@ -13,6 +14,8 @@ import java.sql.Statement;
  * Реазизация интерфейса
  */
 public class SQLiteDB implements DB{
+    private static final Logger log = Logger.getLogger(SQLiteDB.class.getName());
+
     /**
      * Объект подключения к БД.
      */
@@ -26,6 +29,7 @@ public class SQLiteDB implements DB{
         this.config = config;
         Class.forName("org.sqlite.JDBC");
         this.conn = DriverManager.getConnection(config.getConnection());
+        SQLiteDB.log.info("Подключение к базе данных установлено.");
     }
 
     /**

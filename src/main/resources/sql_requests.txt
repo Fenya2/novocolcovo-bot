@@ -10,9 +10,8 @@ CREATE TABLE logged_users(
 	user_id INTEGER,
 	platform TEXT NOT NULL,
 	id_on_platform TEXT NOT NULL,
-	FOREIGN KEY (id) REFERENCES users
-	CONSTRAINT platform_check CHECK
-		(platform in ("telegram", "discord"))
+	login_date DATE NOT NULL,
+	FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 

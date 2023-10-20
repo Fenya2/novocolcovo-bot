@@ -1,5 +1,8 @@
 package entities;
 
+/**
+ * Класс, описывающий пользователя в программе
+ */
 public class User {
     public long id;
     public String name;
