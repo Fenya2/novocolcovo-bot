@@ -1,6 +1,6 @@
 package db;
 
-import entities.User;
+import models.User;
 import org.apache.log4j.Logger;
 
 import java.sql.ResultSet;
@@ -29,6 +29,7 @@ public class UserRepository extends Repository {
      */
     public User save(User user) throws SQLException {
         if(user.name == null || user.description == null) {
+            // todo сделать поля пользователя приватными, тогда проверка не будет нужна
             user.id = -1;
             return user;
         }

@@ -14,7 +14,12 @@ CREATE TABLE logged_users(
 	FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-
+CREATE TABLE user_contexts(
+	user_id INTEGER,
+	state TEXT NOT NULL,
+	state_num INTEGER NOT NULL,
+	FOREIGN KEY (user_id) REFERENCES users(id)
+);
 
 
 // Основные действия с таблицей пользователей.

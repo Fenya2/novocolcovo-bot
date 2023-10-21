@@ -1,4 +1,4 @@
-package entities;
+package models;
 
 /**
  * Класс, описывающий пользователя в программе

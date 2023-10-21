@@ -1,6 +1,6 @@
 package db;
 
-import entities.User;
+import models.User;
 import org.apache.log4j.Logger;
 
 import java.sql.ResultSet;
