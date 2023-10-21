@@ -30,7 +30,7 @@ public class UserContextRepository extends Repository{
         if(getUserContext(userId) != null) {
             return -1;
         }
-        if(userRepository.getUserById(userId) == null) {
+        if(userRepository.getById(userId) == null) {
             return -2;
         }
         String request = """
@@ -60,7 +60,7 @@ public class UserContextRepository extends Repository{
      * @throws SQLException
      */
     public UserContext getUserContext(long userId) throws SQLException {
-        if(userId <= 0 || userRepository.getUserById(userId) == null) {
+        if(userId <= 0 || userRepository.getById(userId) == null) {
             return null;
         }
 

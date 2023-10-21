@@ -28,8 +28,9 @@ public class UserRepository extends Repository {
      * @throws SQLException
      */
     public User save(User user) throws SQLException {
+        //todo сделать рефактор без try/catch
         if(user.name == null || user.description == null) {
-            // todo сделать поля пользователя приватными, тогда проверка не будет нужна
+            // todo сделать поля пользователя приватными, тогда проверка не будет нужна.
             user.id = -1;
             return user;
         }
@@ -78,7 +79,7 @@ public class UserRepository extends Repository {
      * @return {@link User}, если пользователь с переданным идентификатором существует. иначе <b>null</b>
      * @throws SQLException
      */
-    public User getUserById(long id) throws SQLException {
+    public User getById(long id) throws SQLException {
         if (id <= 0)
             return null;
         String request = "SELECT name, description FROM users WHERE id = %d;".formatted(id);
@@ -100,7 +101,7 @@ public class UserRepository extends Repository {
     /**
      * Удаляет пользователя с переданным идентификатором
      * @param id идентификатор пользователя (натуральное число)
-     * @return 1, если пользователь успешно удален, иначе 0.
+     * @return <b>1</b>, если пользователь успешно удален, иначе <b>0</b>.
      * @throws SQLException
      */
     public int deleteUserWithId(long id) throws SQLException {

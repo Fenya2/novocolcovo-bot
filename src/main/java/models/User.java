@@ -13,6 +13,12 @@ public class User {
         description = null;
     }
 
+    /**
+     *
+     * @param id
+     * @param name
+     * @param description
+     */
     public User(long id, String name, String description) {
         this.id = id;
         this.name = name;

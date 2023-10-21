@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Класс, отвечающий за работу с таблицей LoggedUsers базы данных.
+ * Класс, отвечающий за работу с таблицей logged_users базы данных.
  */
 public class LoggedUsersRepository extends Repository {
     private static final Logger log = Logger.getLogger(LoggedUsersRepository.class.getName());
@@ -40,7 +40,7 @@ public class LoggedUsersRepository extends Repository {
         if (userId <= 0
                 || platform == null
                 || idOnPLatform == null
-                || userRepository.getUserById(userId) == null) {
+                || userRepository.getById(userId) == null) {
             return -1;
         }
         String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
@@ -91,7 +91,7 @@ public class LoggedUsersRepository extends Repository {
         long userId = resultSet.getLong("user_id");
         resultSet.close();
         statement.close();
-        return userRepository.getUserById(userId);
+        return userRepository.getById(userId);
     }
 
     /**
