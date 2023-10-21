@@ -1,0 +1,5 @@
+{
+  "name":"novocolcovo_db",
+  "db_location":"novocolcovo.sqlite",
+  "db_connection":"jdbc:sqlite:novocolcovo.sqlite"
+}

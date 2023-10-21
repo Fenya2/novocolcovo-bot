@@ -1,11 +1,41 @@
 package entities;
 
+/**
+ * Класс, описывающий пользователя в программе
+ */
 public class User {
-    private int id;
-    private String platform;
-    private String idOnPlatform;
+    public long id;
+    public String name;
+    public String description;
+    public User() {
+        id = 0;
+        name = null;
+        description = null;
+    }
 
-    private String login;
-    private String name;
-    private String phone;
+    public User(long id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
+
+    public User id(long id) {
+        this.id = id;
+        return this;
+    }
+
+    public User name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public User description(String description) {
+        this.description = description;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "User(id:%d, name:%s, description:%s)".formatted(id, name, description);
+    }
 }
