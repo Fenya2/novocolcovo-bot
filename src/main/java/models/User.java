@@ -4,44 +4,61 @@ package models;
  * Класс, описывающий пользователя в программе
  */
 public class User {
-    public long id;
-    public String name;
-    public String description;
+    private long id;
+    private String name;
+    private String description;
+
+    /**
+     * Устанавливает id, name, description в
+     * -42, "default name", "default description" соответственно.
+     */
     public User() {
-        id = 0;
-        name = null;
-        description = null;
+        id = -42;
+        name = "default name";
+        description = "default description";
     }
 
     /**
-     *
      * @param id
      * @param name
      * @param description
      */
     public User(long id, String name, String description) {
         this.id = id;
-        this.name = name;
-        this.description = description;
+        setName(name);
+        setDescription(description);
+    }
+    public long getId() {
+        return id;
     }
 
-    public User id(long id) {
+    public void setId(long id) {
         this.id = id;
-        return this;
     }
 
-    public User name(String name) {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) throws IllegalArgumentException {
+        if(name == null)
+            throw new IllegalArgumentException();
         this.name = name;
-        return this;
     }
 
-    public User description(String description) {
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) throws IllegalArgumentException {
+        if(description == null)
+            throw new IllegalArgumentException();
+        //todo тут можно прикрутить проверку на недопустимые слова. Или повыше?
         this.description = description;
-        return this;
     }
 
     @Override
     public String toString() {
-        return "User(id:%d, name:%s, description:%s)".formatted(id, name, description);
+        return "User(id:%d, name:\"%s\", description:\"%s\")".formatted(id, name, description);
     }
 }

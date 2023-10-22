@@ -27,6 +27,7 @@ CREATE TABLE orders(
 	courier_id INTEGER NOT NULL,
 	date_created TEXT NOT NULL,
 	description TEXT NOT NULL,
+	status TEXT NOT NULL,
 	FOREIGN KEY (creator_id) REFERENCES users(id)
 	FOREIGN KEY (courier_id) REFERENCES users(id)
 );
