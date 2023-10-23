@@ -44,7 +44,7 @@ public class CommandHandler {
                 case "/help" -> {return """
                         /create_order - создать заказ
                         /update_order - изменить заказ
-                        /canсel_order - удалить заказ
+                        /cancel_order - удалить заказ
                         /view_list_order - посмотреть список заказов
                         """;}
                 case "/start" -> {return start(msg);}
@@ -52,7 +52,7 @@ public class CommandHandler {
 
             User user = loggedUsersRepository.getUserByPlatformAndIdOnPlatform(msg.getPlatform(), msg.getUserIdOnPlatform());
             if (user == null)
-                return "напишите /start";
+                return "Напишите /start";
 
             UserContext userContext = userContextRepository.getUserContext(user.getId());
             if(userContext!=null)
@@ -88,7 +88,7 @@ public class CommandHandler {
                 User userWithID = userRepository.save(user);
                 loggedUsersRepository.linkUserIdAndUserPlatform(userWithID.getId(),platform,userIdOnPlatform);
             }
-            return "Привет. Напиши /help";
+            return "Привет. Напишите /help";
         } catch (Exception e) {
             return "Что-то пошло не так";
         }

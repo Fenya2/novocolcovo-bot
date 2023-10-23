@@ -219,7 +219,13 @@ public class OrderRepository extends Repository{
         statement.close();
         return ret;
     }
-    //TODO
+
+    /**
+     * У одного пользователя может изменятся только один заказ, а значит можно
+     * @param idUser по пользователю
+     * @param status и статусу заказа
+     * @return вернуть заказ
+     */
     public Order getOrderByIdUserAndStatus(long idUser, String status) throws SQLException, ParseException {
         ArrayList<Order> listAllOrders = getAll();
         for(Order s: listAllOrders){
@@ -228,7 +234,11 @@ public class OrderRepository extends Repository{
         }
         return null;
     }
-    //TODO
+
+    /**
+     * Обновляет статус у заказа на новый
+     * @return вовзращает 1 при удачно обновлении и 0 иначе
+     */
     public int updateOrderStatus(long idOrder,String status) throws SQLException, ParseException {
         ArrayList<Order> listAllOrders = getAll();
         for(Order s: listAllOrders){

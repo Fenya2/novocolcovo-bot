@@ -25,18 +25,15 @@ class MessageHandlerTest {
     void handleText() {
         Message msg = new Message();
         msg.setText("text. Not command");
-        Mockito.when(textHandler.handle(msg)).thenReturn("отработал текстовый обработчик");
-        Mockito.when(commandHandler.handle(msg)).thenReturn("отработал командный обработчик");
-        String handel = messageHandler.handle(msg);
-        Assertions.assertEquals("отработал текстовый обработчик",handel);
-    }
-    @Test
-    void handleCommand() {
-        Message msg = new Message();
+        Mockito.when(textHandler.handle(msg))
+                .thenReturn("отработал текстовый обработчик");
+        String handel1 = messageHandler.handle(msg);
+        Assertions.assertEquals("отработал текстовый обработчик",handel1);
+
         msg.setText("/command. Not text");
-        Mockito.when(textHandler.handle(msg)).thenReturn("отработал текстовый обработчик");
-        Mockito.when(commandHandler.handle(msg)).thenReturn("отработал командный обработчик");
-        String handel = messageHandler.handle(msg);
-        Assertions.assertEquals("отработал командный обработчик",handel);
+        Mockito.when(commandHandler.handle(msg))
+                .thenReturn("отработал командный обработчик");
+        String handel2 = messageHandler.handle(msg);
+        Assertions.assertEquals("отработал командный обработчик",handel2);
     }
 }
