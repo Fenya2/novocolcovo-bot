@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 public class TGBotConfig {
     private final String name;
     private final String token;
+    private final String platform;
+
     public TGBotConfig(String configFile){
         String str;
         try {
@@ -21,6 +23,7 @@ public class TGBotConfig {
         JSONObject jo = new JSONObject(str);
         name = jo.getString("name");
         token = jo.getString("token");
+        platform = jo.getString("platform");
     }
 
     public String getName() {
@@ -30,4 +33,6 @@ public class TGBotConfig {
     public String getToken() {
         return token;
     }
+
+    public String getPlatform() {return platform;}
 }

@@ -35,9 +35,10 @@ public class SQLiteDB implements DB{
     /**
      * Сущность, передаваемая репозиториям для выполнения запросов к БД.
      */
+
     @Override
-    public Connection getConnection() {
-        return conn;
+    public Statement getStatement() throws SQLException {
+        return conn.createStatement();
     }
 
     /**

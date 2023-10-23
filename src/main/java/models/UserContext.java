@@ -1,7 +1,7 @@
 package models;
 
 /**
- * Класс, позволяющий узнать, в каком состоянии находится пользователей (какая команда выполняетсся)
+ * Класс, позволяющий узнать, в каком состоянии находится пользователь (какая команда выполняетсся)
  * для последующей обработки его зароса. Необходим, когда взаимодействие с пользователем происходит
  * в форме диалога.
  */
@@ -38,18 +38,19 @@ public class UserContext {
     /**
      * Доступные state:
      * <ol>
-     *  <li><i>create_order</i></li>
-     *  <li><i>change_username</i></li>
      *  <li><i>alcohol_intoxication</i></li>
      * </ol>
      * @param state
      * @throws IllegalArgumentException
      */
     public void setState(String state) throws IllegalArgumentException{
+        //todo возможно тут нужен enum?
         switch (state) {
             case "create_order",
                     "change_username",
-                    "alcohol_intoxication":
+                    "alcohol_intoxication",
+                    "update_order",
+                    "cancel_order":
                 this.state = state;
                 return;
         }
@@ -58,9 +59,13 @@ public class UserContext {
 
     public void setStateNum(int stateNum) {
         if(stateNum < 0) {
-            throw new IllegalArgumentException("Try to set negative state_num (must be not neggative)");
+            throw new IllegalArgumentException("Try to set negative state_num.");
         }
         this.stateNum = stateNum;
+    }
+
+    public void incrementStateNum() {
+        stateNum++;
     }
 
     @Override

@@ -1,21 +1,42 @@
 package core;
 
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
+import db.LoggedUsersRepository;
+import db.UserContextRepository;
+import models.Message;
+import models.User;
+import models.UserContext;
+
+import java.sql.SQLException;
 
 /**
- * Обрабатывает сообщения, поступающие через TelegramBot в методе onUpdateReceived. Возвращает сообщение для отправки.
+ * Обработчик сообщений
  */
 public class MessageHandler {
-    public SendMessage parse(Message msg){
-        SendMessage.SendMessageBuilder smb = SendMessage.builder()
-            .chatId(msg.getFrom().getId());
-        switch (msg.getText()) {
-            case "/start" -> smb.text(String.format("Привет, %s! Я эхо бот. Отправь /help, чтобы узнать, что я умею", msg.getFrom().getUserName()));
-            case "/help" -> smb.text("Я эхо бот. Отправь мне любой текст и я отправлю тебе его же в ответ.");
-            default -> smb.text(msg.getText());
-        }
-        return smb.build();
+
+    /**
+     * обработчик команд
+     */
+    private final CommandHandler commandHandler;
+
+    /**
+     * обработчик текста
+     */
+    private final TextHandler textHandler;
+    public MessageHandler(CommandHandler commandHandler, UserContextRepository userContextRepository, LoggedUsersRepository loggedUsersRepository, TextHandler textHandler){
+        this.commandHandler = commandHandler;
+        this.textHandler = textHandler;
     }
 
+    /**
+     * метод определяет сообщение как команду или как текст
+     * и отправляет в соответствующий обработчик
+     * @param msg
+     * @return String, текст который сформирует соответствующий обработчик
+     */
+    public String handle(Message msg){
+        String text = msg.getText();
+        if (text.charAt(0)=='/')
+            return commandHandler.handle(msg);
+        return textHandler.handle(msg);
+    }
 }

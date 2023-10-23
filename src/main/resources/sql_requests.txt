@@ -21,6 +21,17 @@ CREATE TABLE user_contexts(
 	FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+CREATE TABLE orders(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	creator_id INTEGER NOT NULL,
+	courier_id INTEGER NOT NULL,
+	date_created TEXT NOT NULL,
+	description TEXT NOT NULL,
+	status TEXT NOT NULL,
+	FOREIGN KEY (creator_id) REFERENCES users(id)
+	FOREIGN KEY (courier_id) REFERENCES users(id)
+);
+
 
 // Основные действия с таблицей пользователей.
 INSERT INTO users (name, description, date_created) VALUES ("John Doe", "Wake up!", "ГГГГ-ММ-ДД");

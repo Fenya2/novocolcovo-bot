@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Класс, отвечающий за работу с таблицей LoggedUsers базы данных.
+ * Класс, отвечающий за работу с таблицей logged_users базы данных.
  */
 public class LoggedUsersRepository extends Repository {
     private static final Logger log = Logger.getLogger(LoggedUsersRepository.class.getName());
@@ -23,26 +23,28 @@ public class LoggedUsersRepository extends Repository {
 
     /**
      * Связывает идентификатор пользователя в программе и платформу, с которой пользователь
-     * взаимодействует с программой, используя его идентификатор на этой платформе.
+     * взаимодействует с программой, используя его идентификатор на этой платформе. Если такая связь уже
+     * существует, то ничего не делает.
      *
      * @param userId       идентификатор пользователя в программе. Пользователь с таким идентификатором
      *                     должен быть в таблице users.
      * @param platform     платформа, с которой пользователь взаимодействует с программой. Не <b>null</b>.
-     * @param idOnPLatform идентификатор пользователя на указанной платформе. Не <b>null</b>.
-     * @return <b>1</b>, если добавление связи прошло успешно,
-     * <b>-1</b>, если
-     * platform <b>null</b>,
-     * или идентификатор пользователя на платформе <b>null</b>,
-     * или пользователя с указанным id нет в таблице users,
-     * @throws SQLException
+     * @param userIdOnPLatform идентификатор пользователя на указанной платформе. Не <b>null</b>.
+     * @return <b>1</b>, если добавление связи прошло успешно, иначе <b>-1</b>, если аргументы
+     * некорректны, <b>0</b>, если связь уже существует.
+     * @throws SQLException,
      */
-    public int linkUserIdAndUserPlatform(long userId, String platform, String idOnPLatform) throws SQLException {
+    public int linkUserIdAndUserPlatform(long userId, String platform, String userIdOnPLatform) throws SQLException {
         if (userId <= 0
                 || platform == null
-                || idOnPLatform == null
-                || userRepository.getUserById(userId) == null) {
+                || userIdOnPLatform == null
+                || userRepository.getById(userId) == null) {
             return -1;
         }
+        if(getUserByPlatformAndIdOnPlatform(platform, userIdOnPLatform) != null) {
+            return 0;
+        }
+
         String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         String request = """
                 INSERT INTO logged_users (
@@ -51,11 +53,11 @@ public class LoggedUsersRepository extends Repository {
                 id_on_platform,
                 login_date
                 ) VALUES (%d, "%s", "%s", "%s");
-                """.formatted(userId, platform, idOnPLatform, date);
-        Statement statement = db.getConnection().createStatement();
-        if (statement.executeUpdate(request) != 1) {
+                """.formatted(userId, platform, userIdOnPLatform, date);
+        Statement statement = db.getStatement();
+        if (statement.executeUpdate(request) == 0) {
             statement.close();
-            throw new SQLException("something went wrong.");
+            throw new SQLException("something went wrong. Хотя не должно.");
         }
         statement.close();
         LoggedUsersRepository.log.info("Пользователь с id = %d зашел с платформы %s."
@@ -81,7 +83,7 @@ public class LoggedUsersRepository extends Repository {
                 WHERE platform = "%s"
                 AND id_on_platform = "%s";
                 """.formatted(platform, idOnPlatform);
-        Statement statement = db.getConnection().createStatement();
+        Statement statement = db.getStatement();
         ResultSet resultSet = statement.executeQuery(request);
         if (!resultSet.next()) {
             resultSet.close();
@@ -91,7 +93,7 @@ public class LoggedUsersRepository extends Repository {
         long userId = resultSet.getLong("user_id");
         resultSet.close();
         statement.close();
-        return userRepository.getUserById(userId);
+        return userRepository.getById(userId);
     }
 
     /**
@@ -114,7 +116,7 @@ public class LoggedUsersRepository extends Repository {
         }
         String request = "DELETE FROM logged_users WHERE user_id = %d AND platform = \"%s\""
                 .formatted(userId, platform);
-        Statement statement = db.getConnection().createStatement();
+        Statement statement = db.getStatement();
         if (statement.executeUpdate(request) == 0) {
             statement.close();
             return -2;
