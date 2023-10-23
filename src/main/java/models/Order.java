@@ -8,55 +8,54 @@ import java.util.Formatter;
  * Класс заказа
  */
 public class Order {
-    /**
-     * Уникальный идентификатор заказа.
-     */
+    /** Уникальный идентификатор заказа. */
     private long id;
 
-    /**
-     * Идентификатор создателя заказа.
-     */
+    /** Уникальный Идентификатор создателя заказа */
     private long creatorId;
 
-    /**
-     * Идентификатор доставщика заказа. Может быть 0, что значит, что заказ никем не принят.
-     */
+    /** Идентификатор доставщика заказа. Может быть <b>0</b>, что значит, что заказ никем не принят. */
     private long courierId;
     private Date dateCreated;
-
-    /**
-     * Описание заказа
-     */
     private String description;
 
+    /** статус заказа */
+    private String status;
+
     /**
-     * {@link #dateCreated} указывается при создании заказа.
-     * {@link #id} выставляется в 0.
+     * {@link #dateCreated} ставится в null.
+     * {@link #id} заказа выставляется в 0.
      * @param creatorId
      * @param courierId
      * @param description
      */
-    public Order(long creatorId, long courierId, String description) {
+    public Order(long creatorId, long courierId, String description,
+                 String status, Date dateCreated) {
         this.id = 0;
         setCreatorId(creatorId);
         setCourierId(courierId);
         setDescription(description);
-        this.dateCreated = new Date();
+        setStatus(status);
+        this.dateCreated = dateCreated;
     }
 
     /**
-     * Облегченный конструктор. Ведь только эта информация известна при создании заказа.
-     * {@link #dateCreated} указывается при создании заказа.
-     * {@link #id id} выставляется в 0
-     * {@link #courierId} выставляется в 0.
-     * @param creatorId
-     * @param description
+     * Облегченный конструктор. Ведь только эта id создателя известен при создании заказа.
+     * <ul>
+     * <li>{@link #dateCreated} указывается при создании заказа.</li>
+     * <li>{@link #id id} выставляется в -42</li>
+     * <li>{@link #courierId} выставляется в 0.</li>
+     * <li>{@link #description} выставляется в "default description".</li>
+     * <li>{@link #status} выставляется в "updating".</li>
+     * </ul>
+     * @param creatorId идентификатор создателя заказа.
      */
-    public Order(long creatorId, String description) {
-        this.id = 0;
+    public Order(long creatorId) {
+        this.id = -42;
         this.courierId = 0;
+        description = "default description";
         setCreatorId(creatorId);
-        setDescription(description);
+        setStatus("updating");
         this.dateCreated = new Date();
     }
 
@@ -64,8 +63,9 @@ public class Order {
         id = -42;
         creatorId = -42;
         courierId = -42;
-        description = null;
-        dateCreated = null;
+        status = "updating";
+        description = "default description";
+        dateCreated = new Date();
     }
 
     public long getId() {
@@ -81,9 +81,6 @@ public class Order {
     }
 
     public void setCreatorId(long creatorId) throws IllegalArgumentException {
-        if(creatorId <= 0) {
-            throw new IllegalArgumentException("Creator id must be positive.");
-        }
         this.creatorId = creatorId;
     }
 
@@ -92,9 +89,6 @@ public class Order {
     }
 
     public void setCourierId(long courierId) throws IllegalArgumentException {
-        if(id < 0) {
-            throw new IllegalArgumentException("Creator id can't be negative.");
-        }
         this.courierId = courierId;
     }
 
@@ -118,22 +112,33 @@ public class Order {
         if(description == null) {
             throw new IllegalArgumentException("description can't null");
         }
-        /*
-            todo здесь можно сделать валидацию на запрещенные слова.
-         */
+        //todo здесь можно сделать валидацию на запрещенные слова. или выше?
         this.description = description;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) throws IllegalArgumentException {
+        switch (status) {
+            case "updating", "in_process":
+                this.status = status;
+                return;
+        }
+        throw new IllegalArgumentException("Попытка приписать к заказу несуществующий статус.");
     }
 
     @Override
     public String toString() {
-        return "Order(id:%d, creator_id:%d, courier_id:%d, date_created:<%s>, description: \"%s\" )"
+        return "Order(id:%d, creator_id:%d, courier_id:%d, date_created:<%s>, description: \"%s\", status: \"%s\" )"
                 .formatted(
                         id,
                         creatorId,
                         courierId,
                         getDateCreatedToString(),
-                        description
+                        description,
+                        status
                 );
     }
-
 }

@@ -21,52 +21,37 @@ public class UserRepository extends Repository {
 
     /**
      * Сохраняет переданного пользователя в таблицу users базы данных.
-     * @param user пользователь, которого нужно сохранить. Поля {@link User#description description} и
-     * {@link User#name name} должны быть не null.
-     * @return Если успешно - ссылка на переданного пользователя с присвоенным {@link User#id id}.
-     * Если поля передаваемого пользователя некорректны, то {@link User#id id} выставляется в <b>-1</b>.
+     * @param user пользователь, которого нужно сохранить.
+     * @return Если успешно - ссылка на переданного пользователя с присвоенным {@link User#getId()} id}.
      * @throws SQLException
      */
     public User save(User user) throws SQLException {
-        //todo сделать рефактор без try/catch
-        if(user.name == null || user.description == null) {
-            // todo сделать поля пользователя приватными, тогда проверка не будет нужна.
-            user.id = -1;
-            return user;
-        }
-
         String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         String request = """
                 INSERT INTO users (
                 name,
                 description,
                 date_created
-                ) VALUES ("%s", "%s", "%s");""".formatted(user.name, user.description, date);
+                ) VALUES ("%s", "%s", "%s");""".formatted
+                (user.getName(), user.getDescription(), date);
         int response = 0;
-        Statement statement = db.getConnection().createStatement();
-        try {response = statement.executeUpdate(request);}
-        catch (SQLException e) {
-            UserRepository.log.error("Не получилось добавить %s".formatted(user), e);
-            statement.close();
-            throw e;
-        }
+        Statement statement = db.getStatement();
+        response = statement.executeUpdate(request);
         if(response == 0) {
             UserRepository.log.error("Не получилось добавить %s".formatted(user));
             statement.close();
-            throw new SQLException("Something went wrong.");
+            throw new SQLException("Something went wrong. Хотя не должно.");
         }
 
-        ResultSet resultSet;
         request = "SELECT max(id) FROM users;";
-        try {resultSet = statement.executeQuery(request);}
-        catch (SQLException e) {
-            UserRepository.log.error("Не удалось извлечь max id.");
+        ResultSet resultSet = statement.executeQuery(request);
+        if(!resultSet.next()) {
+            UserRepository.log.error("Не получилось назначить id для %s".formatted(user));
+            resultSet.close();
             statement.close();
-            throw e;
+            throw new SQLException("Something went wrong. Хотя не должно.");
         }
-
-        resultSet.next();
-        user.id = resultSet.getLong(1);
+        user.setId(resultSet.getLong(1));
         resultSet.close();
         statement.close();
         UserRepository.log.info("добавлен новый пользователь %s".formatted(user));
@@ -83,24 +68,26 @@ public class UserRepository extends Repository {
         if (id <= 0)
             return null;
         String request = "SELECT name, description FROM users WHERE id = %d;".formatted(id);
-        Statement statement = db.getConnection().createStatement();
+        Statement statement = db.getStatement();
         ResultSet resultSet = statement.executeQuery(request);
-        if (resultSet.next()) {
-            User res = new User(
-                    id,
-                    resultSet.getString("name"),
-                    resultSet.getString("description")
-            );
+        if (!resultSet.next()) {
+            resultSet.close();
             statement.close();
-            return res;
+            return null;
         }
+        User res = new User(
+                id,
+                resultSet.getString("name"),
+                resultSet.getString("description")
+        );
+        resultSet.close();
         statement.close();
-        return null;
+        return res;
     }
 
     /**
      * Удаляет пользователя с переданным идентификатором
-     * @param id идентификатор пользователя (натуральное число)
+     * @param id идентификатор пользователя.
      * @return <b>1</b>, если пользователь успешно удален, иначе <b>0</b>.
      * @throws SQLException
      */
@@ -108,29 +95,38 @@ public class UserRepository extends Repository {
         if(id <= 0)
             return 0;
         String request = "DELETE FROM users WHERE id = %d".formatted(id);
-        Statement statement = db.getConnection().createStatement();
-        int response = statement.executeUpdate(request);
-        if(response == 0) {return 0;}
+        Statement statement = db.getStatement();
+        if(statement.executeUpdate(request) == 0) {
+            statement.close();
+            return 0;
+        }
+        statement.close();
         UserRepository.log.info("пользователь с id = %d удален.".formatted(id));
         return 1;
     }
 
     /**
      * Обновляет пользователя в базе данных.
-     * @param user необходимо, чтобы запись с {@link User#id id} передаваемого пользователя существовала в таблице.
+     * @param user необходимо, чтобы запись с {@link User#getId() id} передаваемого пользователя существовала в таблице.
      * @return 1, если пользователь успешно обновлен. Иначе 0
      * @throws SQLException
      */
     public int updateUser(User user) throws SQLException {
+        if(user.getId() <= 0) {
+            return 0;
+        }
         String request = """
-                UPDATE users SET 
+                UPDATE users SET
                 name = "%s",
                 description = "%s"
                 WHERE id = %d;
-                """.formatted(user.name, user.description, user.id);
-        Statement statement = db.getConnection().createStatement();
-        int response = statement.executeUpdate(request);
-        if(response == 0) {return 0;}
+                """.formatted(user.getName(), user.getDescription(), user.getId());
+        Statement statement = db.getStatement();
+        if(statement.executeUpdate(request) == 0) {
+            statement.close();
+            return 0;
+        }
+        statement.close();
         UserRepository.log.info("Пользователь %s обновлен.".formatted(user));
         return 1;
     }
@@ -142,7 +138,7 @@ public class UserRepository extends Repository {
     public ArrayList<User> getAll() throws SQLException {
         ArrayList<User> ret = new ArrayList<>();
         String request = "SELECT id, name, description FROM users;";
-        Statement statement = db.getConnection().createStatement();
+        Statement statement = db.getStatement();
         ResultSet resultSet = statement.executeQuery(request);
         while(resultSet.next()) {
             ret.add(

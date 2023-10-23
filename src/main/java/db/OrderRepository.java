@@ -10,6 +10,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Класс, отвечающий за работу с таблицей orders базы данных.
@@ -27,16 +28,17 @@ public class OrderRepository extends Repository{
      * Сохраняет переданный заказ в таблицу orders базы данных.
      * @param order заказ, который нужно сохранить.
      *              {@link Order#getCourierId()}  Идентификатор доставщика заказа}
-     *              должен быть 0 или должен существовать пользователь с таким идентификатором.
+     *              должен быть 0 (системный пользователь) или
+     *              должен существовать пользователь с таким идентификатором.
      *              Пользователь с {@link Order#getCreatorId()}  идентификатором создателя} должен
      *              существовать.
      * @return Если успешно,
-     * ссылка на переданный заказ с установленным {@link Order#getId()}  идентификатором заказа},
+     * ссылка на переданный заказ с установленным {@link Order#getId() идентификатором заказа},
      * данным базой данных. Если {@link Order#getCourierId()}  Идентификатор доставщика заказа} некорректен
      * или {@link Order#getCreatorId()}  идентификатором создателя} некорректен, id заказа выставляется
      * в -1.
      */
-    public Order create(Order order) throws SQLException {
+    public Order save(Order order) throws SQLException {
         if(userRepository.getById(order.getCreatorId()) == null) {
             order.setId(-1);
             return order;
@@ -52,15 +54,18 @@ public class OrderRepository extends Repository{
                 creator_id,
                 courier_id,
                 description,
-                date_created
-                ) VALUES (%d, %d, "%s", "%s");"""
+                date_created,
+                status
+                ) VALUES (%d, %d, "%s", "%s", "%s");"""
                 .formatted(
                         order.getCreatorId(),
                         order.getCourierId(),
                         order.getDescription(),
-                        order.getDateCreatedToString()
+                        order.getDateCreatedToString(),
+                        order.getStatus()
                 );
-        Statement statement = db.getConnection().createStatement();
+        System.out.println(request);
+        Statement statement = db.getStatement();
         if(statement.executeUpdate(request) == 0) {
             statement.close();
             throw new SQLException("Something went wrong, хотя не должно");
@@ -79,6 +84,7 @@ public class OrderRepository extends Repository{
     }
 
     /**
+     * Возвращает заказ по его переданному идентификатору.
      * @param orderId
      * @return заказ с переданным идентификатором заказа.
      * Если заказа с таким идентификатором не существует - <b>null</b>.
@@ -95,12 +101,15 @@ public class OrderRepository extends Repository{
                 creator_id,
                 courier_id,
                 date_created,
-                description
+                description,
+                status
                 FROM orders WHERE id = %d;
                 """.formatted(orderId);
-        Statement statement = db.getConnection().createStatement();
+        Statement statement = db.getStatement();
         ResultSet resultSet = statement.executeQuery(request);
         if(!resultSet.next()) {
+            resultSet.close();
+            statement.close();
             return null;
         }
         Order order = new Order();
@@ -110,6 +119,7 @@ public class OrderRepository extends Repository{
         order.setDescription(resultSet.getString("description"));
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd H:m:s.S");
         order.setDateCreated(formatter.parse(resultSet.getString("date_created")));
+        order.setStatus(resultSet.getString("status"));
         resultSet.close();
         statement.close();
         return order;
@@ -117,63 +127,67 @@ public class OrderRepository extends Repository{
 
     /**
      * Обновляет существующий заказ.
-     * @param order заказ, который нужно сохранить.
+     * @param order заказ, который нужно сохранить. Должен существовать.
      *              {@link Order#getCourierId()}  Идентификатор доставщика заказа}
      *              должен быть 0 или должен существовать пользователь с таким идентификатором.
      *              Пользователь с {@link Order#getCreatorId()}  идентификатором создателя} должен
      *              существовать.
-     * @param orderId идентификатор заказа (//todo нужно ли его передавать в самом Order)
-     * @return <b>1</b>, если успешно обновлен заказ. Иначе 0.
+     * @return <b>1</b>, если успешно обновлен заказ.
+     * -1, если заказ с заданным идентификатором не существует.
+     * 0, если идентификаторы создателя или доставщика некорректны.
      */
-    public int updateOrderWithId(long orderId, Order order) throws SQLException {
+    public int updateWithId(Order order) throws SQLException, ParseException {
+        if(getById(order.getId()) == null) {
+            return -1;
+        }
         if(userRepository.getById(order.getCreatorId()) == null) {
             return 0;
         }
-
         if(order.getCourierId() != 0 && userRepository.getById(order.getCourierId()) == null) {
             return 0;
         }
-
         String request = """
                         UPDATE orders SET
                         creator_id = %d,
                         courier_id = %d,
                         date_created = "%s",
-                        description = "%s"
-                        WHERE id = %d"""
+                        description = "%s",
+                        status = "%s"
+                        WHERE id = %d;"""
                 .formatted(
                         order.getCreatorId(),
                         order.getCourierId(),
                         order.getDateCreatedToString(),
                         order.getDescription(),
-                        orderId
+                        order.getStatus(),
+                        order.getId()
                 );
 
-        Statement statement = db.getConnection().createStatement();
+        Statement statement = db.getStatement();
         if(statement.executeUpdate(request) == 0) {
+            statement.close();
             throw new SQLException("Something went wrong, хотя не должно");
         }
         statement.close();
-        OrderRepository.log.info("Заказ с id = %d изменен на %s".formatted(orderId, order));
+        OrderRepository.log.info("Заказ с id = %d изменен на %s".formatted(order.getId(), order));
         return 1;
     }
 
     /**
-     * // todo вместо удаления сделать столбец, что заказ отменен.
-     * удаляет заказ с переданным идентификатором.
+     * удаляет заказ с переданным идентификатором из таблицы orders.
      * @param orderId
      * @return 1, если заказ был удален. Иначе 0.
      * @throws SQLException
      */
-    public int cancelOrder(long orderId) throws SQLException {
+    public int delete(long orderId) throws SQLException {
         if(orderId <= 0) {
             return 0;
         }
         String request = "DELETE FROM orders WHERE id = %d;".formatted(orderId);
-        Statement statement = db.getConnection().createStatement();
+        Statement statement = db.getStatement();
         if(statement.executeUpdate(request) == 0) {
             statement.close();
-            return 0;
+            throw new SQLException("Something went wrong, хотя не должно");
         }
         statement.close();
         OrderRepository.log.info("Заказ с id = %d удален".formatted(orderId));
@@ -181,15 +195,15 @@ public class OrderRepository extends Repository{
     }
 
     /**
-     * Возвращает все заказы
+     * Возвращает список всех заказов.
      * @return
      * @throws SQLException
      * @throws ParseException
      */
-    public ArrayList<Order> getAll() throws SQLException, ParseException {
+    public List<Order> getAll() throws SQLException, ParseException {
         String request = "SELECT * FROM orders;";
-        ArrayList<Order> ret= new ArrayList<>();
-        Statement statement = db.getConnection().createStatement();
+        List<Order> ret= new ArrayList<>();
+        Statement statement = db.getStatement();
         ResultSet resultSet = statement.executeQuery(request);
         while (resultSet.next()) {
             Order order = new Order();
@@ -199,8 +213,7 @@ public class OrderRepository extends Repository{
             order.setDescription(resultSet.getString("description"));
             order.setDateCreated(new SimpleDateFormat("yyyy-MM-dd H:m:s.S")
                     .parse(resultSet.getString("date_created")));
-
-
+            order.setStatus(resultSet.getString("status"));
             ret.add(order);
         }
         resultSet.close();
