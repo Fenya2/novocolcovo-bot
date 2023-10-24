@@ -1,10 +1,6 @@
 {
   "name": "novocolcovoBot",
-<<<<<<< HEAD
-  "token":"token",
-=======
   "token":"your token here",
->>>>>>> task2
   "link": "https://t.me/test12763812_bot",
   "platform": "telegram"
 }

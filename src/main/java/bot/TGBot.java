@@ -6,6 +6,7 @@ import core.TextHandler;
 import db.UserRepository;
 import models.Message;
 import models.User;
+import org.apache.log4j.Logger;
 import org.sqlite.core.DB;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -19,6 +20,7 @@ import java.sql.SQLException;
  * Класс для связи с telegram через бота. .
  */
 public class TGBot extends TelegramLongPollingBot implements Bot {
+    private static final Logger log = Logger.getLogger(TGBot.class.getName());
     /**
      * Конфигурации для работы с ботом
      */
@@ -46,27 +48,31 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
     @Override
     public void onUpdateReceived(Update update) {
         if(update.hasMessage()) {
-            try {
-                String text = update.getMessage().getText();
-                String id = update.getMessage().getChatId().toString();
-
-                Message message = new Message();
-                message.setText(text);
-                message.setPlatform(botConfig.getPlatform());
-                message.setUserIdOnPlatform(id);
-
-                String msg = messageHandler.handle(message);
-
-                SendMessage sendMes = new SendMessage();
-                sendMes.setText(msg);
-                sendMes.setChatId(id);
-                execute(sendMes);
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
+            if(update.getMessage().hasText()) {
+                Message message = new Message(update.getMessage());
+                String text = messageHandler.handle(message);
+                sendTextMessage(String.valueOf(update.getMessage().getChatId()), text);
             }
+            else {
+               sendTextMessage(update.getMessage().getChatId().toString(),
+                       "Сейчас бот работает только с текстом.");
+            }
+        } else {
+            // todo обработка другого рода обновлений.
         }
     }
     @Override
-    public void sendTextMessage(long recipient_id, String text) {
+    public void sendTextMessage(String chatId, String text) {
+        SendMessage sendMessage = SendMessage.builder()
+                .text(text)
+                .chatId(chatId)
+                .build();
+
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            log.warn("can't send message with text %s to telegram user with id \"%s\""
+                    .formatted(text, chatId));
+        }
     }
 }
