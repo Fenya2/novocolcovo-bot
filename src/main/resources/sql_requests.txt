@@ -1,0 +1,44 @@
+CREATE TABLE users
+(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT NOT NULL,
+	description TEXT NOT NULL DEFAULT "average novocolcovo enjoyer description",
+	date_created DATE NOT NULL
+);
+
+CREATE TABLE logged_users(
+	user_id INTEGER,
+	platform TEXT NOT NULL,
+	id_on_platform TEXT NOT NULL,
+	login_date DATE NOT NULL,
+	FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE user_contexts(
+	user_id INTEGER,
+	state TEXT NOT NULL,
+	state_num INTEGER NOT NULL,
+	FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE orders(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	creator_id INTEGER NOT NULL,
+	courier_id INTEGER NOT NULL,
+	date_created TEXT NOT NULL,
+	description TEXT NOT NULL,
+	status TEXT NOT NULL,
+	FOREIGN KEY (creator_id) REFERENCES users(id)
+	FOREIGN KEY (courier_id) REFERENCES users(id)
+);
+
+
+// Основные действия с таблицей пользователей.
+INSERT INTO users (name, description, date_created) VALUES ("John Doe", "Wake up!", "ГГГГ-ММ-ДД");
+
+SELECT name, description FROM users WHERE id = 1;
+
+DELETE FROM users WHERE id = 11 LIMIT 1;
+
+UPDATE users SET name = "Артур" WHERE id = 2;
+
