@@ -31,7 +31,7 @@ public class Main {
 
         OrderService os = new OrderService(uc, or);
 
-        CommandHandler cm = new CommandHandler(ur,lg, uc, or, os);
+        CommandHandler cm = new CommandHandler(ur,lg, uc, os);
         TextHandler th = new TextHandler(lg, uc, os);
         MessageHandler mh = new MessageHandler(cm, uc, lg, th);
 

@@ -22,13 +22,11 @@ public class CommandHandler {
      */
     private final LoggedUsersRepository loggedUsersRepository;
     private final UserContextRepository userContextRepository;
-    private final OrderRepository orderRepository;
     private final OrderService orderService;
-    public CommandHandler(UserRepository userRepository, LoggedUsersRepository loggedUsersRepository, UserContextRepository userContextRepository, OrderRepository orderRepository, OrderService orderService){
+    public CommandHandler(UserRepository userRepository, LoggedUsersRepository loggedUsersRepository, UserContextRepository userContextRepository, OrderService orderService){
         this.userRepository = userRepository;
         this.loggedUsersRepository = loggedUsersRepository;
         this.userContextRepository = userContextRepository;
-        this.orderRepository = orderRepository;
         this.orderService = orderService;
     }
 
@@ -50,7 +48,8 @@ public class CommandHandler {
                 case "/start" -> {return start(msg);}
             }
 
-            User user = loggedUsersRepository.getUserByPlatformAndIdOnPlatform(msg.getPlatform(), msg.getUserIdOnPlatform());
+            User user = loggedUsersRepository.getUserByPlatformAndIdOnPlatform(msg.getPlatform(),
+                    msg.getUserIdOnPlatform());
             if (user == null)
                 return "Напишите /start";
 
