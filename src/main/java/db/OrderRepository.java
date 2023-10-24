@@ -64,7 +64,6 @@ public class OrderRepository extends Repository{
                         order.getDateCreatedToString(),
                         order.getStatus()
                 );
-        System.out.println(request);
         Statement statement = db.getStatement();
         if(statement.executeUpdate(request) == 0) {
             statement.close();
@@ -200,9 +199,9 @@ public class OrderRepository extends Repository{
      * @throws SQLException
      * @throws ParseException
      */
-    public List<Order> getAll() throws SQLException, ParseException {
+    public ArrayList<Order> getAll() throws SQLException, ParseException {
         String request = "SELECT * FROM orders;";
-        List<Order> ret= new ArrayList<>();
+        ArrayList<Order> ret= new ArrayList<>();
         Statement statement = db.getStatement();
         ResultSet resultSet = statement.executeQuery(request);
         while (resultSet.next()) {
@@ -219,5 +218,37 @@ public class OrderRepository extends Repository{
         resultSet.close();
         statement.close();
         return ret;
+    }
+
+    /**
+     * У одного пользователя может изменятся только один заказ, а значит можно
+     * @param idUser по пользователю
+     * @param status и статусу заказа
+     * @return вернуть заказ
+     */
+    public Order getOrderByIdUserAndStatus(long idUser, String status) throws SQLException, ParseException {
+        ArrayList<Order> listAllOrders = getAll();
+        for(Order s: listAllOrders){
+            if (s.getCreatorId() == idUser && s.getStatus().equals(status))
+                return s;
+        }
+        return null;
+    }
+
+    /**
+     * Обновляет статус у заказа на новый
+     * @return вовзращает 1 при удачно обновлении и 0 иначе
+     */
+    public int updateOrderStatus(long idOrder,String status) throws SQLException, ParseException {
+        ArrayList<Order> listAllOrders = getAll();
+        for(Order s: listAllOrders){
+            if (s.getId() == idOrder){
+                Order orderNew = new Order(s);
+                orderNew.setStatus(status);
+                updateWithId(orderNew);
+                return 1;
+            }
+        }
+        return 0;
     }
 }

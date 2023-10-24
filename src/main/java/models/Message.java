@@ -1,8 +1,15 @@
 package models;
 
 public class Message {
+    private String userIdOnPlatform;
     private String text;
-    private User user;
+    private String platform;
+
+    public Message() {
+        this.text = "";
+        this.platform = "";
+        this.userIdOnPlatform = "";
+    }
 
     public String getText() {
         return text;
@@ -12,11 +19,19 @@ public class Message {
         this.text = text;
     }
 
-    public User getUser() {
-        return user;
+    public String getPlatform() {
+        return platform;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
+
+    public String getUserIdOnPlatform() {
+        return userIdOnPlatform;
+    }
+
+    public void setUserIdOnPlatform(String userIdOnPlatform) {
+        this.userIdOnPlatform = userIdOnPlatform;
     }
 }

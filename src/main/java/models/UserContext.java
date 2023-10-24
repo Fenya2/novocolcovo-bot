@@ -46,7 +46,11 @@ public class UserContext {
     public void setState(String state) throws IllegalArgumentException{
         //todo возможно тут нужен enum?
         switch (state) {
-            case "alcohol_intoxication":
+            case "create_order",
+                    "change_username",
+                    "alcohol_intoxication",
+                    "update_order",
+                    "cancel_order":
                 this.state = state;
                 return;
         }

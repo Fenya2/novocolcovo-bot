@@ -5,6 +5,6 @@ logs
 testing_novocolcovo.sqlite
 testing_novocolcovo.sqlite-journal
 novocolcovo.sqlite
-novocolcovo.sqlite-journal
 
+novocolcovo.sqlite-journal
 src/main/resources/sql_requests.txt

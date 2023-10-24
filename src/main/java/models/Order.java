@@ -38,7 +38,6 @@ public class Order {
         setStatus(status);
         this.dateCreated = dateCreated;
     }
-
     /**
      * Облегченный конструктор. Ведь только эта id создателя известен при создании заказа.
      * <ul>
@@ -55,15 +54,27 @@ public class Order {
         this.courierId = 0;
         description = "default description";
         setCreatorId(creatorId);
-        setStatus("updating");
+        setStatus("pending");
         this.dateCreated = new Date();
+    }
+
+    /**
+     * Конструктор копирования
+     */
+    public Order(Order order) {
+        this.id = order.id;
+        this.courierId = order.courierId;
+        setCreatorId(order.creatorId);
+        setDescription(order.description);
+        setStatus(order.status);
+        this.dateCreated = order.dateCreated;
     }
 
     public Order() {
         id = -42;
         creatorId = -42;
         courierId = -42;
-        status = "updating";
+        status = "pending";
         description = "default description";
         dateCreated = new Date();
     }
@@ -107,9 +118,8 @@ public class Order {
     public String getDescription() {
         return description;
     }
-
-    public void setDescription(String description) throws  IllegalArgumentException{
-        if(description == null) {
+    public void setDescription(String description) throws IllegalArgumentException {
+        if (description == null) {
             throw new IllegalArgumentException("description can't null");
         }
         //todo здесь можно сделать валидацию на запрещенные слова. или выше?
@@ -122,7 +132,7 @@ public class Order {
 
     public void setStatus(String status) throws IllegalArgumentException {
         switch (status) {
-            case "updating", "in_process":
+            case "pending", "updating", "in_process":
                 this.status = status;
                 return;
         }
