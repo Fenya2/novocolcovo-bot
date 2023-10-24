@@ -118,7 +118,6 @@ public class Order {
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) throws IllegalArgumentException {
         if (description == null) {
             throw new IllegalArgumentException("description can't null");
