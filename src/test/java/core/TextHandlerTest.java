@@ -32,26 +32,32 @@ class TextHandlerTest {
     @Mock
     private UserContextRepository userContextRepository;
 
+    /**
+     * Проыеряет случай когда пользователь не найден(=null)
+     */
     @Test
     void handleUserNull() throws SQLException {
         Message msg = new Message();
         Mockito.when(
                 loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
-                        msg.getPlatform(),
-                        msg.getUserIdOnPlatform())
+                        Mockito.any(),
+                        Mockito.any())
         ).thenReturn(null);
         String handel = textHandler.handle(msg);
         Assertions.assertEquals("напишите /start", handel);
     }
 
+    /**
+     * Проверяет случай когда у найденного пользователя нету контекста
+     */
     @Test
     void handleUserContextNull() throws SQLException {
         Message msg = new Message();
         User user = new User();
         Mockito.when(
                 loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
-                        msg.getPlatform(),
-                        msg.getUserIdOnPlatform())
+                        Mockito.any(),
+                        Mockito.any())
         ).thenReturn(user);
         Mockito.when(
                 userContextRepository.getUserContext(user.getId())
@@ -60,15 +66,19 @@ class TextHandlerTest {
         Assertions.assertEquals("я вас не понимаю", handel);
     }
 
+    /**
+     * Проверяет случай когда контекст пользователя не null и равен
+     * "create_order","edit_order","cancel_order"
+     */
     @Test
-    void handleCreateUpdateCancelOrder() throws SQLException {
+    void handleCreateEditCancelOrder() throws SQLException {
         Message msg = new Message();
         User user = new User();
         UserContext userContext = new UserContext("create_order");
         Mockito.when(
                 loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
-                        msg.getPlatform(),
-                        msg.getUserIdOnPlatform())
+                        Mockito.any(),
+                        Mockito.any())
         ).thenReturn(user);
 
         Mockito.when(
@@ -81,26 +91,18 @@ class TextHandlerTest {
         String handel1 = textHandler.handle(msg);
         Assertions.assertEquals("Отработал continueCreateOrder", handel1);
 
-        userContext.setState("update_order");
+        userContext.setState("edit_order");
         Mockito.when(
-                orderService.continueUpdateOrder(user.getId(),msg.getText())
-        ).thenReturn("Отработал continueUpdateOrder");
+                orderService.continueEditOrder(user.getId(),msg.getText())
+        ).thenReturn("Отработал continueEditOrder");
         String handel2 = textHandler.handle(msg);
-        Assertions.assertEquals("Отработал continueUpdateOrder", handel2);
+        Assertions.assertEquals("Отработал continueEditOrder", handel2);
 
         userContext.setState("cancel_order");
         Mockito.when(
-                orderService.continueСancelOrder(user.getId(),msg.getText())
+                orderService.continueCancelOrder(user.getId(),msg.getText())
         ).thenReturn("Отработал continueCancelOrder");
         String handel3 = textHandler.handle(msg);
         Assertions.assertEquals("Отработал continueCancelOrder", handel3);
-
-        userContext.setState("change_username");
-        Mockito.when(
-                userContextRepository.getUserContext(user.getId())
-        ).thenReturn(userContext);
-        String handel4 = textHandler.handle(msg);
-        Assertions.assertEquals("Извините, я вас не понял. Вызовите команду /help", handel4);
-
     }
 }

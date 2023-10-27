@@ -21,6 +21,9 @@ class MessageHandlerTest {
     @Mock
     private CommandHandler commandHandler;
 
+    /**
+     * проверяет правильность обработки команд
+     */
     @Test
     void handleText() {
         Message msg = new Message();

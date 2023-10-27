@@ -32,51 +32,68 @@ class CommandHandlerTest {
     @Mock
     private UserContextRepository userContextRepository;
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
+    /**
+     * Проверяет случай когда пользователь вводит команду /help
+     */
     @Test
     void handleHelp() {
         Message msg = new Message();
         msg.setText("/help");
         Assertions.assertEquals(commandHandler.handle(msg), """
                 /create_order - создать заказ
-                /update_order - изменить заказ
+                /edit_order - изменить заказ
                 /cancel_order - удалить заказ
-                /view_list_order - посмотреть список заказов
+                /show_order - посмотреть список заказов
                 """);
     }
 
+    /**
+     * Проверяет случай когда пользователь вводит команду /start
+     */
     @Test
     void handleStart() throws SQLException {
         Message msg = new Message();
         msg.setText("/start");
-        String platform = msg.getPlatform();
-        String userIdOnPlatform = msg.getUserIdOnPlatform();
-        Mockito.when(loggedUsersRepository.getUserByPlatformAndIdOnPlatform(platform, userIdOnPlatform))
+        Mockito.when(loggedUsersRepository.getUserByPlatformAndIdOnPlatform(Mockito.any(),Mockito.any()))
+                .thenReturn(null);
+        Mockito.when(userRepository.save(Mockito.any()))
+                        .thenReturn(new User());
+        Assertions.assertEquals(commandHandler.start(msg), "Привет. Напишите /help");
+
+        Mockito.when(loggedUsersRepository.getUserByPlatformAndIdOnPlatform(Mockito.any(),Mockito.any()))
                 .thenReturn(new User());
         Assertions.assertEquals(commandHandler.start(msg), "Привет. Напишите /help");
     }
 
+    /**
+     * Проверяет случай когда команда не /start и не /help<br>
+     * и пользователь не найден
+     */
     @Test
     void handleUserNull() throws SQLException {
         Message msg = new Message();
         Mockito.when(
                 loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
-                        msg.getPlatform(),
-                        msg.getUserIdOnPlatform())
+                        Mockito.any(),Mockito.any())
         ).thenReturn(null);
         String handel = commandHandler.handle(msg);
         Assertions.assertEquals("Напишите /start", handel);
     }
 
+    /**
+     * Проверяет случай когда команда не /start и не /help <br>
+     * и у найденного пользователя есть контекст
+     */
     @Test
     void handleUserContextNotNull() throws SQLException {
         Message msg = new Message();
         User user = new User();
         Mockito.when(
                 loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
-                        msg.getPlatform(),
-                        msg.getUserIdOnPlatform())
+                        Mockito.any(),
+                        Mockito.any())
         ).thenReturn(user);
         Mockito.when(
                 userContextRepository.getUserContext(user.getId())
@@ -85,8 +102,12 @@ class CommandHandlerTest {
         Assertions.assertEquals("Сейчас команды не доступны", handel);
     }
 
+    /**
+     * Проверяет случай когда команда не /start и не /help <br>
+     * у найденного пользователя нету контекста<br>
+     */
     @Test
-    void handleCreateUpdateCancelViewOrder() throws SQLException {
+    void handleCreateEditCancelShowOrder() throws SQLException {
         Message msg = new Message();
         User user = new User();
         Mockito.when(
@@ -105,28 +126,28 @@ class CommandHandlerTest {
         String handel1 = commandHandler.handle(msg);
         Assertions.assertEquals("Отработал startCreateOrder", handel1);
 
-        msg.setText("/update_order");
+        msg.setText("/edit_order");
         Mockito.when(
-                orderService.startUpdateOrder(user.getId())
-        ).thenReturn("Отработал startUpdateOrder");
+                orderService.startEditOrder(user.getId())
+        ).thenReturn("Отработал startEditOrder");
         String handel2 = commandHandler.handle(msg);
-        Assertions.assertEquals("Отработал startUpdateOrder", handel2);
+        Assertions.assertEquals("Отработал startEditOrder", handel2);
 
         msg.setText("/cancel_order");
         Mockito.when(
-                orderService.startСancelOrder(user.getId())
+                orderService.startCancelOrder(user.getId())
         ).thenReturn("Отработал startCancelOrder");
         String handel3 = commandHandler.handle(msg);
         Assertions.assertEquals("Отработал startCancelOrder", handel3);
 
-        msg.setText("/view_list_order");
+        msg.setText("/show_order");
         Mockito.when(
-                orderService.viewListOrder(user.getId())
-        ).thenReturn("Отработал viewLisrOrder");
+                orderService.showOrder(user.getId())
+        ).thenReturn("Отработал showOrder");
         String handel4 = commandHandler.handle(msg);
-        Assertions.assertEquals("Отработал viewLisrOrder", handel4);
+        Assertions.assertEquals("Отработал showOrder", handel4);
 
-        msg.setText("rand");
+        msg.setText("/rand");
         String handel = commandHandler.handle(msg);
         Assertions.assertEquals("Извините я вас не понимаю. Напишите /help.", handel);
 

@@ -1,5 +1,5 @@
 {
   "name":"novocolcovo_db",
   "db_location":"your token here",
-  "db_connection":"jdbc:sqlite:testing_novocolcovo.sqlite"
+  "db_connection":"jdbc:sqlite:novocolcovo.sqlite"
 }

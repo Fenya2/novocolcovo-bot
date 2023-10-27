@@ -11,13 +11,27 @@ import java.sql.SQLException;
 
 
 public class TextHandler {
+
     /**
-     * сервис для проверки контекста
+     * репозиторий для опознания пользователя в системе
      */
     private final LoggedUsersRepository loggedUsersRepository;
+
+    /**
+     * репозиторий для работы с таблицей контекста пользоваталей
+     */
     private final UserContextRepository userContextRepository;
 
+    /**
+     * сервис для работы с заказами
+     */
     private final OrderService orderService;
+
+    /**
+     * @param loggedUsersRepository репозиторий для опознания пользователя в системе
+     * @param userContextRepository репозиторий для работы с таблицей контекста пользоваталей
+     * @param orderService сервис для работы с заказами
+     */
     public TextHandler( LoggedUsersRepository loggedUsersRepository, UserContextRepository userContextRepository, OrderService orderService) {
         this.loggedUsersRepository = loggedUsersRepository;
         this.userContextRepository = userContextRepository;
@@ -29,7 +43,6 @@ public class TextHandler {
      * у сообщения
      * @param msg
      * @return возвращает работу работу сервиса связанного с контекстом
-     * или в случае его отсутствия соответствующее сообщение
      */
     public String handle(Message msg) {
         try {
@@ -46,13 +59,13 @@ public class TextHandler {
 
             switch(userContext.getState()) {
                 case "create_order" ->{return orderService.continueCreateOrder(userWithId.getId(), msg.getText());}
-                case "update_order" ->{return orderService.continueUpdateOrder(userWithId.getId(), msg.getText());}
-                case "cancel_order" ->{return orderService.continueСancelOrder(userWithId.getId(), msg.getText());}
-                default -> {return "Извините, я вас не понял. Вызовите команду /help";}
+                case "edit_order" ->{return orderService.continueEditOrder(userWithId.getId(), msg.getText());}
+                case "cancel_order" ->{return orderService.continueCancelOrder(userWithId.getId(), msg.getText());}
             }
         }
         catch (SQLException e) {
-            return "Пользователь не найден";
+            return " Пользователь не найден";
         }
+        return null;
     }
 }

@@ -22,7 +22,12 @@ public class MessageHandler {
      * обработчик текста
      */
     private final TextHandler textHandler;
-    public MessageHandler(CommandHandler commandHandler, UserContextRepository userContextRepository, LoggedUsersRepository loggedUsersRepository, TextHandler textHandler){
+
+    /**
+     * @param commandHandler обработчик команд
+     * @param textHandler обработчик текста
+     */
+    public MessageHandler(CommandHandler commandHandler, TextHandler textHandler){
         this.commandHandler = commandHandler;
         this.textHandler = textHandler;
     }
@@ -30,7 +35,6 @@ public class MessageHandler {
     /**
      * метод определяет сообщение как команду или как текст
      * и отправляет в соответствующий обработчик
-     * @param msg
      * @return String, текст который сформирует соответствующий обработчик
      */
     public String handle(Message msg){
