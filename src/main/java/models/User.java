@@ -40,6 +40,9 @@ public class User {
         return name;
     }
 
+    /**
+        есть проверка на null
+     */
     public void setName(String name) throws IllegalArgumentException {
         if(name == null)
             throw new IllegalArgumentException();
@@ -50,6 +53,9 @@ public class User {
         return description;
     }
 
+    /**
+     есть проверка на null
+     */
     public void setDescription(String description) throws IllegalArgumentException {
         if(description == null)
             throw new IllegalArgumentException();

@@ -1,6 +1,6 @@
 {
   "name": "novocolcovoBot",
-  "token":"your token here",
+  "token":"token",
   "link": "https://t.me/test12763812_bot",
   "platform": "telegram"
 }

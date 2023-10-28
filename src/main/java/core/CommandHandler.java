@@ -2,7 +2,6 @@ package core;
 
 import core.service.OrderService;
 import db.LoggedUsersRepository;
-import db.OrderRepository;
 import db.UserContextRepository;
 import db.UserRepository;
 import models.Message;
@@ -21,8 +20,21 @@ public class CommandHandler {
      * содержащит информацию о платформе, id  в этой платформе и id в системе
      */
     private final LoggedUsersRepository loggedUsersRepository;
+    /**
+     * Содержит информацио о контексте пользователя
+     */
     private final UserContextRepository userContextRepository;
+    /**
+     * Содержит информацию о заказах
+     */
     private final OrderService orderService;
+
+    /**
+     * @param userRepository содержит информацию о пользователях.
+     * @param loggedUsersRepository Позволяет опознать пользователя в системе
+     * @param userContextRepository Содержит информацио о контексте пользователя
+     * @param orderService Содержит информацию о заказах
+     */
     public CommandHandler(UserRepository userRepository, LoggedUsersRepository loggedUsersRepository, UserContextRepository userContextRepository, OrderService orderService){
         this.userRepository = userRepository;
         this.loggedUsersRepository = loggedUsersRepository;
@@ -41,9 +53,9 @@ public class CommandHandler {
             switch (text) {
                 case "/help" -> {return """
                         /create_order - создать заказ
-                        /update_order - изменить заказ
+                        /edit_order - изменить заказ
                         /cancel_order - удалить заказ
-                        /view_list_order - посмотреть список заказов
+                        /show_order - посмотреть список заказов
                         """;}
                 case "/start" -> {return start(msg);}
             }
@@ -59,9 +71,9 @@ public class CommandHandler {
             long idUser = user.getId();
             switch (text){
                 case "/create_order" -> {return orderService.startCreateOrder(idUser);}
-                case "/update_order" -> {return orderService.startUpdateOrder(idUser);}
-                case "/cancel_order" -> {return orderService.startСancelOrder(idUser);}
-                case "/view_list_order" -> {return orderService.viewListOrder(idUser);}
+                case "/edit_order" -> {return orderService.startEditOrder(idUser);}
+                case "/cancel_order" -> {return orderService.startCancelOrder(idUser);}
+                case "/show_order" -> {return orderService.showOrder(idUser);}
                 default -> {return "Извините я вас не понимаю. Напишите /help.";}
             }
         } catch (SQLException e){

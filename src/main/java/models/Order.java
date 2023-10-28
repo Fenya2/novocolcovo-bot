@@ -118,6 +118,10 @@ public class Order {
     public String getDescription() {
         return description;
     }
+
+    /**
+        в сетере есть проверка на null
+     */
     public void setDescription(String description) throws IllegalArgumentException {
         if (description == null) {
             throw new IllegalArgumentException("description can't null");
@@ -130,6 +134,9 @@ public class Order {
         return status;
     }
 
+    /**
+        в сетере есть проверка на допустимое значение status
+     */
     public void setStatus(String status) throws IllegalArgumentException {
         switch (status) {
             case "pending", "updating", "in_process":

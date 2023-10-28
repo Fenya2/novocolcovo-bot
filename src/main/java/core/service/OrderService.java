@@ -3,7 +3,6 @@ package core.service;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
-import models.User;
 import models.UserContext;
 
 import java.sql.SQLException;
@@ -14,9 +13,20 @@ import java.util.ArrayList;
  * Сервис заказов
  */
 public class OrderService {
+    /**
+     * Для работы с таблицей контекстов пользователя
+     */
     private final UserContextRepository userContextRepository;
+    /**
+     * Для работы с таблицей заказов
+     */
     private final OrderRepository orderRepository;
 
+    /**
+     * Кон
+     * @param userContextRepository Для работы с таблицей контекстов пользователя
+     * @param orderRepository Для работы с таблицей заказов
+     */
     public OrderService(UserContextRepository userContextRepository, OrderRepository orderRepository) {
         this.userContextRepository = userContextRepository;
         this.orderRepository = orderRepository;
@@ -76,7 +86,7 @@ public class OrderService {
      * @param idUser order
      * @return Выводит список всех заказов пользователя, что бы пользователь мог выбрать какой заказ обновить
      */
-    public String startUpdateOrder(long idUser) {
+    public String startEditOrder(long idUser) {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();
@@ -87,8 +97,8 @@ public class OrderService {
             }
             if (allOrderUser.isEmpty())
                 return "у вас нет ни одного заказа";
-
-            UserContext userContext = new UserContext("update_order", 0);
+            //TODO
+            UserContext userContext = new UserContext("edit_order", 0);
             userContextRepository.saveUserContext(idUser, userContext);
             return "Какой заказ вы хотите обновить.?\n"
                     .concat(allOrderUser.toString());
@@ -101,7 +111,7 @@ public class OrderService {
      * Продолжение обновления. Диалог с пользователем<br>
      * <p>
      * 1) получает от пользователя text = idOrder по нему смотрим есть ли такие заказы и если есть
-     * обновляем статус заказа до update
+     * обновляем статус заказа до edit
      * <p>
      * 2) получает от пользователя text = список продуктов. Получаем заказ по idUser и status
      * Создаем новый заказ и меняем в нем описание. Обнвовляем заказ в бд.
@@ -113,7 +123,7 @@ public class OrderService {
      * @return 1)выводим сообщение с просьбой ввести данные <br>
      * 2)выводим сообщение об окончании изменения заказа
      */
-    public String continueUpdateOrder(long idUser, String text) {
+    public String continueEditOrder(long idUser, String text) {
         try {
             UserContext userContext = userContextRepository.getUserContext(idUser);
             switch (userContext.getState_num()) {
@@ -160,7 +170,7 @@ public class OrderService {
      * @param idUser long
      * @return Выводит список всех заказов пользователя, что бы пользователь мог выбрать какой заказ удалить
      */
-    public String startСancelOrder(long idUser) {
+    public String startCancelOrder(long idUser) {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();
@@ -191,7 +201,7 @@ public class OrderService {
      * @param text   string
      * @return сообщение об успешном удалении заказа
      */
-    public String continueСancelOrder(long idUser, String text) {
+    public String continueCancelOrder(long idUser, String text) {
         try {
             UserContext userContext = userContextRepository.getUserContext(idUser);
             if (userContext.getState_num() == 0) {
@@ -223,7 +233,7 @@ public class OrderService {
      * @param idUser long
      * @return Возвращает список все заказов пользователя с их описанием
      */
-    public String viewListOrder(long idUser) {
+    public String showOrder(long idUser) {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();

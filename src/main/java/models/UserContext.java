@@ -36,20 +36,15 @@ public class UserContext {
     }
 
     /**
-     * Доступные state:
-     * <ol>
-     *  <li><i>alcohol_intoxication</i></li>
-     * </ol>
-     * @param state
-     * @throws IllegalArgumentException
+        есть проверка на допустимые состояния
      */
     public void setState(String state) throws IllegalArgumentException{
         //todo возможно тут нужен enum?
         switch (state) {
             case "create_order",
-                    "change_username",
-                    "alcohol_intoxication",
-                    "update_order",
+//                    "change_username",
+//                    "alcohol_intoxication",
+                    "edit_order",
                     "cancel_order":
                 this.state = state;
                 return;
@@ -57,6 +52,9 @@ public class UserContext {
         throw new IllegalArgumentException("Try to make state, that not exist");
     }
 
+    /**
+     * есть проверка на 0
+     */
     public void setStateNum(int stateNum) {
         if(stateNum < 0) {
             throw new IllegalArgumentException("Try to set negative state_num.");

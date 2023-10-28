@@ -33,7 +33,7 @@ public class Main {
 
         CommandHandler cm = new CommandHandler(ur,lg, uc, os);
         TextHandler th = new TextHandler(lg, uc, os);
-        MessageHandler mh = new MessageHandler(cm, uc, lg, th);
+        MessageHandler mh = new MessageHandler(cm, th);
 
         TGBotConfig tgBotConfig = new TGBotConfig("src/main/resources/config/TGBotConfig.json");
 
