@@ -9,23 +9,16 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
-/**
- * Сервис заказов
- */
+/** Сервис заказов */
 public class OrderService {
-    /**
-     * Для работы с таблицей контекстов пользователя
-     */
+    /** Для работы с таблицей контекстов пользователя. */
     private final UserContextRepository userContextRepository;
-    /**
-     * Для работы с таблицей заказов
-     */
+    /** Для работы с таблицей заказов. */
     private final OrderRepository orderRepository;
 
     /**
-     * Кон
-     * @param userContextRepository Для работы с таблицей контекстов пользователя
-     * @param orderRepository Для работы с таблицей заказов
+     * @param userContextRepository Для работы с таблицей контекстов пользователя.
+     * @param orderRepository Для работы с таблицей заказов.
      */
     public OrderService(UserContextRepository userContextRepository, OrderRepository orderRepository) {
         this.userContextRepository = userContextRepository;
@@ -33,12 +26,13 @@ public class OrderService {
     }
 
     /**
-     * Начало создание заказа. <br>
+     * Начало создания заказа. <br>
      * Создает заказ и добавляет в таблицу order, обновляет статус у заказа
-     * и добавляет контекст в таблицу userContext
+     * и добавляет контекст в таблицу userContext.
      *
-     * @param idUser long
-     * @return возвращает сообщение для дальнейшего создания заказа
+     * @param idUser идентификатор пользователя.
+     * @return Сообщение для дальнейшего создания заказа.
+     * todo может число, либо true False. А обработчик сгенерирует сообщение по ответу сервиса?
      */
     public String startCreateOrder(long idUser) {
         try {
@@ -54,7 +48,7 @@ public class OrderService {
 
     /**
      * Продолжение создания заказа. Диалог с пользователем<br><br>
-     * 1)Получает контекст пользователя и заказ, создает новый заказ с описанием. Обновляет заказ в бд<br>
+     * Получает контекст пользователя и заказ, создает новый заказ с описанием. Обновляет заказ в бд<br>
      * Удаляет контекст пользователя и меняет статус заказа так как создание закончилось
      *
      * @param idUser long

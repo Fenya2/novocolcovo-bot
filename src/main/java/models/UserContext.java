@@ -11,6 +11,7 @@ public class UserContext {
      * Доступные state смотри в {@link #setState(String)}
      */
     private String state;
+
     private int stateNum;
 
     public UserContext(String state, int stateNum) {

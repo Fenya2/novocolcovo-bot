@@ -35,7 +35,7 @@ public class CommandHandlerTest {
     private UserRepository userRepository;
 
     /**
-     * Проверяет случай когда пользователь вводит команду /help
+     * Проверяет случай когда пользователь вводит команду /help.
      */
     @Test
     public void handleHelp() {
@@ -50,7 +50,7 @@ public class CommandHandlerTest {
     }
 
     /**
-     * Проверяет случай когда пользователь вводит команду /start
+     * Проверяет случай когда пользователь вводит команду /start.
      */
     @Test
     public void handleStart() throws SQLException {
@@ -69,7 +69,7 @@ public class CommandHandlerTest {
 
     /**
      * Проверяет случай когда команда не /start и не /help<br>
-     * и пользователь не найден
+     * и пользователь не найден.
      */
     @Test
     public void handleUserNull() throws SQLException {
@@ -84,7 +84,7 @@ public class CommandHandlerTest {
 
     /**
      * Проверяет случай когда команда не /start и не /help <br>
-     * и у найденного пользователя есть контекст
+     * и у найденного пользователя есть контекст.
      */
     @Test
     public void handleUserContextNotNull() throws SQLException {
@@ -104,7 +104,7 @@ public class CommandHandlerTest {
 
     /**
      * Проверяет случай когда команда не /start и не /help <br>
-     * у найденного пользователя нету контекста<br>
+     * у найденного пользователя нету контекста<br>.
      */
     @Test
     public void handleCreateEditCancelShowOrder() throws SQLException {

@@ -32,9 +32,7 @@ public class TextHandlerTest {
     @Mock
     private UserContextRepository userContextRepository;
 
-    /**
-     * Проыеряет случай когда пользователь не найден(=null)
-     */
+    /** Проыеряет случай когда пользователь не найден(=null). */
     @Test
     public void handleUserNull() throws SQLException {
         Message msg = new Message();
@@ -47,9 +45,7 @@ public class TextHandlerTest {
         Assert.assertEquals("напишите /start", handle);
     }
 
-    /**
-     * Проверяет случай когда у найденного пользователя нету контекста
-     */
+    /** Проверяет случай когда у найденного пользователя нету контекста. */
     @Test
     public void handleUserContextNull() throws SQLException {
         Message msg = new Message();
@@ -68,7 +64,7 @@ public class TextHandlerTest {
 
     /**
      * Проверяет случай когда контекст пользователя не null и равен
-     * "create_order","edit_order","cancel_order"
+     * "create_order","edit_order","cancel_order".
      */
     @Test
     public void handleCreateEditCancelOrder() throws SQLException {

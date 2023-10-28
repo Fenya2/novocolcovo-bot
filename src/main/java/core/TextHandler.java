@@ -4,6 +4,7 @@ import core.service.OrderService;
 import db.LoggedUsersRepository;
 import db.UserContextRepository;
 import models.Message;
+import models.Platform;
 import models.User;
 import models.UserContext;
 
@@ -12,19 +13,13 @@ import java.sql.SQLException;
 
 public class TextHandler {
 
-    /**
-     * репозиторий для опознания пользователя в системе
-     */
+    /** Репозиторий для опознания пользователя в системе */
     private final LoggedUsersRepository loggedUsersRepository;
 
-    /**
-     * репозиторий для работы с таблицей контекста пользоваталей
-     */
+    /** Репозиторий для работы с таблицей контекста пользоваталей */
     private final UserContextRepository userContextRepository;
 
-    /**
-     * сервис для работы с заказами
-     */
+    /** Сервис для работы с заказами */
     private final OrderService orderService;
 
     /**
@@ -39,14 +34,14 @@ public class TextHandler {
     }
 
     /**
-     * Обработчик текста проверяет на наличие контекста (например конеткст регистрации или создания заказа)
-     * у сообщения
+     * Обработчик текста проверяет на наличие контекста (например контекст регистрации или
+     * создания заказа) у сообщения
      * @param msg
      * @return возвращает работу работу сервиса связанного с контекстом
      */
     public String handle(Message msg) {
         try {
-            String platform = msg.getPlatform();
+            Platform platform = msg.getPlatform();
             String userIdOnPlatform = msg.getUserIdOnPlatform();
 
             User userWithId = loggedUsersRepository.getUserByPlatformAndIdOnPlatform(platform,userIdOnPlatform);

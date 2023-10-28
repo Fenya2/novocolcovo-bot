@@ -5,35 +5,27 @@ import db.LoggedUsersRepository;
 import db.UserContextRepository;
 import db.UserRepository;
 import models.Message;
+import models.Platform;
 import models.User;
 import models.UserContext;
 
 import java.sql.SQLException;
 
 public class CommandHandler {
-    /**
-     * содержит информацию о пользователях.
-     */
+    /** Cодержит информацию о пользователях. */
     private final UserRepository userRepository;
-    /**
-     * Позволяет опознать пользователя в системе
-     * содержащит информацию о платформе, id  в этой платформе и id в системе
-     */
+    /** Позволяет опознать пользователя в системе. */
     private final LoggedUsersRepository loggedUsersRepository;
-    /**
-     * Содержит информацио о контексте пользователя
-     */
+    /** Содержит информацио о контексте пользователя. */
     private final UserContextRepository userContextRepository;
-    /**
-     * Содержит информацию о заказах
-     */
+    /** Содержит информацию о заказах. */
     private final OrderService orderService;
 
     /**
      * @param userRepository содержит информацию о пользователях.
-     * @param loggedUsersRepository Позволяет опознать пользователя в системе
-     * @param userContextRepository Содержит информацио о контексте пользователя
-     * @param orderService Содержит информацию о заказах
+     * @param loggedUsersRepository Позволяет опознать пользователя в системе.
+     * @param userContextRepository Содержит информацио о контексте пользователя.
+     * @param orderService Содержит информацию о заказах.
      */
     public CommandHandler(UserRepository userRepository, LoggedUsersRepository loggedUsersRepository, UserContextRepository userContextRepository, OrderService orderService){
         this.userRepository = userRepository;
@@ -43,7 +35,7 @@ public class CommandHandler {
     }
 
     /**
-     * Обрабатыевает команды и передает в соответствующий сервис
+     * Обрабатыевает команды и передает в соответствующий сервис для ее выполнения.
      * @param msg
      * @return возвращает работу сервиса
      */
@@ -85,13 +77,13 @@ public class CommandHandler {
 
     /**
      * Проверяет наличие пользователя в системе, если нету то добавляет в таблицы User и LoggedUsers
-     * @param msg
-     * @return сообщение с приветствием
-     * В случае ошибки возвращает сообщение об ошибке
+     * @param msg сообщение от {@link MessageHandler}.
+     * @return сообщение с приветствием.
+     * В случае ошибки возвращает сообщение об ошибке.
      */
     public String start(Message msg) {
         //TODO реализовать в отдельном сервисе
-        String platform = msg.getPlatform();
+        Platform platform = msg.getPlatform();
         String userIdOnPlatform = msg.getUserIdOnPlatform();
         User user = new User(0,"User","Я есть user");
         try {

@@ -30,9 +30,7 @@ public class OrderServiceTest {
     @Mock
     private OrderRepository orderRepository;
 
-    /**
-     * Проверяет работу startCreateOrder
-     */
+    /** Проверяет работу startCreateOrder */
     @Test
     public void startCreateOrder() throws SQLException {
         User user = new User();

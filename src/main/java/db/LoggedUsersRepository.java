@@ -1,5 +1,6 @@
 package db;
 
+import models.Platform;
 import models.User;
 import org.apache.log4j.Logger;
 
@@ -9,9 +10,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Класс, отвечающий за работу с таблицей logged_users базы данных.
- */
+/** Класс, отвечающий за работу с таблицей logged_users базы данных. */
 public class LoggedUsersRepository extends Repository {
     private static final Logger log = Logger.getLogger(LoggedUsersRepository.class.getName());
     private final UserRepository userRepository;
@@ -34,7 +33,7 @@ public class LoggedUsersRepository extends Repository {
      * некорректны, <b>0</b>, если связь уже существует.
      * @throws SQLException,
      */
-    public int linkUserIdAndUserPlatform(long userId, String platform, String userIdOnPLatform) throws SQLException {
+    public int linkUserIdAndUserPlatform(long userId, Platform platform, String userIdOnPLatform) throws SQLException {
         if (userId <= 0
                 || platform == null
                 || userIdOnPLatform == null
@@ -75,7 +74,7 @@ public class LoggedUsersRepository extends Repository {
      * Иначе <b>null</b>.
      * @throws SQLException
      */
-    public User getUserByPlatformAndIdOnPlatform(String platform, String idOnPlatform) throws SQLException {
+    public User getUserByPlatformAndIdOnPlatform(Platform platform, String idOnPlatform) throws SQLException {
         if (platform == null || idOnPlatform == null) return null;
         //todo или делать один sql запрос, cразу возвращая нужную строку таблицы users, если она найдется?
         String request = """
@@ -107,7 +106,7 @@ public class LoggedUsersRepository extends Repository {
      * <b>-2</b>, если связи не существует и удалять нечего.
      * @throws SQLException
      */
-    public int deleteLink(long userId, String platform) throws SQLException {
+    public int deleteLink(long userId, Platform platform) throws SQLException {
         if (platform == null) {
             return -1;
         }
