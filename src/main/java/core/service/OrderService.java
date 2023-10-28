@@ -3,6 +3,7 @@ package core.service;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
+import models.OrderStatus;
 import models.UserContext;
 
 import java.sql.SQLException;
@@ -37,7 +38,7 @@ public class OrderService {
     public String startCreateOrder(long idUser) {
         try {
             Order order = orderRepository.save(new Order(idUser));
-            orderRepository.updateOrderStatus(order.getId(), "updating");
+            orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
             UserContext userContext = new UserContext("create_order", 0);
             userContextRepository.saveUserContext(idUser, userContext);
             return "Введите список продуктов";
@@ -59,10 +60,10 @@ public class OrderService {
         try {
             UserContext userContext = userContextRepository.getUserContext(idUser);
             if (userContext.getState_num() == 0) {
-                Order order = orderRepository.getOrderByIdUserAndStatus(idUser, "updating");
+                Order order = orderRepository.getOrderByIdUserAndStatus(idUser, OrderStatus.UPDATING);
                 order.setDescription(text);
                 orderRepository.updateWithId(order);
-                orderRepository.updateOrderStatus(order.getId(), "pending");
+                orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                 userContextRepository.deleteUserContext(idUser);
                 return "Заказ создан";
             } else
@@ -129,10 +130,10 @@ public class OrderService {
                     if (order == null)
                         return "Заказ не найден. Попробуйте еще раз(2)";
 
-                    orderRepository.updateOrderStatus(order.getId(), "updating");
-                    Order orderCheck = orderRepository.getOrderByIdUserAndStatus(idUser, "updating");
+                    orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
+                    Order orderCheck = orderRepository.getOrderByIdUserAndStatus(idUser, OrderStatus.UPDATING);
                     if (orderCheck == null) {
-                        orderRepository.updateOrderStatus(order.getId(), "pending");
+                        orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                         return "Заказ не найден. Попробуйте еще раз(3)";
                     }
 
@@ -141,10 +142,10 @@ public class OrderService {
                     return "Напишите новый список продуктов";
                 }
                 case 1 -> {
-                    Order order = orderRepository.getOrderByIdUserAndStatus(idUser, "updating");
+                    Order order = orderRepository.getOrderByIdUserAndStatus(idUser, OrderStatus.UPDATING);
                     order.setDescription(text);
                     orderRepository.updateWithId(order);
-                    orderRepository.updateOrderStatus(order.getId(), "pending");
+                    orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                     userContextRepository.deleteUserContext(idUser);
                     return "Заказ изменен";
                 }
@@ -206,10 +207,10 @@ public class OrderService {
                 if (order == null)
                     return "Заказ не найден. Попробуйте еще раз(2)";
 
-                orderRepository.updateOrderStatus(order.getId(), "updating");
-                Order orderCheck = orderRepository.getOrderByIdUserAndStatus(idUser, "updating");
+                orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
+                Order orderCheck = orderRepository.getOrderByIdUserAndStatus(idUser, OrderStatus.UPDATING);
                 if (orderCheck == null) {
-                    orderRepository.updateOrderStatus(order.getId(), "pending");
+                    orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                     return "Заказ не найден. Попробуйте еще раз(3)";
                 }
 

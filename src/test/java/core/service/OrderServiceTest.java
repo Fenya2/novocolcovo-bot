@@ -3,6 +3,7 @@ package core.service;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
+import models.OrderStatus;
 import models.User;
 import models.UserContext;
 import org.junit.Assert;
@@ -57,7 +58,7 @@ public class OrderServiceTest {
         UserContext context2 = new UserContext("create_order", 0);
         Mockito.when(userContextRepository.getUserContext(user.getId()))
                 .thenReturn(context2);
-        Mockito.when(orderRepository.getOrderByIdUserAndStatus(user.getId(), "updating"))
+        Mockito.when(orderRepository.getOrderByIdUserAndStatus(user.getId(), OrderStatus.UPDATING))
                 .thenReturn(new Order());
         String continueCreateOrder2 = orderService.continueCreateOrder(user.getId(), "anyText");
         Assert.assertEquals("Заказ создан", continueCreateOrder2);
@@ -115,12 +116,12 @@ public class OrderServiceTest {
 
         Mockito.when(orderRepository.getById(11254))
                 .thenReturn(new Order(1));
-        Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, "pending"))
+        Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, OrderStatus.PENDING))
                 .thenReturn(null);
         String continueEditOrder4 = orderService.continueEditOrder(1, "11254");
         Assert.assertEquals("Заказ не найден. Попробуйте еще раз(3)", continueEditOrder4);
 
-        Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, "updating"))
+        Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, OrderStatus.UPDATING))
                 .thenReturn(new Order(1));
         String continueEditOrder5 = orderService.continueEditOrder(1, "11254");
         Assert.assertEquals("Напишите новый список продуктов", continueEditOrder5);
@@ -137,7 +138,7 @@ public class OrderServiceTest {
         UserContext userContext1 = new UserContext("edit_order", 1);
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(userContext1);
-        Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, "updating"))
+        Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, OrderStatus.UPDATING))
                 .thenReturn(new Order());
         String continueEditOrder5 = orderService.continueEditOrder(1, "11254");
         Assert.assertEquals("Заказ изменен", continueEditOrder5);
@@ -197,12 +198,12 @@ public class OrderServiceTest {
 
         Mockito.when(orderRepository.getById(11254))
                 .thenReturn(new Order(1));
-        Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, "pending"))
+        Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, OrderStatus.PENDING))
                 .thenReturn(null);
         String continueCancelOrder4 = orderService.continueCancelOrder(1, "11254");
         Assert.assertEquals("Заказ не найден. Попробуйте еще раз(3)", continueCancelOrder4);
 
-        Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, "updating"))
+        Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, OrderStatus.UPDATING))
                 .thenReturn(new Order(1));
         String continueCancelOrder5 = orderService.continueCancelOrder(1, "11254");
         Assert.assertEquals("Заказ удален", continueCancelOrder5);

@@ -9,9 +9,14 @@ public class Message {
     /** Текст сообщения */
     private String text;
 
+    /**
+     * поля text, platform, userIdOnPlatform выставляются в
+     * "empty constructor text", {@link Platform NO_PLATFORM}, "empty constructor id"
+     * соответственно.
+     */
     public Message() {
         this.text = "empty constructor text";
-        this.platform = Platform.TELEGRAM;
+        this.platform = Platform.NO_PLATFORM;
         this.userIdOnPlatform = "empty constructor id";
     }
 
@@ -22,6 +27,7 @@ public class Message {
         this.userIdOnPlatform = String.valueOf(message.getChatId());
     }
 
+    /** Возвращает текст сообщения. */
     public String getText() {
         return text;
     }
@@ -36,14 +42,20 @@ public class Message {
         this.text = text;
     }
 
+    /** Возвращает платформу, с которой отправлено сообщение. */
     public Platform getPlatform() {
         return platform;
     }
 
-    public void setPlatform(Platform platform) {
+    /** @param platform платформа. Не <b>null</b> */
+    public void setPlatform(Platform platform) throws IllegalArgumentException{
+        if(platform == null) {
+            throw new IllegalArgumentException("platform must be not null");
+        }
         this.platform = platform;
     }
 
+    /** Возвращает идентификатор пользователя на платформе, с которой было отправлено сообщение. */
     public String getUserIdOnPlatform() {
         return userIdOnPlatform;
     }
