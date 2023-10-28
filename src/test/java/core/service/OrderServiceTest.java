@@ -5,9 +5,9 @@ import db.UserContextRepository;
 import models.Order;
 import models.User;
 import models.UserContext;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -17,8 +17,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
-class OrderServiceTest {
-    @BeforeEach
+public class OrderServiceTest {
+    @Before
     public void init() {
         MockitoAnnotations.openMocks(this);
     }
@@ -34,12 +34,12 @@ class OrderServiceTest {
      * Проверяет работу startCreateOrder
      */
     @Test
-    void startCreateOrder() throws SQLException {
+    public void startCreateOrder() throws SQLException {
         User user = new User();
         Mockito.when(orderRepository.save(Mockito.any()))
                 .thenReturn(new Order());
         String startCreateOrder = orderService.startCreateOrder(user.getId());
-        Assertions.assertEquals("Введите список продуктов", startCreateOrder);
+        Assert.assertEquals("Введите список продуктов", startCreateOrder);
     }
 
     /**
@@ -48,13 +48,13 @@ class OrderServiceTest {
      * и когда контекст выходит за границы допустимых значений
      */
     @Test
-    void continueCreateOrder() throws SQLException, ParseException {
+    public void continueCreateOrder() throws SQLException, ParseException {
         User user = new User();
         UserContext context1 = new UserContext("create_order", 10);
         Mockito.when(userContextRepository.getUserContext(user.getId()))
                 .thenReturn(context1);
         String continueCreateOrder1 = orderService.continueCreateOrder(user.getId(), "anyText");
-        Assertions.assertEquals("Выход за пределы контекста", continueCreateOrder1);
+        Assert.assertEquals("Выход за пределы контекста", continueCreateOrder1);
 
         UserContext context2 = new UserContext("create_order", 0);
         Mockito.when(userContextRepository.getUserContext(user.getId()))
@@ -62,7 +62,7 @@ class OrderServiceTest {
         Mockito.when(orderRepository.getOrderByIdUserAndStatus(user.getId(), "updating"))
                 .thenReturn(new Order());
         String continueCreateOrder2 = orderService.continueCreateOrder(user.getId(), "anyText");
-        Assertions.assertEquals("Заказ создан", continueCreateOrder2);
+        Assert.assertEquals("Заказ создан", continueCreateOrder2);
     }
 
     /**
@@ -71,7 +71,7 @@ class OrderServiceTest {
      * и когда список заказов не пустой
      */
     @Test
-    void startEditOrder() throws SQLException, ParseException {
+    public void startEditOrder() throws SQLException, ParseException {
         ArrayList<Order> listAllOrder = new ArrayList<>(1);
         Order order = new Order(1);
         order.setDescription("");
@@ -79,10 +79,10 @@ class OrderServiceTest {
         Mockito.when(orderRepository.getAll())
                 .thenReturn(listAllOrder);
         String startEditOrder1 = orderService.startEditOrder(-1);
-        Assertions.assertEquals("у вас нет ни одного заказа", startEditOrder1);
+        Assert.assertEquals("у вас нет ни одного заказа", startEditOrder1);
 
         String startEditOrder2 = orderService.startEditOrder(1);
-        Assertions.assertEquals("Какой заказ вы хотите обновить.?\n-42: \n", startEditOrder2);
+        Assert.assertEquals("Какой заказ вы хотите обновить.?\n-42: \n", startEditOrder2);
     }
 
     /**
@@ -94,38 +94,38 @@ class OrderServiceTest {
      * так же проверяет случай когда все условия соблюдены
      */
     @Test
-    void continueEditOrder0() throws SQLException, ParseException {
+    public void continueEditOrder0() throws SQLException, ParseException {
         UserContext userContext1 = new UserContext("edit_order", 10);
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(userContext1);
         String continueEditOrder = orderService.continueEditOrder(1, "no digit");
-        Assertions.assertEquals("Выход за пределы контекста", continueEditOrder);
+        Assert.assertEquals("Выход за пределы контекста", continueEditOrder);
 
         UserContext userContext = new UserContext("edit_order", 0);
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(userContext);
         String continueEditOrder1 = orderService.continueEditOrder(1, "no digit");
-        Assertions.assertEquals("Заказ не найден. Попробуйте еще раз(1)", continueEditOrder1);
+        Assert.assertEquals("Заказ не найден. Попробуйте еще раз(1)", continueEditOrder1);
 
         String continueEditOrder2 = orderService.continueEditOrder(1, "1234567891234567899");
-        Assertions.assertEquals("Заказ не найден. Попробуйте еще раз(1)", continueEditOrder2);
+        Assert.assertEquals("Заказ не найден. Попробуйте еще раз(1)", continueEditOrder2);
 
         Mockito.when(orderRepository.getById(0))
                 .thenReturn(null);
         String continueEditOrder3 = orderService.continueEditOrder(1, "123456789");
-        Assertions.assertEquals("Заказ не найден. Попробуйте еще раз(2)", continueEditOrder3);
+        Assert.assertEquals("Заказ не найден. Попробуйте еще раз(2)", continueEditOrder3);
 
         Mockito.when(orderRepository.getById(11254))
                 .thenReturn(new Order(1));
         Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, "pending"))
                 .thenReturn(null);
         String continueEditOrder4 = orderService.continueEditOrder(1, "11254");
-        Assertions.assertEquals("Заказ не найден. Попробуйте еще раз(3)", continueEditOrder4);
+        Assert.assertEquals("Заказ не найден. Попробуйте еще раз(3)", continueEditOrder4);
 
         Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, "updating"))
                 .thenReturn(new Order(1));
         String continueEditOrder5 = orderService.continueEditOrder(1, "11254");
-        Assertions.assertEquals("Напишите новый список продуктов", continueEditOrder5);
+        Assert.assertEquals("Напишите новый список продуктов", continueEditOrder5);
 
     }
 
@@ -135,14 +135,14 @@ class OrderServiceTest {
      * проверяет кореектность работы метода, иначе проверяет сообщение об ошибке
      */
     @Test
-    void continueEditOrder1() throws SQLException, ParseException {
+    public void continueEditOrder1() throws SQLException, ParseException {
         UserContext userContext1 = new UserContext("edit_order", 1);
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(userContext1);
         Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, "updating"))
                 .thenReturn(new Order());
         String continueEditOrder5 = orderService.continueEditOrder(1, "11254");
-        Assertions.assertEquals("Заказ изменен", continueEditOrder5);
+        Assert.assertEquals("Заказ изменен", continueEditOrder5);
     }
 
     /**
@@ -151,7 +151,7 @@ class OrderServiceTest {
      * и когда список заказов не пустой
      */
     @Test
-    void startCancelOrder() throws SQLException, ParseException {
+    public void startCancelOrder() throws SQLException, ParseException {
         ArrayList<Order> listAllOrder = new ArrayList<>(1);
         Order order = new Order(1);
         order.setDescription("");
@@ -159,10 +159,10 @@ class OrderServiceTest {
         Mockito.when(orderRepository.getAll())
                 .thenReturn(listAllOrder);
         String startEditOrder1 = orderService.startCancelOrder(-1);
-        Assertions.assertEquals("у вас нет ни одного заказа", startEditOrder1);
+        Assert.assertEquals("у вас нет ни одного заказа", startEditOrder1);
 
         String startEditOrder2 = orderService.startCancelOrder(1);
-        Assertions.assertEquals("Какой заказ вы хотите удалить.?\n-42: \n", startEditOrder2);
+        Assert.assertEquals("Какой заказ вы хотите удалить.?\n-42: \n", startEditOrder2);
     }
 
     /**
@@ -174,12 +174,12 @@ class OrderServiceTest {
      * так же проверяет случай когда все условия соблюдены
      */
     @Test
-    void continueCancelOrder() throws SQLException, ParseException {
+    public void continueCancelOrder() throws SQLException, ParseException {
         UserContext userContext1 = new UserContext("edit_order", 10);
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(userContext1);
         String continueEditOrder = orderService.continueCancelOrder(1, "no digit");
-        Assertions.assertEquals("Выход за пределы контекста", continueEditOrder);
+        Assert.assertEquals("Выход за пределы контекста", continueEditOrder);
 
 
         UserContext userContext = new UserContext("cancel_order", 0);
@@ -187,31 +187,31 @@ class OrderServiceTest {
                 .thenReturn(userContext);
 
         String continueCancelOrder1 = orderService.continueCancelOrder(1, "no digit");
-        Assertions.assertEquals("Заказ не найден. Попробуйте еще раз(1)", continueCancelOrder1);
+        Assert.assertEquals("Заказ не найден. Попробуйте еще раз(1)", continueCancelOrder1);
 
         String continueCancelOrder2 = orderService.continueCancelOrder(1, "1234567891234567899");
-        Assertions.assertEquals("Заказ не найден. Попробуйте еще раз(1)", continueCancelOrder2);
+        Assert.assertEquals("Заказ не найден. Попробуйте еще раз(1)", continueCancelOrder2);
 
         Mockito.when(orderRepository.getById(0))
                 .thenReturn(null);
         String continueCancelOrder3 = orderService.continueCancelOrder(1, "123456789");
-        Assertions.assertEquals("Заказ не найден. Попробуйте еще раз(2)", continueCancelOrder3);
+        Assert.assertEquals("Заказ не найден. Попробуйте еще раз(2)", continueCancelOrder3);
 
         Mockito.when(orderRepository.getById(11254))
                 .thenReturn(new Order(1));
         Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, "pending"))
                 .thenReturn(null);
         String continueCancelOrder4 = orderService.continueCancelOrder(1, "11254");
-        Assertions.assertEquals("Заказ не найден. Попробуйте еще раз(3)", continueCancelOrder4);
+        Assert.assertEquals("Заказ не найден. Попробуйте еще раз(3)", continueCancelOrder4);
 
         Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, "updating"))
                 .thenReturn(new Order(1));
         String continueCancelOrder5 = orderService.continueCancelOrder(1, "11254");
-        Assertions.assertEquals("Заказ удален", continueCancelOrder5);
+        Assert.assertEquals("Заказ удален", continueCancelOrder5);
     }
 
     @Test
-    void showOrder() throws SQLException, ParseException {
+    public void showOrder() throws SQLException, ParseException {
         ArrayList<Order> listAllOrder = new ArrayList<>(1);
         Order order = new Order(1);
         order.setDescription("");
@@ -219,10 +219,10 @@ class OrderServiceTest {
         Mockito.when(orderRepository.getAll())
                 .thenReturn(listAllOrder);
         String showOrder1 = orderService.showOrder(-1);
-        Assertions.assertEquals("у вас нет ни одного заказа", showOrder1);
+        Assert.assertEquals("у вас нет ни одного заказа", showOrder1);
 
         String showOrder2 = orderService.showOrder(1);
-        Assertions.assertEquals("-42: \n", showOrder2);
+        Assert.assertEquals("-42: \n", showOrder2);
 
     }
 }
