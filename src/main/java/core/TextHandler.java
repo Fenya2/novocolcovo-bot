@@ -53,9 +53,9 @@ public class TextHandler {
                 return "я вас не понимаю";
 
             switch(userContext.getState()) {
-                case "create_order" ->{return orderService.continueCreateOrder(userWithId.getId(), msg.getText());}
-                case "edit_order" ->{return orderService.continueEditOrder(userWithId.getId(), msg.getText());}
-                case "cancel_order" ->{return orderService.continueCancelOrder(userWithId.getId(), msg.getText());}
+                case ORDER_CREATING ->{return orderService.continueCreateOrder(userWithId.getId(), msg.getText());}
+                case ORDER_EDITING ->{return orderService.continueEditOrder(userWithId.getId(), msg.getText());}
+                case ORDER_CANCELING ->{return orderService.continueCancelOrder(userWithId.getId(), msg.getText());}
             }
         }
         catch (SQLException e) {

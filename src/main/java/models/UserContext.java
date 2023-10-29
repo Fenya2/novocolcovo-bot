@@ -6,70 +6,80 @@ package models;
  * в форме диалога.
  */
 public class UserContext {
-    /**
-     * Состояния, в которых может находится при взаимодействии с ботом.
-     * Доступные state смотри в {@link #setState(String)}
-     */
-    private String state;
+    /** Состояние, в котором находится пользователь при взаимодействии с ботом. */
+    private UserState state;
 
+    /** Номер состояния, в котором находится пользователь. */
     private int stateNum;
 
-    public UserContext(String state, int stateNum) {
+    /**
+     * Устанавливает {@link #state состояние пользователя} в {@link UserState NO_STATE},
+     * {@link #stateNum номер состояния пользователя} в <b>0</b>
+     */
+    public UserContext() {
+        state = UserState.NO_STATE;
+        stateNum = 0;
+    }
+
+    /**
+     * @param state состояние пользователя. не <b>null</b>.
+     * @param stateNum номер состояния пользователя.
+     */
+    public UserContext(UserState state, int stateNum) {
         setState(state);
         setStateNum(stateNum);
     }
 
     /**
-     * поле {@link #getState_num() stateNum} установит в 0.
-     * @param state
+     * поле {@link #stateNum номер состояния пользователя} установит в 0.
+     * @param state {@link #state состояние пользователя}. не <b>null</b>.
      */
-    public UserContext(String state) {
+    public UserContext(UserState state) {
         setState(state);
         stateNum = 0;
     }
 
-    public String getState() {
+    /** Возврашает {@link #state состояние пользователя}. */
+    public UserState getState() {
         return state;
     }
 
-    public int getState_num() {
+    /** Возврашает {@link #stateNum номер состояния пользователя}. */
+    public int getStateNum() {
         return stateNum;
     }
 
     /**
-        есть проверка на допустимые состояния
+     * Устанавливает {@link #state состояние пользователя}.
+     * @param state состояние пользователя. Не <b>null</b>.
      */
-    public void setState(String state) throws IllegalArgumentException{
-        //todo возможно тут нужен enum?
-        switch (state) {
-            case "create_order",
-//                    "change_username",
-//                    "alcohol_intoxication",
-                    "edit_order",
-                    "cancel_order":
-                this.state = state;
-                return;
-        }
-        throw new IllegalArgumentException("Try to make state, that not exist");
+    public void setState(UserState state) throws IllegalArgumentException{
+        if(state == null)
+            throw new IllegalArgumentException("Try to make state, that not exist");
+        this.state = state;
     }
 
     /**
-     * есть проверка на 0
+     * Устанавливает {@link #stateNum номер состояния пользователя}.
+     * @param stateNum номер состояния пользователя. Больше или равен <b>0</b>
      */
     public void setStateNum(int stateNum) {
-        if(stateNum < 0) {
+        if(stateNum < 0)
             throw new IllegalArgumentException("Try to set negative state_num.");
-        }
         this.stateNum = stateNum;
     }
 
+    /**Увеличивает  {@link #stateNum номер состояния пользователя} на <b>1</b>. */
     public void incrementStateNum() {
         stateNum++;
     }
 
     @Override
     public String toString() {
-        return "UserContext:(state: %s, state_num: %d)".formatted(state, stateNum);
+        return "UserContext{" +
+                "state=" + state +
+                ", stateNum=" + stateNum +
+                '}';
     }
 }
 

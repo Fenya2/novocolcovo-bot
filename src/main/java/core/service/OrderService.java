@@ -5,6 +5,7 @@ import db.UserContextRepository;
 import models.Order;
 import models.OrderStatus;
 import models.UserContext;
+import models.UserState;
 
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -39,7 +40,7 @@ public class OrderService {
         try {
             Order order = orderRepository.save(new Order(idUser));
             orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
-            UserContext userContext = new UserContext("create_order", 0);
+            UserContext userContext = new UserContext(UserState.ORDER_CREATING, 0);
             userContextRepository.saveUserContext(idUser, userContext);
             return "Введите список продуктов";
         } catch (SQLException | ParseException e) {
@@ -59,7 +60,7 @@ public class OrderService {
     public String continueCreateOrder(long idUser, String text) {
         try {
             UserContext userContext = userContextRepository.getUserContext(idUser);
-            if (userContext.getState_num() == 0) {
+            if (userContext.getStateNum() == 0) {
                 Order order = orderRepository.getOrderByIdUserAndStatus(idUser, OrderStatus.UPDATING);
                 order.setDescription(text);
                 orderRepository.updateWithId(order);
@@ -93,7 +94,7 @@ public class OrderService {
             if (allOrderUser.isEmpty())
                 return "у вас нет ни одного заказа";
             //TODO
-            UserContext userContext = new UserContext("edit_order", 0);
+            UserContext userContext = new UserContext(UserState.ORDER_EDITING, 0);
             userContextRepository.saveUserContext(idUser, userContext);
             return "Какой заказ вы хотите обновить.?\n"
                     .concat(allOrderUser.toString());
@@ -121,7 +122,7 @@ public class OrderService {
     public String continueEditOrder(long idUser, String text) {
         try {
             UserContext userContext = userContextRepository.getUserContext(idUser);
-            switch (userContext.getState_num()) {
+            switch (userContext.getStateNum()) {
                 case 0 -> {
                     if (!text.chars().allMatch(Character::isDigit) || text.length() > 18)
                         return "Заказ не найден. Попробуйте еще раз(1)";
@@ -137,7 +138,7 @@ public class OrderService {
                         return "Заказ не найден. Попробуйте еще раз(3)";
                     }
 
-                    userContext.setStateNum(userContext.getState_num() + 1);
+                    userContext.setStateNum(userContext.getStateNum() + 1);
                     userContextRepository.updateUserContext(idUser, userContext);
                     return "Напишите новый список продуктов";
                 }
@@ -178,7 +179,7 @@ public class OrderService {
             if (allOrderUser.isEmpty())
                 return "у вас нет ни одного заказа";
 
-            UserContext userContext = new UserContext("cancel_order", 0);
+            UserContext userContext = new UserContext(UserState.ORDER_CANCELING, 0);
             userContextRepository.saveUserContext(idUser, userContext);
             return "Какой заказ вы хотите удалить.?\n"
                     .concat(allOrderUser.toString());
@@ -199,7 +200,7 @@ public class OrderService {
     public String continueCancelOrder(long idUser, String text) {
         try {
             UserContext userContext = userContextRepository.getUserContext(idUser);
-            if (userContext.getState_num() == 0) {
+            if (userContext.getStateNum() == 0) {
                 if(text.length() > 18 || !text.chars().allMatch(Character::isDigit))
                     return "Заказ не найден. Попробуйте еще раз(1)";
                 long idOrder = Long.parseLong(text);

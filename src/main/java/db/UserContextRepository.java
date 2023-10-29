@@ -2,6 +2,7 @@ package db;
 
 
 import models.UserContext;
+import models.UserState;
 import org.apache.log4j.Logger;
 
 import java.sql.ResultSet;
@@ -13,7 +14,7 @@ import java.sql.Statement;
  */
 public class UserContextRepository extends Repository{
     private static final Logger log = Logger.getLogger(UserContextRepository.class.getName());
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     public UserContextRepository(DB db, UserRepository userRepository) {
         super(db);
         this.userRepository = userRepository;
@@ -26,7 +27,6 @@ public class UserContextRepository extends Repository{
      * @return <b>1</b>, если успешно.
      * <b>-1</b>, если контекст при взаимодействии с пользователем уже существует.
      * <b>-2</b>, если пользователя с переданным идентификатором не существует.
-     * @throws SQLException
      */
     public int saveUserContext(long userId, UserContext userContext) throws SQLException {
         if(userRepository.getById(userId) == null) {
@@ -41,7 +41,7 @@ public class UserContextRepository extends Repository{
                 state,
                 state_num
                 ) VALUES (%d, "%s", "%d");
-                """.formatted(userId, userContext.getState(), userContext.getState_num());
+                """.formatted(userId, userContext.getState(), userContext.getStateNum());
         Statement statement = db.getStatement();
         if(statement.executeUpdate(request) == 0) {
             statement.close();
@@ -58,7 +58,6 @@ public class UserContextRepository extends Repository{
      * @param userId идентификатор пользователя.
      * @return {@link UserContext контекст} пользователя с переданным идентификатором.
      * Если контекста нет, то <b>null</b>
-     * @throws SQLException
      */
     public UserContext getUserContext(long userId) throws SQLException {
         if(userId <= 0) {
@@ -73,7 +72,7 @@ public class UserContextRepository extends Repository{
             return null;
         }
         UserContext userContext = new UserContext(
-                resultSet.getString("state"),
+                UserState.valueOf(resultSet.getString("state")),
                 resultSet.getInt("state_num")
                 );
         resultSet.close();
@@ -96,7 +95,7 @@ public class UserContextRepository extends Repository{
                 UPDATE user_contexts
                 SET state = "%s", state_num = %d
                 WHERE user_id = %d;
-                """.formatted(userContext.getState(), userContext.getState_num(), userId);
+                """.formatted(userContext.getState(), userContext.getStateNum(), userId);
         Statement statement = db.getStatement();
         if(statement.executeUpdate(request) == 0) {
             statement.close();

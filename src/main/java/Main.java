@@ -7,8 +7,6 @@ import core.MessageHandler;
 import core.TextHandler;
 import core.service.OrderService;
 import db.*;
-import models.OrderStatus;
-import models.Platform;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;

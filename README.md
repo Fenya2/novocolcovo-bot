@@ -12,13 +12,13 @@
 
 Дать заказчику возможность создать заказ, изменить его, отменить, просмотреть свои сделанные заказы с помощью соответствующих команд.
 
-/create_order
-/edit_order (mb /update_order)
-/cancel_order
-/show_orders (mb /show_my_orders)
+/create_order<br>
+/edit_order (mb /update_order)<br>
+/cancel_order<br>
+/show_orders (mb /show_my_orders)<br>
 
 Пример взаимодействия с ботом (телеграм):
-1) создание, просмотр, изменение, удаление заказа.
+1) создание, просмотр, изменение, удаление заказа (crud).<br>
    П: /create_order <br>
    Б: Перечислите, что вам нужно.<br>
    П: Хлеб, молоко, гречка.<br>

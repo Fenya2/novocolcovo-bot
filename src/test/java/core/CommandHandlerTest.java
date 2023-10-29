@@ -7,6 +7,7 @@ import db.UserRepository;
 import models.Message;
 import models.User;
 import models.UserContext;
+import models.UserState;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -97,7 +98,7 @@ public class CommandHandlerTest {
         ).thenReturn(user);
         Mockito.when(
                 userContextRepository.getUserContext(user.getId())
-        ).thenReturn(new UserContext("create_order", 0));
+        ).thenReturn(new UserContext(UserState.ORDER_CREATING, 0));
         String handle = commandHandler.handle(msg);
         Assert.assertEquals("Сейчас команды не доступны", handle);
     }
