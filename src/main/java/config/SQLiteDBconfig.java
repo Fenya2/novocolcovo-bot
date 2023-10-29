@@ -7,21 +7,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-/**
- * Класс конфигурации для SQliteDB
- */
+/** Класс конфигурации для базы данных (возможно не только sqlite) */
 public class SQLiteDBconfig {
-    private final String dbName;
-    /**
-     * Подключение, пеоедваемое DriverManager
-     */
+    /** Подключение, пеоедваемое DriverManager */
     private final String connection;
 
-    /**
-     * Местоположение файла БД на диске.*
-     */
-    private final String location;
-
+    /** @param configure путь к файлу конфигурации типа json */
     public SQLiteDBconfig(String configure) {
         String str;
         try {
@@ -31,20 +22,11 @@ public class SQLiteDBconfig {
             throw new RuntimeException("file not founded");
         }
         JSONObject jo = new JSONObject(str);
-        dbName = jo.getString("name");
         connection = jo.getString("db_connection");
-        location = jo.getString("db_location");
     }
 
-    public String getDbName() {
-        return dbName;
-    }
-
+    /**@return строка для подключения к бд. */
     public String getConnection() {
         return connection;
-    }
-
-    public String getLocation() {
-        return location;
     }
 }

@@ -3,38 +3,44 @@ package core.service;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
-import models.User;
+import models.OrderStatus;
 import models.UserContext;
+import models.UserState;
 
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
-/**
- * Сервис заказов
- */
+/** Сервис заказов */
 public class OrderService {
+    /** Для работы с таблицей контекстов пользователя. */
     private final UserContextRepository userContextRepository;
+    /** Для работы с таблицей заказов. */
     private final OrderRepository orderRepository;
 
+    /**
+     * @param userContextRepository Для работы с таблицей контекстов пользователя.
+     * @param orderRepository Для работы с таблицей заказов.
+     */
     public OrderService(UserContextRepository userContextRepository, OrderRepository orderRepository) {
         this.userContextRepository = userContextRepository;
         this.orderRepository = orderRepository;
     }
 
     /**
-     * Начало создание заказа. <br>
+     * Начало создания заказа. <br>
      * Создает заказ и добавляет в таблицу order, обновляет статус у заказа
-     * и добавляет контекст в таблицу userContext
+     * и добавляет контекст в таблицу userContext.
      *
-     * @param idUser long
-     * @return возвращает сообщение для дальнейшего создания заказа
+     * @param idUser идентификатор пользователя.
+     * @return Сообщение для дальнейшего создания заказа.
+     * todo может число, либо true False. А обработчик сгенерирует сообщение по ответу сервиса?
      */
     public String startCreateOrder(long idUser) {
         try {
             Order order = orderRepository.save(new Order(idUser));
-            orderRepository.updateOrderStatus(order.getId(), "updating");
-            UserContext userContext = new UserContext("create_order", 0);
+            orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
+            UserContext userContext = new UserContext(UserState.ORDER_CREATING, 0);
             userContextRepository.saveUserContext(idUser, userContext);
             return "Введите список продуктов";
         } catch (SQLException | ParseException e) {
@@ -44,7 +50,7 @@ public class OrderService {
 
     /**
      * Продолжение создания заказа. Диалог с пользователем<br><br>
-     * 1)Получает контекст пользователя и заказ, создает новый заказ с описанием. Обновляет заказ в бд<br>
+     * Получает контекст пользователя и заказ, создает новый заказ с описанием. Обновляет заказ в бд<br>
      * Удаляет контекст пользователя и меняет статус заказа так как создание закончилось
      *
      * @param idUser long
@@ -54,11 +60,11 @@ public class OrderService {
     public String continueCreateOrder(long idUser, String text) {
         try {
             UserContext userContext = userContextRepository.getUserContext(idUser);
-            if (userContext.getState_num() == 0) {
-                Order order = orderRepository.getOrderByIdUserAndStatus(idUser, "updating");
+            if (userContext.getStateNum() == 0) {
+                Order order = orderRepository.getOrderByIdUserAndStatus(idUser, OrderStatus.UPDATING);
                 order.setDescription(text);
                 orderRepository.updateWithId(order);
-                orderRepository.updateOrderStatus(order.getId(), "pending");
+                orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                 userContextRepository.deleteUserContext(idUser);
                 return "Заказ создан";
             } else
@@ -76,7 +82,7 @@ public class OrderService {
      * @param idUser order
      * @return Выводит список всех заказов пользователя, что бы пользователь мог выбрать какой заказ обновить
      */
-    public String startUpdateOrder(long idUser) {
+    public String startEditOrder(long idUser) {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();
@@ -87,8 +93,8 @@ public class OrderService {
             }
             if (allOrderUser.isEmpty())
                 return "у вас нет ни одного заказа";
-
-            UserContext userContext = new UserContext("update_order", 0);
+            //TODO
+            UserContext userContext = new UserContext(UserState.ORDER_EDITING, 0);
             userContextRepository.saveUserContext(idUser, userContext);
             return "Какой заказ вы хотите обновить.?\n"
                     .concat(allOrderUser.toString());
@@ -101,7 +107,7 @@ public class OrderService {
      * Продолжение обновления. Диалог с пользователем<br>
      * <p>
      * 1) получает от пользователя text = idOrder по нему смотрим есть ли такие заказы и если есть
-     * обновляем статус заказа до update
+     * обновляем статус заказа до edit
      * <p>
      * 2) получает от пользователя text = список продуктов. Получаем заказ по idUser и status
      * Создаем новый заказ и меняем в нем описание. Обнвовляем заказ в бд.
@@ -113,10 +119,10 @@ public class OrderService {
      * @return 1)выводим сообщение с просьбой ввести данные <br>
      * 2)выводим сообщение об окончании изменения заказа
      */
-    public String continueUpdateOrder(long idUser, String text) {
+    public String continueEditOrder(long idUser, String text) {
         try {
             UserContext userContext = userContextRepository.getUserContext(idUser);
-            switch (userContext.getState_num()) {
+            switch (userContext.getStateNum()) {
                 case 0 -> {
                     if (!text.chars().allMatch(Character::isDigit) || text.length() > 18)
                         return "Заказ не найден. Попробуйте еще раз(1)";
@@ -125,22 +131,22 @@ public class OrderService {
                     if (order == null)
                         return "Заказ не найден. Попробуйте еще раз(2)";
 
-                    orderRepository.updateOrderStatus(order.getId(), "updating");
-                    Order orderCheck = orderRepository.getOrderByIdUserAndStatus(idUser, "updating");
+                    orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
+                    Order orderCheck = orderRepository.getOrderByIdUserAndStatus(idUser, OrderStatus.UPDATING);
                     if (orderCheck == null) {
-                        orderRepository.updateOrderStatus(order.getId(), "pending");
+                        orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                         return "Заказ не найден. Попробуйте еще раз(3)";
                     }
 
-                    userContext.setStateNum(userContext.getState_num() + 1);
+                    userContext.setStateNum(userContext.getStateNum() + 1);
                     userContextRepository.updateUserContext(idUser, userContext);
                     return "Напишите новый список продуктов";
                 }
                 case 1 -> {
-                    Order order = orderRepository.getOrderByIdUserAndStatus(idUser, "updating");
+                    Order order = orderRepository.getOrderByIdUserAndStatus(idUser, OrderStatus.UPDATING);
                     order.setDescription(text);
                     orderRepository.updateWithId(order);
-                    orderRepository.updateOrderStatus(order.getId(), "pending");
+                    orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                     userContextRepository.deleteUserContext(idUser);
                     return "Заказ изменен";
                 }
@@ -160,7 +166,7 @@ public class OrderService {
      * @param idUser long
      * @return Выводит список всех заказов пользователя, что бы пользователь мог выбрать какой заказ удалить
      */
-    public String startСancelOrder(long idUser) {
+    public String startCancelOrder(long idUser) {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();
@@ -173,7 +179,7 @@ public class OrderService {
             if (allOrderUser.isEmpty())
                 return "у вас нет ни одного заказа";
 
-            UserContext userContext = new UserContext("cancel_order", 0);
+            UserContext userContext = new UserContext(UserState.ORDER_CANCELING, 0);
             userContextRepository.saveUserContext(idUser, userContext);
             return "Какой заказ вы хотите удалить.?\n"
                     .concat(allOrderUser.toString());
@@ -191,10 +197,10 @@ public class OrderService {
      * @param text   string
      * @return сообщение об успешном удалении заказа
      */
-    public String continueСancelOrder(long idUser, String text) {
+    public String continueCancelOrder(long idUser, String text) {
         try {
             UserContext userContext = userContextRepository.getUserContext(idUser);
-            if (userContext.getState_num() == 0) {
+            if (userContext.getStateNum() == 0) {
                 if(text.length() > 18 || !text.chars().allMatch(Character::isDigit))
                     return "Заказ не найден. Попробуйте еще раз(1)";
                 long idOrder = Long.parseLong(text);
@@ -202,10 +208,10 @@ public class OrderService {
                 if (order == null)
                     return "Заказ не найден. Попробуйте еще раз(2)";
 
-                orderRepository.updateOrderStatus(order.getId(), "updating");
-                Order orderCheck = orderRepository.getOrderByIdUserAndStatus(idUser, "updating");
+                orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
+                Order orderCheck = orderRepository.getOrderByIdUserAndStatus(idUser, OrderStatus.UPDATING);
                 if (orderCheck == null) {
-                    orderRepository.updateOrderStatus(order.getId(), "pending");
+                    orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                     return "Заказ не найден. Попробуйте еще раз(3)";
                 }
 
@@ -223,7 +229,7 @@ public class OrderService {
      * @param idUser long
      * @return Возвращает список все заказов пользователя с их описанием
      */
-    public String viewListOrder(long idUser) {
+    public String showOrder(long idUser) {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();

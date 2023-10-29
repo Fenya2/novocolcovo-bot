@@ -1,50 +1,39 @@
 package bot;
 
-import core.CommandHandler;
 import core.MessageHandler;
-import core.TextHandler;
-import db.UserRepository;
 import models.Message;
-import models.User;
 import org.apache.log4j.Logger;
-import org.sqlite.core.DB;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import config.TGBotConfig;
 
-import java.sql.SQLException;
-
-/**
- * Класс для связи с telegram через бота. .
- */
+/** Класс для связи с telegram через бота. */
 public class TGBot extends TelegramLongPollingBot implements Bot {
     private static final Logger log = Logger.getLogger(TGBot.class.getName());
-    /**
-     * Конфигурации для работы с ботом
-     */
+    /** Конфигурация для работы с ботом. */
     TGBotConfig botConfig;
-    /**
-     * Обработчик сообщений
-     */
+    /** Обработчик сообщений */
     MessageHandler messageHandler;
+
     /**
-     * Конструктор TGBot
+     * @param botConfig объект конфигурации бота
+     * @param messageHandler обработчик сообщений
      */
-    public TGBot(TGBotConfig botConfig,MessageHandler messageHandler) throws SQLException {
+    public TGBot(TGBotConfig botConfig,MessageHandler messageHandler) {
         super(botConfig.getToken());
         this.botConfig = botConfig;
         this.messageHandler = messageHandler;
     }
+
+    /** Возвращает имя бота, указанное в конфигурационном файле бота. */
     @Override
     public String getBotUsername() {
         return botConfig.getName();
     }
 
-    /**
-     * Связь с ботом
-     */
+    /** Метод, вызывающийся, когда пользователь как-то взаимодействует с ботом. */
     @Override
     public void onUpdateReceived(Update update) {
         if(update.hasMessage()) {
@@ -61,18 +50,28 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
             // todo обработка другого рода обновлений.
         }
     }
+
+    /**
+     * Отправляет сообщение пользователю по его идентификатору на платформе.
+     * @param userIdOnPlatform идентификатор пользователя на платформе. Не <b>null</b>
+     * @param text текст сообщения. Не <b>null</b>
+     */
     @Override
-    public void sendTextMessage(String chatId, String text) {
+    public void sendTextMessage(String userIdOnPlatform, String text)
+            throws IllegalArgumentException {
+        if(userIdOnPlatform == null)
+            throw new IllegalArgumentException("userIdOnPlatform must be not null.");
+        if(text == null)
+            throw new IllegalArgumentException("text must be not null");
         SendMessage sendMessage = SendMessage.builder()
                 .text(text)
-                .chatId(chatId)
+                .chatId(userIdOnPlatform)
                 .build();
-
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
             log.warn("can't send message with text %s to telegram user with id \"%s\""
-                    .formatted(text, chatId));
+                    .formatted(text, userIdOnPlatform));
         }
     }
 }

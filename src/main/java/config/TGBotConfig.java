@@ -1,5 +1,6 @@
 package config;
 
+import models.Platform;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
@@ -8,10 +9,14 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class TGBotConfig {
+    /** Имя бота, указываемое в файле конфигурации */
     private final String name;
+    /** Токен бота, указываемый в файле конфигурации */
     private final String token;
-    private final String platform;
+    /** Платформа, на которой бот работает, указываемая в файле конфигурации */
+    private final Platform platform;
 
+    /** @param configFile путь к файлу конфигурации типа json. */
     public TGBotConfig(String configFile){
         String str;
         try {
@@ -21,18 +26,21 @@ public class TGBotConfig {
             throw new RuntimeException("file not founded");
         }
         JSONObject jo = new JSONObject(str);
+        platform = Platform.TELEGRAM;
         name = jo.getString("name");
         token = jo.getString("token");
-        platform = jo.getString("platform");
     }
 
+    /** Возвращает имя бота */
     public String getName() {
         return name;
     }
 
+    /** Возвращает токен бота */
     public String getToken() {
         return token;
     }
 
-    public String getPlatform() {return platform;}
+    /** Возвращает платформу, на которой работает бот. */
+    public Platform getPlatform() {return platform;}
 }

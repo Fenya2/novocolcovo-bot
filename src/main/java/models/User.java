@@ -4,8 +4,11 @@ package models;
  * Класс, описывающий пользователя в программе
  */
 public class User {
+    /** идентификатор пользователя. */
     private long id;
+    /** имя пользователя. */
     private String name;
+    /** описание пользователя. */
     private String description;
 
     /**
@@ -19,9 +22,9 @@ public class User {
     }
 
     /**
-     * @param id
-     * @param name
-     * @param description
+     * @param id идентификатор пользователя.
+     * @param name имя пользователя.
+     * @param description описание пользователя.
      */
     public User(long id, String name, String description) {
         this.id = id;
@@ -40,9 +43,13 @@ public class User {
         return name;
     }
 
+    /**
+     * @param name имя пользователя. Не <b>null</b>.
+     * @throws IllegalArgumentException
+     */
     public void setName(String name) throws IllegalArgumentException {
         if(name == null)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("name must be not null.");
         this.name = name;
     }
 
@@ -50,15 +57,20 @@ public class User {
         return description;
     }
 
+    /** @param description описание пользователя. не <b>null</b> */
     public void setDescription(String description) throws IllegalArgumentException {
-        if(description == null)
-            throw new IllegalArgumentException();
+        if (description == null)
+            throw new IllegalArgumentException("description must be not null.");
         //todo тут можно прикрутить проверку на недопустимые слова. Или повыше?
         this.description = description;
     }
 
     @Override
     public String toString() {
-        return "User(id:%d, name:\"%s\", description:\"%s\")".formatted(id, name, description);
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }
