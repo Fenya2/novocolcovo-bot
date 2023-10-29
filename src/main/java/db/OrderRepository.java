@@ -1,6 +1,7 @@
 package db;
 
 import models.Order;
+import models.OrderStatus;
 import org.apache.log4j.Logger;
 
 import java.sql.ResultSet;
@@ -48,7 +49,7 @@ public class OrderRepository extends Repository{
             return order;
         }
 
-        //todo или дату заказа назначать перед добавлением? В однопотоке как будто не важно.
+        //todo или дату заказа назначать перед добавлением? Как будто не важно.
         String request = """
                 INSERT INTO orders(
                 creator_id,
@@ -118,14 +119,14 @@ public class OrderRepository extends Repository{
         order.setDescription(resultSet.getString("description"));
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd H:m:s.S");
         order.setDateCreated(formatter.parse(resultSet.getString("date_created")));
-        order.setStatus(resultSet.getString("status"));
+        order.setStatus(OrderStatus.valueOf(resultSet.getString("status")));
         resultSet.close();
         statement.close();
         return order;
     }
 
     /**
-     * Обновляет существующий заказ.
+     * Обновляет существующий заказ. //todo надо переименовать просто в update. Тут же id не передается.
      * @param order заказ, который нужно сохранить. Должен существовать.
      *              {@link Order#getCourierId()}  Идентификатор доставщика заказа}
      *              должен быть 0 или должен существовать пользователь с таким идентификатором.
@@ -174,9 +175,8 @@ public class OrderRepository extends Repository{
 
     /**
      * удаляет заказ с переданным идентификатором из таблицы orders.
-     * @param orderId
+     * @param orderId идентификатор заказа.
      * @return 1, если заказ был удален. Иначе 0.
-     * @throws SQLException
      */
     public int delete(long orderId) throws SQLException {
         if(orderId <= 0) {
@@ -193,12 +193,7 @@ public class OrderRepository extends Repository{
         return 1;
     }
 
-    /**
-     * Возвращает список всех заказов.
-     * @return
-     * @throws SQLException
-     * @throws ParseException
-     */
+    /** Возвращает список всех заказов. */
     public ArrayList<Order> getAll() throws SQLException, ParseException {
         String request = "SELECT * FROM orders;";
         ArrayList<Order> ret= new ArrayList<>();
@@ -212,7 +207,7 @@ public class OrderRepository extends Repository{
             order.setDescription(resultSet.getString("description"));
             order.setDateCreated(new SimpleDateFormat("yyyy-MM-dd H:m:s.S")
                     .parse(resultSet.getString("date_created")));
-            order.setStatus(resultSet.getString("status"));
+            order.setStatus(OrderStatus.valueOf(resultSet.getString("status")));
             ret.add(order);
         }
         resultSet.close();
@@ -221,34 +216,34 @@ public class OrderRepository extends Repository{
     }
 
     /**
+     * /todo АРТУР! в таком случает тебе не нужно передавать статус заказа. Ты же ищешь только UPDATING заказ, заказов с другими статусами у пользователя может быть несколько. Возникнет неопределенность при возвращении.
      * У одного пользователя может изменятся только один заказ, а значит можно
-     * @param idUser по пользователю
+     * @param userId по пользователю
      * @param status и статусу заказа
      * @return вернуть заказ
      */
-    public Order getOrderByIdUserAndStatus(long idUser, String status) throws SQLException, ParseException {
+    public Order getOrderByIdUserAndStatus(long userId, OrderStatus status) throws SQLException, ParseException {
         ArrayList<Order> listAllOrders = getAll();
         for(Order s: listAllOrders){
-            if (s.getCreatorId() == idUser && s.getStatus().equals(status))
+            if (s.getCreatorId() == userId && s.getStatus().equals(status))
                 return s;
         }
         return null;
     }
 
     /**
+     * //todo АРТУР! Проверь, все ли правильно? У тебя не сломалась логика?
      * Обновляет статус у заказа на новый
      * @return вовзращает 1 при удачно обновлении и 0 иначе
      */
-    public int updateOrderStatus(long idOrder,String status) throws SQLException, ParseException {
-        ArrayList<Order> listAllOrders = getAll();
-        for(Order s: listAllOrders){
-            if (s.getId() == idOrder){
-                Order orderNew = new Order(s);
-                orderNew.setStatus(status);
-                updateWithId(orderNew);
-                return 1;
-            }
+    public int updateOrderStatus(long orderId, OrderStatus orderStatus) throws SQLException, ParseException {
+        Order order = getById(orderId);
+        if(order == null) {
+            return 0;
         }
-        return 0;
+        order.setStatus(orderStatus);
+        if(updateWithId(order) != 1)
+            return 0;
+        return 1;
     }
 }

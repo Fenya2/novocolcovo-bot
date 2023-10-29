@@ -7,6 +7,7 @@ import db.UserRepository;
 import models.Message;
 import models.User;
 import models.UserContext;
+import models.UserState;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +36,7 @@ public class CommandHandlerTest {
     private UserRepository userRepository;
 
     /**
-     * Проверяет случай когда пользователь вводит команду /help
+     * Проверяет случай когда пользователь вводит команду /help.
      */
     @Test
     public void handleHelp() {
@@ -50,7 +51,7 @@ public class CommandHandlerTest {
     }
 
     /**
-     * Проверяет случай когда пользователь вводит команду /start
+     * Проверяет случай когда пользователь вводит команду /start.
      */
     @Test
     public void handleStart() throws SQLException {
@@ -69,7 +70,7 @@ public class CommandHandlerTest {
 
     /**
      * Проверяет случай когда команда не /start и не /help<br>
-     * и пользователь не найден
+     * и пользователь не найден.
      */
     @Test
     public void handleUserNull() throws SQLException {
@@ -84,7 +85,7 @@ public class CommandHandlerTest {
 
     /**
      * Проверяет случай когда команда не /start и не /help <br>
-     * и у найденного пользователя есть контекст
+     * и у найденного пользователя есть контекст.
      */
     @Test
     public void handleUserContextNotNull() throws SQLException {
@@ -97,14 +98,14 @@ public class CommandHandlerTest {
         ).thenReturn(user);
         Mockito.when(
                 userContextRepository.getUserContext(user.getId())
-        ).thenReturn(new UserContext("create_order", 0));
+        ).thenReturn(new UserContext(UserState.ORDER_CREATING, 0));
         String handle = commandHandler.handle(msg);
         Assert.assertEquals("Сейчас команды не доступны", handle);
     }
 
     /**
      * Проверяет случай когда команда не /start и не /help <br>
-     * у найденного пользователя нету контекста<br>
+     * у найденного пользователя нету контекста<br>.
      */
     @Test
     public void handleCreateEditCancelShowOrder() throws SQLException {

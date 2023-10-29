@@ -13,14 +13,10 @@ import java.sql.SQLException;
  */
 public class MessageHandler {
 
-    /**
-     * обработчик команд
-     */
+    /** обработчик команд */
     private final CommandHandler commandHandler;
 
-    /**
-     * обработчик текста
-     */
+    /** обработчик текста */
     private final TextHandler textHandler;
 
     /**
@@ -34,8 +30,8 @@ public class MessageHandler {
 
     /**
      * метод определяет сообщение как команду или как текст
-     * и отправляет в соответствующий обработчик
-     * @return String, текст который сформирует соответствующий обработчик
+     * и отправляет в соответствующий обработчик: {@link CommandHandler} или {@link TextHandler}
+     * @return Текст, который сформирует соответствующий обработчик
      */
     public String handle(Message msg){
         String text = msg.getText();

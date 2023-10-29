@@ -1,71 +1,72 @@
 package models;
 
-/**
- * Message - то что получает логика проекта.
- */
+/** Message - тип сообщений, с которым работает core логика проекта. */
 public class Message {
-    /**
-     * платформа с которой пришло сообщение
-     */
-    private String platform;
-    /**
-     * id на этой платформе
-     */
+    /** Платформа с которой пришло сообщение*/
+    private Platform platform;
+    /** Идентификатор отправителя сообщения на платформе, с которой он отправил сообщение */
     private String userIdOnPlatform;
-    /**
-     * текст сообщения
-     */
+    /** Текст сообщения */
     private String text;
 
+    /**
+     * поля text, platform, userIdOnPlatform выставляются в
+     * "empty constructor text", {@link Platform NO_PLATFORM}, "empty constructor id"
+     * соответственно.
+     */
     public Message() {
         this.text = "empty constructor text";
-        this.platform = "telegram";
+        this.platform = Platform.NO_PLATFORM;
         this.userIdOnPlatform = "empty constructor id";
     }
 
-    /**
-     * Конструктор для работы с telegram
-     */
+    /** Конструктор для работы с telegram. */
     public Message(org.telegram.telegrambots.meta.api.objects.Message message) {
+        this.platform = Platform.TELEGRAM;
         setText(message.getText());
-        this.platform = "telegram";
         this.userIdOnPlatform = String.valueOf(message.getChatId());
     }
 
+    /** Возвращает текст сообщения. */
     public String getText() {
         return text;
     }
 
     /**
-     * после проверки на нулевой текст меняет его на переданый
+     * @param text текст сообщения. не <b>null</b>.
+     * @throws IllegalArgumentException
      */
-    public void setText(String text) {
-        if(text == null) {
+    public void setText(String text) throws IllegalArgumentException {
+        if(text == null)
             throw new IllegalArgumentException("incorrect text. Must be not null");
-        }
         this.text = text;
     }
 
-    public String getPlatform() {
+    /** Возвращает платформу, с которой отправлено сообщение. */
+    public Platform getPlatform() {
         return platform;
     }
 
-    /**
-     * после проверки на наличие переданной платформы изменяет старую платформу на переданную
-     */
-    public void setPlatform(String platform) {
-        switch (platform) {
-            case "telegram":
-                this.platform = "telegram";
+    /** @param platform платформа. Не <b>null</b> */
+    public void setPlatform(Platform platform) throws IllegalArgumentException{
+        if(platform == null) {
+            throw new IllegalArgumentException("platform must be not null");
         }
-        throw new IllegalArgumentException("incorrect platform entered.");
+        this.platform = platform;
     }
 
+    /** Возвращает идентификатор пользователя на платформе, с которой было отправлено сообщение. */
     public String getUserIdOnPlatform() {
         return userIdOnPlatform;
     }
 
-    public void setUserIdOnPlatform(String userIdOnPlatform) {
+    /**
+     * @param userIdOnPlatform идентификатор пользователя на платформе, с которой он взаимодействует
+     *                         с программой. Не <b>null</b>
+     */
+    public void setUserIdOnPlatform(String userIdOnPlatform) throws IllegalArgumentException {
+        if(userIdOnPlatform == null)
+            throw new IllegalArgumentException("incorrect userIdOnPlatform. Must be not null");
         this.userIdOnPlatform = userIdOnPlatform;
     }
 }
