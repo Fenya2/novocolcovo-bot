@@ -1,12 +1,15 @@
 import bot.Bot;
 import bot.TGBot;
 import config.SQLiteDBconfig;
+import config.Stickers;
 import config.TGBotConfig;
 import core.CommandHandler;
 import core.MessageHandler;
 import core.TextHandler;
 import core.service.OrderService;
 import db.*;
+import models.Platform;
+import models.User;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;

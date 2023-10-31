@@ -125,4 +125,34 @@ public class LoggedUsersRepository extends Repository {
         statement.close();
         return 1;
     }
+
+    /**
+     * По идентификатору пользователя в программе возвращает идентификатор пользователя на указанной
+     * платформе, с которой пользователь взаимодействет с программой.
+     * @param userId идентификатор пользователя в программе
+     * @param platform платформа, с которой пользователь взаимодействует с программой. Не <b>null</b>
+     * @return идентификатор, если он существует, иначе <b>null</b>
+     */
+    public String getUserIdOnPlatform(long userId, Platform platform) throws SQLException {
+        if(platform == null)
+            return null;
+        if(userId <= 0)
+            return null;
+        String request = """
+                SELECT id_on_platform
+                FROM logged_users
+                WHERE user_id = %d AND platform = "%s";
+                """.formatted(userId, platform);
+        Statement statement = db.getStatement();
+        ResultSet resultSet = statement.executeQuery(request);
+        if (!resultSet.next()) {
+            resultSet.close();
+            statement.close();
+            return null;
+        }
+        String userIdOnPlatform= resultSet.getString("id_on_platform");
+        resultSet.close();
+        statement.close();
+        return userIdOnPlatform;
+    }
 }

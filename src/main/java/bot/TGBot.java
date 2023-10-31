@@ -5,9 +5,13 @@ import models.Message;
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import config.TGBotConfig;
+
+import java.util.concurrent.TimeoutException;
 
 /** Класс для связи с telegram через бота. */
 public class TGBot extends TelegramLongPollingBot implements Bot {
@@ -72,6 +76,17 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
         } catch (TelegramApiException e) {
             log.warn("can't send message with text %s to telegram user with id \"%s\""
                     .formatted(text, userIdOnPlatform));
+        }
+    }
+
+    public void sendSticker(String recipientId, String stickerToken) throws TelegramApiException {
+        SendSticker sendSticker = new SendSticker();
+        sendSticker.setChatId(recipientId);
+        sendSticker.setSticker(new InputFile(stickerToken));
+        try {
+            execute(sendSticker);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 }
