@@ -206,6 +206,9 @@ public class OrderServiceTest {
         Assert.assertEquals("Заказ удален", continueCancelOrder5);
     }
 
+    /** Проверяет работу команды show_order в случае, когда нет ни одного заказа.
+     * В случае когда у пользователя имеется хотя бы один заказ.
+     */
     @Test
     public void showOrder() throws SQLException, ParseException {
         ArrayList<Order> listAllOrder = new ArrayList<>(1);
@@ -219,6 +222,5 @@ public class OrderServiceTest {
 
         String showOrder2 = orderService.showOrder(1);
         Assert.assertEquals("-42: \n", showOrder2);
-
     }
 }
