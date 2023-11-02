@@ -9,9 +9,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * Реазизация интерфейса
- */
+/** Реазизация интерфейса */
 public class SQLiteDB implements DB{
     private static final Logger log = Logger.getLogger(SQLiteDB.class.getName());
 

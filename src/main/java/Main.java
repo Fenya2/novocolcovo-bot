@@ -2,11 +2,11 @@ import bot.Bot;
 import bot.TGBot;
 import config.SQLiteDBconfig;
 import config.TGBotConfig;
-import core.CommandHandler;
-import core.MessageHandler;
-import core.TextHandler;
-import core.service.OrderService;
 import db.*;
+import new_core.handlers.CommandHandler;
+import new_core.handlers.MessageHandler;
+import new_core.handlers.service_handlers.UpdateUserServiceHandler;
+import new_core.services.UpdateUserService;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
@@ -25,15 +25,14 @@ public class Main {
         UserContextRepository uc = new UserContextRepository(db,ur);
         OrderRepository or = new OrderRepository(db,ur);
 
-        OrderService os = new OrderService(uc, or);
-
-        CommandHandler cm = new CommandHandler(ur,lg, uc, os);
-        TextHandler th = new TextHandler(lg, uc, os);
-        MessageHandler mh = new MessageHandler(cm, th);
+        UpdateUserService updateUserService = new UpdateUserService(uc, ur);
+        UpdateUserServiceHandler updateUserServiceHandler = new UpdateUserServiceHandler(updateUserService);
+        CommandHandler commandHandler = new CommandHandler(updateUserService);
+        MessageHandler messageHandler = new MessageHandler(uc, lg, commandHandler, updateUserServiceHandler);
 
         TGBotConfig tgBotConfig = new TGBotConfig("src/main/resources/config/TGBotConfig.json");
 
-        Bot bot = new TGBot(tgBotConfig,mh);
+        Bot bot = new TGBot(tgBotConfig, messageHandler);
         TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
         botsApi.registerBot((LongPollingBot) bot);
     }

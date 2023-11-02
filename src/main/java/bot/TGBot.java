@@ -1,13 +1,17 @@
 package bot;
 
-import core.MessageHandler;
 import models.Message;
+import new_core.handlers.MessageHandler;
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import config.TGBotConfig;
+
+import java.util.concurrent.TimeoutException;
 
 /** Класс для связи с telegram через бота. */
 public class TGBot extends TelegramLongPollingBot implements Bot {
@@ -15,13 +19,13 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
     /** Конфигурация для работы с ботом. */
     TGBotConfig botConfig;
     /** Обработчик сообщений */
-    MessageHandler messageHandler;
+    new_core.handlers.MessageHandler messageHandler;
 
     /**
      * @param botConfig объект конфигурации бота
      * @param messageHandler обработчик сообщений
      */
-    public TGBot(TGBotConfig botConfig,MessageHandler messageHandler) {
+    public TGBot(TGBotConfig botConfig, MessageHandler messageHandler) {
         super(botConfig.getToken());
         this.botConfig = botConfig;
         this.messageHandler = messageHandler;
@@ -39,8 +43,8 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
         if(update.hasMessage()) {
             if(update.getMessage().hasText()) {
                 Message message = new Message(update.getMessage());
-                String text = messageHandler.handle(message);
-                sendTextMessage(String.valueOf(update.getMessage().getChatId()), text);
+                message.setBotFrom(this);
+                messageHandler.handle(message);
             }
             else {
                sendTextMessage(update.getMessage().getChatId().toString(),
@@ -72,6 +76,17 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
         } catch (TelegramApiException e) {
             log.warn("can't send message with text %s to telegram user with id \"%s\""
                     .formatted(text, userIdOnPlatform));
+        }
+    }
+
+    public void sendSticker(String recipientId, String stickerToken) throws TelegramApiException {
+        SendSticker sendSticker = new SendSticker();
+        sendSticker.setChatId(recipientId);
+        sendSticker.setSticker(new InputFile(stickerToken));
+        try {
+            execute(sendSticker);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 }
