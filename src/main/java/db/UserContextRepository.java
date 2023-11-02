@@ -32,7 +32,7 @@ public class UserContextRepository extends Repository{
         if(userRepository.getById(userId) == null) {
             return -2;
         }
-        if(getUserContext(userId) != null) {
+        if(getUserContext(userId).getState() != UserState.NO_STATE) {
             return -1;
         }
         String request = """

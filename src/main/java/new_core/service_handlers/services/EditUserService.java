@@ -79,7 +79,7 @@ public class EditUserService extends Service{
     public String startSession(long userId) {
         UserContext userContext = new UserContext(UserState.EDIT_USER);
         try {
-            super.userContextRepository.saveUserContext(userId, userContext);
+            super.userContextRepository.updateUserContext(userId, userContext);
         } catch (SQLException e) {
             return "Ошибка при обращении к базе данных." + e.getMessage();
         }

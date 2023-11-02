@@ -10,33 +10,28 @@ import models.UserState;
 import java.sql.SQLException;
 import java.text.ParseException;
 
-public class CreateOrderService extends Service{
+public class CreateOrderService {
     private final OrderRepository orderRepository;
-    public CreateOrderService(UserContextRepository userContextRepository, OrderRepository orderRepository) {
-        super(userContextRepository);
+    private final UserContextRepository userContextRepository;
+    public CreateOrderService(OrderRepository orderRepository, UserContextRepository userContextRepository) {
         this.orderRepository = orderRepository;
+        this.userContextRepository = userContextRepository;
     }
 
-    @Override
-    public String startSession(long userId) {
+    public String continueSession(long userId, String text) {
         try {
-            Order order = orderRepository.save(new Order(userId));
-            orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
-            UserContext userContext = new UserContext(UserState.ORDER_CREATING, 0);
-            userContextRepository.saveUserContext(userId, userContext);
-            return "Введите список продуктов";
+            UserContext userContext = userContextRepository.getUserContext(userId);
+            if (userContext.getStateNum() == 0) {
+                Order order = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
+                order.setDescription(text);
+                orderRepository.updateWithId(order);
+                orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
+                userContextRepository.updateUserContext(userId,new UserContext());
+                return "Заказ создан";
+            } else
+                return "Выход за пределы контекста";
         } catch (SQLException | ParseException e) {
             return "что-то пошло не так";
         }
-    }
-
-    @Override
-    public String endSession(long userId) throws SQLException {
-        return null;
-    }
-
-    @Override
-    public String getHelpMessage() {
-        return null;
     }
 }

@@ -5,10 +5,10 @@ import db.UserContextRepository;
 import models.Message;
 import models.User;
 import models.UserContext;
-import new_core.service_handlers.HandlerCancelOrderService;
-import new_core.service_handlers.HandlerCreateOrderService;
-import new_core.service_handlers.HandlerEditOrderService;
-import new_core.service_handlers.HandlerEditUserService;
+import new_core.service_handlers.handlers.HandlerCancelOrderService;
+import new_core.service_handlers.handlers.HandlerEditOrderService;
+import new_core.service_handlers.handlers.HandlerCreateOrderService;
+import new_core.service_handlers.handlers.HandlerEditUserService;
 
 import java.sql.SQLException;
 

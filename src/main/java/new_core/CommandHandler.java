@@ -30,7 +30,7 @@ public class CommandHandler {
             msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
         }
         switch (msg.getText()) {
-            case "/case"->{
+            case "/start"->{
                 String startMessage = serviceManager.start(msg);
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
             }

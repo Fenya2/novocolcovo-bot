@@ -34,7 +34,6 @@ public class OrderService {
      *
      * @param idUser идентификатор пользователя.
      * @return Сообщение для дальнейшего создания заказа.
-     * todo может число, либо true False. А обработчик сгенерирует сообщение по ответу сервиса?
      */
     public String startCreateOrder(long idUser) {
         try {

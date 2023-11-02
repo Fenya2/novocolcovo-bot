@@ -1,4 +1,4 @@
-package new_core.service_handlers;
+package new_core.service_handlers.handlers;
 
 import config.services.UpdateUserServiceConfig;
 import models.Message;
@@ -7,9 +7,9 @@ import new_core.service_handlers.services.EditUserService;
 import java.sql.SQLException;
 
 public class HandlerEditUserService {
-    private final EditUserService updateUserService;
+    private final EditUserService editUserService;
     public HandlerEditUserService(EditUserService updateUserService) {
-        this.updateUserService = updateUserService;
+        this.editUserService = updateUserService;
     }
 
     /**
@@ -21,7 +21,7 @@ public class HandlerEditUserService {
         switch (message.getText()) {
             case "/edit_username": {
                 try {
-                    updateUserService.setEditUsernameContext(message.getUser().getId());
+                    editUserService.setEditUsernameContext(message.getUser().getId());
                 } catch (SQLException e) {
                     message.getBotFrom().sendTextMessage(
                             message.getUserIdOnPlatform(),
@@ -37,7 +37,7 @@ public class HandlerEditUserService {
             }
             case "/edit_description": {
                 try {
-                    updateUserService.setEditDescriptionContext(message.getUser().getId());
+                    editUserService.setEditDescriptionContext(message.getUser().getId());
                 } catch (SQLException e) {
                     message.getBotFrom().sendTextMessage(
                             message.getUserIdOnPlatform(),
@@ -53,7 +53,7 @@ public class HandlerEditUserService {
             }
 
             case "/cancel": {
-                String text = updateUserService.endSession(message.getUser().getId());
+                String text = editUserService.endSession(message.getUser().getId());
                 message.getBotFrom().sendTextMessage(
                         message.getUserIdOnPlatform(),
                         text
@@ -73,8 +73,8 @@ public class HandlerEditUserService {
         switch(message.getUserContext().getStateNum()) {
             case 1: {
                 try {
-                    updateUserService.updateUsername(message.getText(), message.getUser());
-                    updateUserService.resetEditContext(message.getUser().getId());
+                    editUserService.updateUsername(message.getText(), message.getUser());
+                    editUserService.resetEditContext(message.getUser().getId());
                 } catch (SQLException e) {
                     message.getBotFrom().sendTextMessage(
                             message.getUserIdOnPlatform(),
@@ -89,8 +89,8 @@ public class HandlerEditUserService {
             }
             case 2: {
                 try {
-                    updateUserService.updateDescription(message.getText(), message.getUser());
-                    updateUserService.resetEditContext(message.getUser().getId());
+                    editUserService.updateDescription(message.getText(), message.getUser());
+                    editUserService.resetEditContext(message.getUser().getId());
                 } catch (SQLException e) {
                     message.getBotFrom().sendTextMessage(
                             message.getUserIdOnPlatform(),
