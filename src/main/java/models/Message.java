@@ -1,13 +1,25 @@
 package models;
 
+import bot.Bot;
+
 /** Message - тип сообщений, с которым работает core логика проекта. */
 public class Message {
+
+    /** Интерфейс бота, от которого пришло сообщение пользователя */
+    Bot botFrom;
+
     /** Платформа с которой пришло сообщение*/
     private Platform platform;
     /** Идентификатор отправителя сообщения на платформе, с которой он отправил сообщение */
     private String userIdOnPlatform;
     /** Текст сообщения */
     private String text;
+
+    /** Пользователь, которого получим во время обработки сообщения */
+    private User user;
+
+    /** Контекст пользователя, который получим во время обработки сообщения */
+    private UserContext userContext;
 
     /**
      * поля text, platform, userIdOnPlatform выставляются в
@@ -25,6 +37,14 @@ public class Message {
         this.platform = Platform.TELEGRAM;
         setText(message.getText());
         this.userIdOnPlatform = String.valueOf(message.getChatId());
+    }
+
+    public Bot getBotFrom() {
+        return botFrom;
+    }
+
+    public void setBotFrom(Bot bot) {
+        this.botFrom = bot;
     }
 
     /** Возвращает текст сообщения. */
@@ -68,5 +88,21 @@ public class Message {
         if(userIdOnPlatform == null)
             throw new IllegalArgumentException("incorrect userIdOnPlatform. Must be not null");
         this.userIdOnPlatform = userIdOnPlatform;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public UserContext getUserContext() {
+        return userContext;
+    }
+
+    public void setUserContext(UserContext userContext) {
+        this.userContext = userContext;
     }
 }
