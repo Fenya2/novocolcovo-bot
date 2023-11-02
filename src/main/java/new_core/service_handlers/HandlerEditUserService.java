@@ -1,15 +1,14 @@
-package new_core.handlers.service_handlers;
+package new_core.service_handlers;
 
 import config.services.UpdateUserServiceConfig;
 import models.Message;
-import models.User;
-import new_core.services.UpdateUserService;
+import new_core.service_handlers.services.EditUserService;
 
 import java.sql.SQLException;
 
-public class UpdateUserServiceHandler {
-    private final UpdateUserService updateUserService;
-    public UpdateUserServiceHandler(UpdateUserService updateUserService) {
+public class HandlerEditUserService {
+    private final EditUserService updateUserService;
+    public HandlerEditUserService(EditUserService updateUserService) {
         this.updateUserService = updateUserService;
     }
 

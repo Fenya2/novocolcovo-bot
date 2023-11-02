@@ -69,7 +69,7 @@ public class UserContextRepository extends Repository{
         Statement statement = db.getStatement();
         ResultSet resultSet = statement.executeQuery(request);
         if(!resultSet.next()) {
-            return null;
+            return new UserContext();
         }
         UserContext userContext = new UserContext(
                 UserState.valueOf(resultSet.getString("state")),

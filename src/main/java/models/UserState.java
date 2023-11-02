@@ -5,6 +5,5 @@ public enum UserState {
     ORDER_CREATING,
     ORDER_EDITING,
     ORDER_CANCELING,
-
     EDIT_USER
 }

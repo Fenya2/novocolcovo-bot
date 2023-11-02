@@ -1,7 +1,7 @@
 package bot;
 
 import models.Message;
-import new_core.handlers.MessageHandler;
+import new_core.MessageHandler;
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -11,15 +11,13 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import config.TGBotConfig;
 
-import java.util.concurrent.TimeoutException;
-
 /** Класс для связи с telegram через бота. */
 public class TGBot extends TelegramLongPollingBot implements Bot {
     private static final Logger log = Logger.getLogger(TGBot.class.getName());
     /** Конфигурация для работы с ботом. */
     TGBotConfig botConfig;
     /** Обработчик сообщений */
-    new_core.handlers.MessageHandler messageHandler;
+    MessageHandler messageHandler;
 
     /**
      * @param botConfig объект конфигурации бота

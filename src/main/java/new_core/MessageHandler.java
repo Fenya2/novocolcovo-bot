@@ -1,11 +1,14 @@
-package new_core.handlers;
+package new_core;
 
 import db.LoggedUsersRepository;
 import db.UserContextRepository;
 import models.Message;
 import models.User;
 import models.UserContext;
-import new_core.handlers.service_handlers.UpdateUserServiceHandler;
+import new_core.service_handlers.HandlerCancelOrderService;
+import new_core.service_handlers.HandlerCreateOrderService;
+import new_core.service_handlers.HandlerEditOrderService;
+import new_core.service_handlers.HandlerEditUserService;
 
 import java.sql.SQLException;
 
@@ -19,21 +22,32 @@ public class MessageHandler {
     private final UserContextRepository userContextRepository;
     /** Таблица залогинившихся пользователелй. */
     private final LoggedUsersRepository loggedUsersRepository;
-
     private final CommandHandler commandHandler;
-    private final UpdateUserServiceHandler updateUserServiceHandler;
+    private final HandlerEditUserService handlerEditUserService;
+    private final HandlerCreateOrderService handlerCreateOrderService;
+    private final HandlerEditOrderService handlerEditOrderService;
+    private final HandlerCancelOrderService handlerCancelOrderService;
 
-    /** @param userContextRepository таблица контекстов пользователей */
+
+    /**
+     * @param userContextRepository     таблица контекстов пользователей
+     * @param handlerCreateOrderService
+     * @param handlerEditOrderService
+     * @param handlerCancelOrderService
+     */
     public MessageHandler(
             UserContextRepository userContextRepository,
             LoggedUsersRepository loggedUsersRepository,
             CommandHandler commandHandler,
-            UpdateUserServiceHandler updateUserServiceHandler
-    ) {
+            HandlerEditUserService updateUserServiceHandler,
+            HandlerCreateOrderService handlerCreateOrderService, HandlerEditOrderService handlerEditOrderService, HandlerCancelOrderService handlerCancelOrderService) {
         this.userContextRepository = userContextRepository;
         this.loggedUsersRepository = loggedUsersRepository;
         this.commandHandler = commandHandler;
-        this.updateUserServiceHandler = updateUserServiceHandler;
+        this.handlerEditUserService = updateUserServiceHandler;
+        this.handlerCreateOrderService = handlerCreateOrderService;
+        this.handlerEditOrderService = handlerEditOrderService;
+        this.handlerCancelOrderService = handlerCancelOrderService;
     }
 
     /** первичный метод обработки сообщения. Если у пользователя, отправившего сообщение есть
@@ -41,51 +55,50 @@ public class MessageHandler {
      * сообщение является командой, перенаправляет сообщение в обработчик команд. Иначе сообщает
      * пользователю, что сообщение некорректно.
      */
-    public void handle(Message message) {
+    public void handle(Message msg) {
         User user = null;
         UserContext userContext = null;
         try {
             user = loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
-                    message.getPlatform(),
-                    message.getUserIdOnPlatform()
+                    msg.getPlatform(),
+                    msg.getUserIdOnPlatform()
             );
         } catch (SQLException e) {
-            message.getBotFrom().sendTextMessage(
-                    message.getUserIdOnPlatform(),
+            msg.getBotFrom().sendTextMessage(
+                    msg.getUserIdOnPlatform(),
                     "Проблемы с доступом к базе данных " + e.getMessage()
             );
             return;
         }
+
         if(user == null) {
-            message.getBotFrom().sendTextMessage(
-                    message.getUserIdOnPlatform(),
+            if (msg.getText().equals("/start")) {
+                commandHandler.handle(msg);
+                return;
+            }
+            msg.getBotFrom().sendTextMessage(
+                    msg.getUserIdOnPlatform(),
                     "отправтьте /start для последующей работы."
             );
             return;
         }
-        message.setUser(user);
+
+        msg.setUser(user);
         try {userContext = userContextRepository.getUserContext(user.getId());}
         catch (SQLException e) {
-            message.getBotFrom().sendTextMessage(
-                    message.getUserIdOnPlatform(),
+            msg.getBotFrom().sendTextMessage(
+                    msg.getUserIdOnPlatform(),
                     "Проблемы с доступом к базе данных " + e.getMessage());
             return;
         }
 
-        if(userContext == null) {
-            switch (message.getPlatform()) {
-                case TELEGRAM -> {
-                    if(message.getText().charAt(0) == '/') {
-                        commandHandler.handle(message);
-                        return;
-                    }
-                }
-            }
-        }
-
-        message.setUserContext(userContext);
+        msg.setUserContext(userContext);
         switch(userContext.getState()) {
-            case EDIT_USER -> updateUserServiceHandler.handle(message);
+            case NO_STATE -> commandHandler.handle(msg);
+            case EDIT_USER -> handlerEditUserService.handle(msg);
+            case ORDER_CREATING -> handlerCreateOrderService.handle(msg);
+            case ORDER_EDITING -> handlerEditOrderService.handle(msg);
+            case ORDER_CANCELING-> handlerCancelOrderService.handle(msg);
         }
     }
 }

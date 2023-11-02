@@ -1,4 +1,4 @@
-package new_core.services;
+package new_core.service_handlers.services;
 
 import config.services.UpdateUserServiceConfig;
 import db.UserContextRepository;
@@ -9,13 +9,13 @@ import models.UserState;
 
 import java.sql.SQLException;
 
-public class UpdateUserService extends Service{
+public class EditUserService extends Service{
 
     /** таблица пользователей */
-    private UserRepository ur;
+    private final UserRepository ur;
 
     /** Конструктор Сервиса */
-    public UpdateUserService(UserContextRepository ucr, UserRepository ur) {
+    public EditUserService(UserContextRepository ucr, UserRepository ur) {
         super(ucr);
         this.ur = ur;
     }
