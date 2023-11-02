@@ -43,13 +43,13 @@ public class CommandHandler {
         try {
             String text = msg.getText();
             switch (text) {
+                case "/start" -> {return start(msg);}
                 case "/help" -> {return """
                         /create_order - создать заказ
                         /edit_order - изменить заказ
                         /cancel_order - удалить заказ
                         /show_order - посмотреть список заказов
                         """;}
-                case "/start" -> {return start(msg);}
             }
 
             User user = loggedUsersRepository.getUserByPlatformAndIdOnPlatform(msg.getPlatform(),
@@ -71,8 +71,6 @@ public class CommandHandler {
         } catch (SQLException e){
             return "Что-то пошло не так";
         }
-
-
     }
 
     /**

@@ -1,7 +1,7 @@
 package bot;
 
-import core.MessageHandler;
 import models.Message;
+import new_core.handlers.MessageHandler;
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -19,13 +19,13 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
     /** Конфигурация для работы с ботом. */
     TGBotConfig botConfig;
     /** Обработчик сообщений */
-    MessageHandler messageHandler;
+    new_core.handlers.MessageHandler messageHandler;
 
     /**
      * @param botConfig объект конфигурации бота
      * @param messageHandler обработчик сообщений
      */
-    public TGBot(TGBotConfig botConfig,MessageHandler messageHandler) {
+    public TGBot(TGBotConfig botConfig, MessageHandler messageHandler) {
         super(botConfig.getToken());
         this.botConfig = botConfig;
         this.messageHandler = messageHandler;
@@ -43,8 +43,8 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
         if(update.hasMessage()) {
             if(update.getMessage().hasText()) {
                 Message message = new Message(update.getMessage());
-                String text = messageHandler.handle(message);
-                sendTextMessage(String.valueOf(update.getMessage().getChatId()), text);
+                message.setBotFrom(this);
+                messageHandler.handle(message);
             }
             else {
                sendTextMessage(update.getMessage().getChatId().toString(),
