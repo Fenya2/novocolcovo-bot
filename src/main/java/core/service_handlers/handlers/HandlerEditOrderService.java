@@ -1,8 +1,7 @@
-package new_core.service_handlers.handlers;
+package core.service_handlers.handlers;
 
 import models.Message;
-import new_core.service_handlers.services.EditOrderService;
-import new_core.service_handlers.services.EditUserService;
+import core.service_handlers.services.EditOrderService;
 
 /** Обработчик контекста {@link models.UserState#ORDER_EDITING ORDER_EDITING}. */
 public class HandlerEditOrderService {

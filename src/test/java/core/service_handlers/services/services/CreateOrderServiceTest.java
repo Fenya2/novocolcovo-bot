@@ -1,10 +1,9 @@
-package new_core.service_handlers.services.services;
+package core.service_handlers.services.services;
 
-import core.service.OrderService;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.*;
-import new_core.service_handlers.services.CreateOrderService;
+import core.service_handlers.services.CreateOrderService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,8 +14,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-
-import static org.junit.Assert.*;
 
 public class CreateOrderServiceTest {
     @Before

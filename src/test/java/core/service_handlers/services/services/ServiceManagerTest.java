@@ -1,14 +1,11 @@
-package new_core.service_handlers.services.services;
+package core.service_handlers.services.services;
 
-import core.CommandHandler;
-import core.TextHandler;
-import core.service.OrderService;
 import db.LoggedUsersRepository;
 import db.OrderRepository;
 import db.UserContextRepository;
 import db.UserRepository;
 import models.*;
-import new_core.service_handlers.services.ServiceManager;
+import core.service_handlers.services.ServiceManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,8 +17,6 @@ import org.mockito.MockitoAnnotations;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
-
-import static org.junit.Assert.*;
 
 public class ServiceManagerTest {
     @Before
@@ -124,7 +119,5 @@ public class ServiceManagerTest {
 
         String showOrder2 = serviceManager.showOrder(1);
         Assert.assertEquals("-42: \n", showOrder2);
-
     }
-    
 }

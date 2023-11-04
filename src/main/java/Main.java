@@ -2,11 +2,11 @@ import bot.Bot;
 import bot.TGBot;
 import config.SQLiteDBconfig;
 import config.TGBotConfig;
+import core.service_handlers.handlers.*;
+import core.service_handlers.services.*;
 import db.*;
 
-import new_core.service_handlers.handlers.*;
-import new_core.MessageHandler;
-import new_core.service_handlers.services.*;
+import core.MessageHandler;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;

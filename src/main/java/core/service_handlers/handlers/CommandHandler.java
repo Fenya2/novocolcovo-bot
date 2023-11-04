@@ -1,7 +1,7 @@
-package new_core.service_handlers.handlers;
+package core.service_handlers.handlers;
 
+import core.service_handlers.services.ServiceManager;
 import models.Message;
-import new_core.service_handlers.services.*;
 /** Обработчик команд. <br>
  * При вызове команды, она либо сразу обрабатывается,
  * либо запускается контекст, в который помещается пользователь для дальнейшей работы

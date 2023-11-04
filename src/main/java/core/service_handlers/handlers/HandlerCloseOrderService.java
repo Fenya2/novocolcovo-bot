@@ -1,7 +1,7 @@
-package new_core.service_handlers.handlers;
+package core.service_handlers.handlers;
 
 import models.Message;
-import new_core.service_handlers.services.CloseOrderService;
+import core.service_handlers.services.CloseOrderService;
 
 /** Обработчик контекстов {@link models.UserState#ORDER_CLOSING_COURIER ORDER_CLOSING_COURIER}
  *  и {@link models.UserState#ORDER_CLOSING_CLIENT ORDER_CLOSING_CLIENT} */

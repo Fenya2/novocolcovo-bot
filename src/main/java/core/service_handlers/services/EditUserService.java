@@ -1,4 +1,4 @@
-package new_core.service_handlers.services;
+package core.service_handlers.services;
 
 import config.services.EditUserServiceConfig;
 import db.UserContextRepository;

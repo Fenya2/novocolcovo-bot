@@ -1,7 +1,6 @@
-package new_core.service_handlers.services;
+package core.service_handlers.services;
 
 import config.services.EditUserServiceConfig;
-import core.MessageHandler;
 import db.LoggedUsersRepository;
 import db.OrderRepository;
 import db.UserContextRepository;
@@ -42,7 +41,7 @@ public class ServiceManager {
     /**
      * Проверяет наличие пользователя в системе, если нет то добавляет в таблицы User и LoggedUsers
      *
-     * @param msg сообщение от {@link MessageHandler}.
+     * @param msg сообщение от {@link core.MessageHandler}.
      * @return сообщение с приветствием.
      * В случае ошибки возвращает сообщение об ошибке.
      */

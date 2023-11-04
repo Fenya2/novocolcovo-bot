@@ -1,9 +1,9 @@
-package new_core.service_handlers.services.services;
+package core.service_handlers.services.services;
 
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.*;
-import new_core.service_handlers.services.CancelOrderService;
+import core.service_handlers.services.CancelOrderService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,8 +14,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-
-import static org.junit.Assert.*;
 
 public class CancelOrderServiceTest {
     @Before

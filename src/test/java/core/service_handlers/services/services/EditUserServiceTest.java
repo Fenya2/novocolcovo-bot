@@ -1,10 +1,10 @@
-package new_core.service_handlers.services.services;
+package core.service_handlers.services.services;
 
+import core.service_handlers.services.EditUserService;
 import db.UserContextRepository;
 import db.UserRepository;
 import models.User;
 import models.UserContext;
-import new_core.service_handlers.services.EditUserService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

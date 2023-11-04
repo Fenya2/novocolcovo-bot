@@ -1,8 +1,8 @@
-package new_core.service_handlers.handlers;
+package core.service_handlers.handlers;
 
 import config.services.EditUserServiceConfig;
 import models.Message;
-import new_core.service_handlers.services.EditUserService;
+import core.service_handlers.services.EditUserService;
 
 import java.sql.SQLException;
 /** Обработчик контекста изменения пользователя. */
