@@ -10,7 +10,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Класс, отвечающий за работу с таблицей user_contexts базы данных.
+ * Класс, отвечающий за работу с таблицей user_contexts базы данных. <br>
+ * Содержит информацио о контексте пользователя.
  */
 public class UserContextRepository extends Repository{
     private static final Logger log = Logger.getLogger(UserContextRepository.class.getName());

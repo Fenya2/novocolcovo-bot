@@ -1,16 +1,21 @@
 package new_core.service_handlers.handlers;
 
 import models.Message;
-import new_core.service_handlers.services.CancelOrderService;
 import new_core.service_handlers.services.EditOrderService;
+import new_core.service_handlers.services.EditUserService;
 
+/** Обработчик контекста {@link models.UserState#ORDER_EDITING ORDER_EDITING}. */
 public class HandlerEditOrderService {
+
+    /** @see EditOrderService */
     private final EditOrderService editOrderService;
 
+    /** Конструктор {@link HandlerEditOrderService}*/
     public HandlerEditOrderService(EditOrderService editOrderService) {
         this.editOrderService = editOrderService;
     }
 
+    /**Обработчик команд связаных с контекстом {@link models.UserState#ORDER_EDITING ORDER_EDITING}*/
     public void handle(Message msg) {
         if(msg.getText().charAt(0)=='/'){
             String message = "Команды сейчас недоступны";

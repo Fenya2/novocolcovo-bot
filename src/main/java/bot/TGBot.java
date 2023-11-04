@@ -59,8 +59,7 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
      * @param text текст сообщения. Не <b>null</b>
      */
     @Override
-    public void sendTextMessage(String userIdOnPlatform, String text)
-            throws IllegalArgumentException {
+    public void sendTextMessage(String userIdOnPlatform, String text) throws IllegalArgumentException {
         if(userIdOnPlatform == null)
             throw new IllegalArgumentException("userIdOnPlatform must be not null.");
         if(text == null)

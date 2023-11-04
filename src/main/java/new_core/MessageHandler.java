@@ -5,42 +5,52 @@ import db.UserContextRepository;
 import models.Message;
 import models.User;
 import models.UserContext;
-import new_core.service_handlers.handlers.HandlerCancelOrderService;
-import new_core.service_handlers.handlers.HandlerEditOrderService;
-import new_core.service_handlers.handlers.HandlerCreateOrderService;
-import new_core.service_handlers.handlers.HandlerEditUserService;
+import new_core.service_handlers.handlers.*;
 
 import java.sql.SQLException;
 
 /**
- * Класс, обрабатывающий сообщения, поступаюшие от пользователей из разных платформ, направляющий
- * сообщение в нужный сервисный обработчик, в зависимости от контекста пользователя для последующей
+ * Класс, обрабатывающий сообщения, поступающие от пользователей из разных платформ, направляющий
+ * сообщение в нужный сервисный обработчике, в зависимости от контекста пользователя для последующей
  * обработки
  */
 public class MessageHandler {
-    /** Таблица контекстов пользователей. Должен только читать таблицу! */
+    /** @see UserContextRepository */
     private final UserContextRepository userContextRepository;
-    /** Таблица залогинившихся пользователелй. */
+
+    /** @see LoggedUsersRepository*/
     private final LoggedUsersRepository loggedUsersRepository;
+
+    /** @see CommandHandler */
     private final CommandHandler commandHandler;
+
+    /** @see HandlerEditUserService */
     private final HandlerEditUserService handlerEditUserService;
+
+    /** @see HandlerCreateOrderService */
     private final HandlerCreateOrderService handlerCreateOrderService;
+
+    /** @see HandlerEditOrderService */
     private final HandlerEditOrderService handlerEditOrderService;
+
+    /** @see HandlerCancelOrderService */
     private final HandlerCancelOrderService handlerCancelOrderService;
+    private final HandlerAcceptOrderService handlerAcceptOrderService;
+    private final HandlerCloseOrderService handlerCloseOrderService;
 
 
-    /**
-     * @param userContextRepository     таблица контекстов пользователей
-     * @param handlerCreateOrderService
-     * @param handlerEditOrderService
-     * @param handlerCancelOrderService
-     */
+    /** Конструктор {@link MessageHandler MessageHandler}*/
     public MessageHandler(
             UserContextRepository userContextRepository,
             LoggedUsersRepository loggedUsersRepository,
             CommandHandler commandHandler,
             HandlerEditUserService updateUserServiceHandler,
-            HandlerCreateOrderService handlerCreateOrderService, HandlerEditOrderService handlerEditOrderService, HandlerCancelOrderService handlerCancelOrderService) {
+            HandlerCreateOrderService handlerCreateOrderService,
+            HandlerEditOrderService handlerEditOrderService,
+            HandlerCancelOrderService handlerCancelOrderService,
+            HandlerAcceptOrderService handlerAcceptOrderService,
+            HandlerCloseOrderService handlerCloseOrderService
+    ) {
         this.userContextRepository = userContextRepository;
         this.loggedUsersRepository = loggedUsersRepository;
         this.commandHandler = commandHandler;
@@ -48,16 +58,18 @@ public class MessageHandler {
         this.handlerCreateOrderService = handlerCreateOrderService;
         this.handlerEditOrderService = handlerEditOrderService;
         this.handlerCancelOrderService = handlerCancelOrderService;
+        this.handlerAcceptOrderService = handlerAcceptOrderService;
+        this.handlerCloseOrderService = handlerCloseOrderService;
     }
 
-    /** первичный метод обработки сообщения. Если у пользователя, отправившего сообщение есть
-     * контекст, напрявляет сообщение в соответствующий сервисный обработчик, если отправленное
+    /** Первичный метод обработки сообщения. Если у пользователя, отправившего сообщение есть
+     * контекст, направляет сообщение в соответствующий сервисный обработчик, если отправленное
      * сообщение является командой, перенаправляет сообщение в обработчик команд. Иначе сообщает
      * пользователю, что сообщение некорректно.
      */
     public void handle(Message msg) {
-        User user = null;
-        UserContext userContext = null;
+        User user;
+        UserContext userContext;
         try {
             user = loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
                     msg.getPlatform(),
@@ -78,7 +90,7 @@ public class MessageHandler {
             }
             msg.getBotFrom().sendTextMessage(
                     msg.getUserIdOnPlatform(),
-                    "отправтьте /start для последующей работы."
+                    "отправьте /start для последующей работы."
             );
             return;
         }
@@ -99,6 +111,9 @@ public class MessageHandler {
             case ORDER_CREATING -> handlerCreateOrderService.handle(msg);
             case ORDER_EDITING -> handlerEditOrderService.handle(msg);
             case ORDER_CANCELING-> handlerCancelOrderService.handle(msg);
+            case ORDER_ACCEPTING -> handlerAcceptOrderService.handle(msg);
+            case ORDER_CLOSING_COURIER,
+                    ORDER_CLOSING_CLIENT -> handlerCloseOrderService.handle(msg);
         }
     }
 }

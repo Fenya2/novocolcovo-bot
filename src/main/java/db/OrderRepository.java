@@ -14,7 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Класс, отвечающий за работу с таблицей orders базы данных.
+ * Класс, отвечающий за работу с таблицей orders базы данных. <br>
+ * Содержит информацию о заказах.
  */
 public class OrderRepository extends Repository{
     private static final Logger log = Logger.getLogger(OrderRepository.class.getName());

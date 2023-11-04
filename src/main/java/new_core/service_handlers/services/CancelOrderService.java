@@ -5,20 +5,34 @@ import db.UserContextRepository;
 import models.Order;
 import models.OrderStatus;
 import models.UserContext;
-import models.UserState;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.ArrayList;
 
+/** Сервис для работы с контекстом {@link models.UserState#ORDER_CANCELING ORDER_CANCELING}*/
 public class CancelOrderService {
+
+    /** @see OrderRepository*/
     private final OrderRepository orderRepository;
+
+    /** @see UserContextRepository*/
     private final UserContextRepository userContextRepository;
+
+    /** Конструктор {@link CancelOrderService}*/
     public CancelOrderService(OrderRepository orderRepository, UserContextRepository userContextRepository) {
         this.orderRepository = orderRepository;
         this.userContextRepository = userContextRepository;
     }
 
+    /**
+     * Продолжение удаления заказа. Диалог с пользователем<br><br>
+     * 1)Получает контекст пользователя и заказ, удаляет заказ в бд<br>
+     * Удаляет контекст пользователя и меняет статус заказа так как создание закончилось
+     *
+     * @param userId id пользователя, который удаляет заказ
+     * @param text   string
+     * @return сообщение об успешном удалении заказа
+     */
     public String continueSession(long userId, String text){
         try {
             UserContext userContext = userContextRepository.getUserContext(userId);

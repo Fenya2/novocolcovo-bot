@@ -5,19 +5,34 @@ import db.UserContextRepository;
 import models.Order;
 import models.OrderStatus;
 import models.UserContext;
-import models.UserState;
 
 import java.sql.SQLException;
 import java.text.ParseException;
 
+/** Сервис для работы с контекстом {@link models.UserState#ORDER_CREATING ORDER_CREATING}*/
 public class CreateOrderService {
+
+    /** @see OrderRepository*/
     private final OrderRepository orderRepository;
+
+    /** @see UserContextRepository*/
     private final UserContextRepository userContextRepository;
+
+    /** Конструктор {@link CreateOrderService}*/
     public CreateOrderService(OrderRepository orderRepository, UserContextRepository userContextRepository) {
         this.orderRepository = orderRepository;
         this.userContextRepository = userContextRepository;
     }
 
+    /**
+     * Продолжение создания заказа. Диалог с пользователем<br><br>
+     * Получает контекст пользователя и заказ, создает новый заказ с описанием. Обновляет заказ в бд<br>
+     * Удаляет контекст пользователя и меняет статус заказа так как создание закончилось
+     *
+     * @param userId id пользователя, который создает заказ
+     * @param text   string список продуктов
+     * @return сообщение об успешном создании заказа
+     */
     public String continueSession(long userId, String text) {
         try {
             UserContext userContext = userContextRepository.getUserContext(userId);

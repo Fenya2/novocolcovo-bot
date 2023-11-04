@@ -1,7 +1,7 @@
 package new_core.service_handlers.services;
 
+import config.services.EditUserServiceConfig;
 import core.MessageHandler;
-import core.service.OrderService;
 import db.LoggedUsersRepository;
 import db.OrderRepository;
 import db.UserContextRepository;
@@ -12,30 +12,23 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
+
+/** Главный сервис. Работает c контекстом {@link UserState#NO_STATE NO_STATE}*/
 public class ServiceManager {
-    /**
-     * Cодержит информацию о пользователях.
-     */
+
+    /** @see UserRepository*/
     private final UserRepository userRepository;
-    /**
-     * Позволяет опознать пользователя в системе.
-     */
+
+    /** @see LoggedUsersRepository*/
     private final LoggedUsersRepository loggedUsersRepository;
-    /**
-     * Содержит информацио о контексте пользователя.
-     */
+
+    /** @see UserContextRepository*/
     private final UserContextRepository userContextRepository;
-    /**
-     * Содержит информацию о заказах.
-     */
+
+    /** @see OrderRepository*/
     private final OrderRepository orderRepository;
 
-    /**
-     * @param userRepository        содержит информацию о пользователях.
-     * @param loggedUsersRepository Позволяет опознать пользователя в системе.
-     * @param userContextRepository Содержит информацио о контексте пользователя.
-     * @param orderRepository       Содержит информацию о заказах.
-     */
+    /**Конструктор {@link ServiceManager ServiceManager} */
     public ServiceManager(LoggedUsersRepository loggedUsersRepository,
                           OrderRepository orderRepository,
                           UserRepository userRepository,
@@ -47,7 +40,7 @@ public class ServiceManager {
     }
 
     /**
-     * Проверяет наличие пользователя в системе, если нету то добавляет в таблицы User и LoggedUsers
+     * Проверяет наличие пользователя в системе, если нет то добавляет в таблицы User и LoggedUsers
      *
      * @param msg сообщение от {@link MessageHandler}.
      * @return сообщение с приветствием.
@@ -65,7 +58,7 @@ public class ServiceManager {
             }
             return "Привет. Напишите /help";
         } catch (Exception e) {
-            return "Что-то пошло не так";
+            return "Что-то пошло не так"+ e.getMessage();
         }
     }
 
@@ -85,14 +78,14 @@ public class ServiceManager {
             userContextRepository.updateUserContext(idUser, userContext);
             return "Введите список продуктов";
         } catch (SQLException | ParseException e) {
-            return "что-то пошло не так";
+            return "что-то пошло не так"+ e.getMessage();
         }
     }
 
     /**
      * Начало обновления заказа.  <br>
      * Получает список всех заказов и из них выбирает заказы пользователя
-     * добавляет контекст пользователя в бд
+     * и добавляет контекст пользователя в бд
      *
      * @param idUser order
      * @return Выводит список всех заказов пользователя, что бы пользователь мог выбрать какой заказ обновить
@@ -108,13 +101,12 @@ public class ServiceManager {
             }
             if (allOrderUser.isEmpty())
                 return "у вас нет ни одного заказа";
-            //TODO
             UserContext userContext = new UserContext(UserState.ORDER_EDITING, 0);
             userContextRepository.updateUserContext(idUser, userContext);
             return "Какой заказ вы хотите обновить.?\n"
                     .concat(allOrderUser.toString());
         } catch (SQLException | ParseException e) {
-            return "что-то пошло не так";
+            return "что-то пошло не так"+ e.getMessage();
         }
     }
 
@@ -144,7 +136,7 @@ public class ServiceManager {
             return "Какой заказ вы хотите удалить.?\n"
                     .concat(allOrderUser.toString());
         } catch (SQLException | ParseException e) {
-            return "что-то пошло не так";
+            return "что-то пошло не так" + e.getMessage();
         }
     }
 
@@ -168,7 +160,41 @@ public class ServiceManager {
                 return "у вас нет ни одного заказа";
             return allOrderUser.toString();
         } catch (SQLException | ParseException e) {
-            return "что-то пошло не так";
+            return "что-то пошло не так" +e.getMessage();
         }
+    }
+
+    /**
+     * Начинает процедуру изменения описания пользователя в системе, меняет контекст пользователя на
+     * {@link UserState EDIT_USER}
+     * @param userId идентификатор пользователя, с которым нужно начать сессию.
+     * @return приветственное сообщение сервиса. Содержащее команды, с помощью которых можно
+     * изменить описание пользователя, его имя.
+     */
+
+    public String startEditUserService(long userId){
+        UserContext userContext = new UserContext(UserState.EDIT_USER);
+        try {
+            userContextRepository.updateUserContext(userId, userContext);
+        } catch (SQLException e) {
+            return "Ошибка при обращении к базе данных." + e.getMessage();
+        }
+        return EditUserServiceConfig.START_MESSAGE.getStr();
+    }
+
+    public String showPendingOrders(long id) {
+        return "";
+    }
+
+    public String startAcceptOrder(long id) {
+        return "";
+    }
+
+    public String showAcceptOrder(long id) {
+        return "";
+    }
+
+    public String startCloseOrder(long id) {
+        return "";
     }
 }

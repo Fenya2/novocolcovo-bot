@@ -1,6 +1,6 @@
 package new_core.service_handlers.services;
 
-import config.services.UpdateUserServiceConfig;
+import config.services.EditUserServiceConfig;
 import db.UserContextRepository;
 import db.UserRepository;
 import models.User;
@@ -9,15 +9,20 @@ import models.UserState;
 
 import java.sql.SQLException;
 
-public class EditUserService extends Service{
+/** Сервис для работы с контекстом {@link models.UserState#EDIT_USER EDIT_USER}*/
 
-    /** таблица пользователей */
-    private final UserRepository ur;
+public class EditUserService {
 
-    /** Конструктор Сервиса */
-    public EditUserService(UserContextRepository ucr, UserRepository ur) {
-        super(ucr);
-        this.ur = ur;
+    /** @see UserContextRepository*/
+    private final UserContextRepository userContextRepository;
+
+    /** @see UserRepository */
+    private final UserRepository userRepository;
+
+    /** Конструктор {@link EditUserService}*/
+    public EditUserService(UserContextRepository userContextRepository, UserRepository userRepository) {
+        this.userContextRepository = userContextRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -27,18 +32,17 @@ public class EditUserService extends Service{
      */
     public void updateUsername(String username, User user) throws SQLException {
         user.setName(username);
-        ur.updateUser(user);
+        userRepository.updateUser(user);
     }
 
     /**
      * Обновляет в базе данных описание пользователя на указанное.
-     * @param description новаое описание пользвоателя
+     * @param description новое описание пользователя
      * @param user пользователь
-     * @throws SQLException
      */
     public void updateDescription(String description, User user) throws SQLException {
         user.setDescription(description);
-        ur.updateUser(user);
+        userRepository.updateUser(user);
     }
 
     /**
@@ -69,40 +73,17 @@ public class EditUserService extends Service{
     }
 
     /**
-     * Начинает процедуру изменения описания пользователя в системе, меняет контекст пользователя на
-     * {@link UserState EDIT_USER}
-     * @param userId идентификатор пользователя, с которым нужно начать сессию.
-     * @return приветственное сообщение сервиса. Содержащее команды, с помощью которых можно
-     * изменить описание пользователя, его имя.
-     */
-    @Override
-    public String startSession(long userId) {
-        UserContext userContext = new UserContext(UserState.EDIT_USER);
-        try {
-            super.userContextRepository.updateUserContext(userId, userContext);
-        } catch (SQLException e) {
-            return "Ошибка при обращении к базе данных." + e.getMessage();
-        }
-        return UpdateUserServiceConfig.START_MESSAGE.getStr();
-    }
-
-    /**
-     * Завершает сессию с пользователем, удаяя его контекст и возвращая сообщение с прощанием.
+     * Завершает сессию с пользователем, удаляя его контекст и возвращая сообщение с прощанием.
      * @param userId идентификатор пользователя.
-     * @return сообщение о заверщении сессии пользователя с этим сервисом.
+     * @return сообщение о завершении сессии пользователя с этим сервисом.
      */
-    @Override
     public String endSession(long userId) {
         try {
-            super.userContextRepository.deleteUserContext(userId);
+            userContextRepository.updateUserContext(userId,new UserContext());
         } catch (SQLException e) {
             return "Ошибка при удалении контекста пользователя с id " + userId + e.getMessage();
         }
-        return UpdateUserServiceConfig.END_MESSAGE.getStr();
+        return EditUserServiceConfig.END_MESSAGE.getStr();
     }
 
-    @Override
-    public String getHelpMessage() {
-        return UpdateUserServiceConfig.START_MESSAGE.getStr();
-    }
 }

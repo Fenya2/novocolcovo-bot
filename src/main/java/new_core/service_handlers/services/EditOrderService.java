@@ -9,14 +9,37 @@ import models.UserContext;
 import java.sql.SQLException;
 import java.text.ParseException;
 
+/** Сервис для работы с контекстом {@link models.UserState#ORDER_EDITING ORDER_EDITING}*/
+
 public class EditOrderService {
+
+    /** @see OrderRepository*/
     private final OrderRepository orderRepository;
+
+    /** @see UserContextRepository*/
     private final UserContextRepository userContextRepository;
+
+    /** Конструктор {@link EditOrderService}*/
     public EditOrderService(OrderRepository orderRepository, UserContextRepository userContextRepository) {
         this.orderRepository = orderRepository;
         this.userContextRepository = userContextRepository;
     }
-
+    /**
+     * Продолжение обновления. Диалог с пользователем<br>
+     * <p>
+     * 1) получает от пользователя text = idOrder по нему смотрим есть ли такие заказы и если есть
+     * обновляем статус заказа до edit
+     * <p>
+     * 2) получает от пользователя text = список продуктов. Получаем заказ по idUser и status.
+     * Создает новый заказ и меняет в нем описание. Обновляет заказ в бд.
+     * Удаляет контекст пользователя и меняет статус заказа так как изменение заказа завершено
+     *
+     * @param userId id пользователя, который изменяет заказ
+     * @param text   string 1)idOrder <br>
+     *               2)список продуктов
+     * @return 1)выводит сообщение с просьбой ввести данные <br>
+     * 2)выводит сообщение об окончании изменения заказа
+     */
     public String continueSession(long userId, String text) {
         try {
             UserContext userContext = userContextRepository.getUserContext(userId);
