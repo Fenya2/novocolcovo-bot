@@ -26,10 +26,12 @@ public class Message {
      * "empty constructor text", {@link Platform NO_PLATFORM}, "empty constructor id"
      * соответственно.
      */
+
     public Message() {
         this.text = "empty constructor text";
         this.platform = Platform.NO_PLATFORM;
         this.userIdOnPlatform = "empty constructor id";
+        this.userContext = new UserContext(UserState.NO_STATE,0);
     }
 
     /**

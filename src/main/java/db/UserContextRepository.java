@@ -10,7 +10,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Класс, отвечающий за работу с таблицей user_contexts базы данных.
+ * Класс, отвечающий за работу с таблицей user_contexts базы данных. <br>
+ * Содержит информацио о контексте пользователя.
  */
 public class UserContextRepository extends Repository{
     private static final Logger log = Logger.getLogger(UserContextRepository.class.getName());
@@ -32,7 +33,7 @@ public class UserContextRepository extends Repository{
         if(userRepository.getById(userId) == null) {
             return -2;
         }
-        if(getUserContext(userId) != null) {
+        if(getUserContext(userId).getState() != UserState.NO_STATE) {
             return -1;
         }
         String request = """
@@ -68,7 +69,7 @@ public class UserContextRepository extends Repository{
         Statement statement = db.getStatement();
         ResultSet resultSet = statement.executeQuery(request);
         if(!resultSet.next()) {
-            throw new SQLException("No user with id %d".formatted(userId));
+            return new UserContext(UserState.NO_STATE);
         }
         UserContext userContext = new UserContext(
                 UserState.valueOf(resultSet.getString("state")),

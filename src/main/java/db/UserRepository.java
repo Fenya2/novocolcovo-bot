@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Класс, отвечающий за работу с таблицей users базы данных.
+ * Класс, отвечающий за работу с таблицей users базы данных. <br>
+ * Cодержит информацию о пользователях.
  */
 public class UserRepository extends Repository {
     private static final Logger log = Logger.getLogger(UserRepository.class.getName());

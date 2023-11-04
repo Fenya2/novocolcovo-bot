@@ -3,10 +3,10 @@ import bot.TGBot;
 import config.SQLiteDBconfig;
 import config.TGBotConfig;
 import db.*;
-import new_core.handlers.CommandHandler;
-import new_core.handlers.MessageHandler;
-import new_core.handlers.service_handlers.EditUserServiceHandler;
-import new_core.services.EditUserService;
+
+import new_core.service_handlers.handlers.*;
+import new_core.MessageHandler;
+import new_core.service_handlers.services.*;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
@@ -25,10 +25,30 @@ public class Main {
         UserContextRepository uc = new UserContextRepository(db,ur);
         OrderRepository or = new OrderRepository(db,ur);
 
-        EditUserService editUserService = new EditUserService(uc, ur);
-        EditUserServiceHandler editUserServiceHandler = new EditUserServiceHandler(editUserService);
-        CommandHandler commandHandler = new CommandHandler(editUserService);
-        MessageHandler messageHandler = new MessageHandler(uc, lg, commandHandler, editUserServiceHandler);
+        ServiceManager serviceManager = new ServiceManager(lg,or,ur,uc);
+        EditUserService updateUserService = new EditUserService(uc, ur);
+        CreateOrderService createOrderService = new CreateOrderService(or, uc);
+        EditOrderService editOrderService = new EditOrderService(or,uc);
+        CancelOrderService cancelOrderService = new CancelOrderService(or,uc);
+        CloseOrderService closeOrderService = new CloseOrderService(or,uc);
+        AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc);
+
+        HandlerEditUserService handlerUpdateUserService = new HandlerEditUserService(updateUserService);
+        HandlerCreateOrderService handlerCreateOrderService = new HandlerCreateOrderService(createOrderService);
+        HandlerEditOrderService handlerEditOrderService = new HandlerEditOrderService(editOrderService);
+        HandlerCancelOrderService handlerCancelOrderService = new HandlerCancelOrderService(cancelOrderService);
+        HandlerAcceptOrderService handlerAcceptOrderService = new HandlerAcceptOrderService(acceptOrderService);
+        HandlerCloseOrderService handlerCloseOrderService = new HandlerCloseOrderService(closeOrderService);
+
+        CommandHandler commandHandler = new CommandHandler(serviceManager);
+        MessageHandler messageHandler = new MessageHandler(uc, lg,
+                commandHandler,
+                handlerUpdateUserService,
+                handlerCreateOrderService,
+                handlerEditOrderService,
+                handlerCancelOrderService,
+                handlerAcceptOrderService,
+                handlerCloseOrderService);
 
         TGBotConfig tgBotConfig = new TGBotConfig(args[0]);
 

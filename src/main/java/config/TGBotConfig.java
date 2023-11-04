@@ -9,30 +9,46 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class TGBotConfig {
-    /** Имя бота, указываемое в файле конфигурации */
+    /**
+     * Имя бота
+     */
     private final String name;
-    /** Токен бота, указываемый в файле конфигурации */
+    /**
+     * Токен бота
+     */
     private final String token;
-    /** Платформа, на которой бот работает, указываемая в файле конфигурации */
+    /**
+     * Платформа, на которой бот работает
+     */
     private final Platform platform;
 
-    /** @param token токен бота */
-    public TGBotConfig(String token){
+    /**
+     * @param token токен бота
+     */
+    public TGBotConfig(String token) {
         this.name = "novocolcovo_bot";
         this.token = token;
         this.platform = Platform.TELEGRAM;
     }
 
-    /** Возвращает имя бота */
+    /**
+     * Возвращает имя бота
+     */
     public String getName() {
         return name;
     }
 
-    /** Возвращает токен бота */
+    /**
+     * Возвращает токен бота
+     */
     public String getToken() {
         return token;
     }
 
-    /** Возвращает платформу, на которой работает бот. */
-    public Platform getPlatform() {return platform;}
+    /**
+     * Возвращает платформу, на которой работает бот.
+     */
+    public Platform getPlatform() {
+        return platform;
+    }
 }
