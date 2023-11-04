@@ -1,17 +1,15 @@
 package new_core.handlers;
 
 import models.Message;
-import models.User;
-import models.UserContext;
-import new_core.services.UpdateUserService;
+import new_core.services.EditUserService;
 
 public class CommandHandler {
 
     /** Сервис изменения аккаунта пользователя. */
-    private final UpdateUserService updateUserService;
+    private final EditUserService editUserService;
 
-    public CommandHandler(UpdateUserService updateUserService) {
-        this.updateUserService = updateUserService;
+    public CommandHandler(EditUserService editUserService) {
+        this.editUserService = editUserService;
     }
 
     /**
@@ -26,7 +24,7 @@ public class CommandHandler {
             case TELEGRAM -> {
                 switch (message.getText()) {
                     case "/edit_user": {
-                        String startMessage = updateUserService.startSession(message.getUser().getId());
+                        String startMessage = editUserService.startSession(message.getUser().getId());
                         message.getBotFrom().sendTextMessage(message.getUserIdOnPlatform(), startMessage);
                         return;
                     }

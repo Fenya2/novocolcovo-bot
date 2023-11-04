@@ -32,9 +32,12 @@ public class Message {
         this.userIdOnPlatform = "empty constructor id";
     }
 
-    /** Конструктор для работы с telegram. */
+    /**
+     * Конструктор для работы с telegram.
+     */
     public Message(org.telegram.telegrambots.meta.api.objects.Message message) {
         this.platform = Platform.TELEGRAM;
+
         setText(message.getText());
         this.userIdOnPlatform = String.valueOf(message.getChatId());
     }

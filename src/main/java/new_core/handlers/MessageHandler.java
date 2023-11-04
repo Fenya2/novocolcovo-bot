@@ -5,7 +5,7 @@ import db.UserContextRepository;
 import models.Message;
 import models.User;
 import models.UserContext;
-import new_core.handlers.service_handlers.UpdateUserServiceHandler;
+import new_core.handlers.service_handlers.EditUserServiceHandler;
 
 import java.sql.SQLException;
 
@@ -21,19 +21,18 @@ public class MessageHandler {
     private final LoggedUsersRepository loggedUsersRepository;
 
     private final CommandHandler commandHandler;
-    private final UpdateUserServiceHandler updateUserServiceHandler;
+    private final EditUserServiceHandler editUserServiceHandler;
 
-    /** @param userContextRepository таблица контекстов пользователей */
     public MessageHandler(
             UserContextRepository userContextRepository,
             LoggedUsersRepository loggedUsersRepository,
             CommandHandler commandHandler,
-            UpdateUserServiceHandler updateUserServiceHandler
+            EditUserServiceHandler editUserServiceHandler
     ) {
         this.userContextRepository = userContextRepository;
         this.loggedUsersRepository = loggedUsersRepository;
         this.commandHandler = commandHandler;
-        this.updateUserServiceHandler = updateUserServiceHandler;
+        this.editUserServiceHandler = editUserServiceHandler;
     }
 
     /** первичный метод обработки сообщения. Если у пользователя, отправившего сообщение есть
@@ -42,8 +41,8 @@ public class MessageHandler {
      * пользователю, что сообщение некорректно.
      */
     public void handle(Message message) {
-        User user = null;
-        UserContext userContext = null;
+        User user;
+        UserContext userContext;
         try {
             user = loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
                     message.getPlatform(),
@@ -85,7 +84,7 @@ public class MessageHandler {
 
         message.setUserContext(userContext);
         switch(userContext.getState()) {
-            case EDIT_USER -> updateUserServiceHandler.handle(message);
+            case EDIT_USER -> editUserServiceHandler.handle(message);
         }
     }
 }

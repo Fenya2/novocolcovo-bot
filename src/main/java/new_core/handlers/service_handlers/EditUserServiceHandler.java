@@ -2,27 +2,26 @@ package new_core.handlers.service_handlers;
 
 import config.services.UpdateUserServiceConfig;
 import models.Message;
-import models.User;
-import new_core.services.UpdateUserService;
+import new_core.services.EditUserService;
 
 import java.sql.SQLException;
 
-public class UpdateUserServiceHandler {
-    private final UpdateUserService updateUserService;
-    public UpdateUserServiceHandler(UpdateUserService updateUserService) {
-        this.updateUserService = updateUserService;
+public class EditUserServiceHandler {
+    private final EditUserService editUserService;
+    public EditUserServiceHandler(EditUserService editUserService) {
+        this.editUserService = editUserService;
     }
 
     /**
      * Обрабатывает сообщение пользователя, когда тот находится в контексте обновления аккаунта
      * пользователя.
-     * @param message
+     * @param message содержит текст, пользователя, его контекст.
      */
     public void handle(Message message) {
         switch (message.getText()) {
             case "/edit_username": {
                 try {
-                    updateUserService.setEditUsernameContext(message.getUser().getId());
+                    editUserService.setEditUsernameContext(message.getUser().getId());
                 } catch (SQLException e) {
                     message.getBotFrom().sendTextMessage(
                             message.getUserIdOnPlatform(),
@@ -38,7 +37,7 @@ public class UpdateUserServiceHandler {
             }
             case "/edit_description": {
                 try {
-                    updateUserService.setEditDescriptionContext(message.getUser().getId());
+                    editUserService.setEditDescriptionContext(message.getUser().getId());
                 } catch (SQLException e) {
                     message.getBotFrom().sendTextMessage(
                             message.getUserIdOnPlatform(),
@@ -54,7 +53,7 @@ public class UpdateUserServiceHandler {
             }
 
             case "/cancel": {
-                String text = updateUserService.endSession(message.getUser().getId());
+                String text = editUserService.endSession(message.getUser().getId());
                 message.getBotFrom().sendTextMessage(
                         message.getUserIdOnPlatform(),
                         text
@@ -74,8 +73,8 @@ public class UpdateUserServiceHandler {
         switch(message.getUserContext().getStateNum()) {
             case 1: {
                 try {
-                    updateUserService.updateUsername(message.getText(), message.getUser());
-                    updateUserService.resetEditContext(message.getUser().getId());
+                    editUserService.updateUsername(message.getText(), message.getUser());
+                    editUserService.resetEditContext(message.getUser().getId());
                 } catch (SQLException e) {
                     message.getBotFrom().sendTextMessage(
                             message.getUserIdOnPlatform(),
@@ -90,8 +89,8 @@ public class UpdateUserServiceHandler {
             }
             case 2: {
                 try {
-                    updateUserService.updateDescription(message.getText(), message.getUser());
-                    updateUserService.resetEditContext(message.getUser().getId());
+                    editUserService.updateDescription(message.getText(), message.getUser());
+                    editUserService.resetEditContext(message.getUser().getId());
                 } catch (SQLException e) {
                     message.getBotFrom().sendTextMessage(
                             message.getUserIdOnPlatform(),

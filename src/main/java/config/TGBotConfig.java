@@ -16,19 +16,11 @@ public class TGBotConfig {
     /** Платформа, на которой бот работает, указываемая в файле конфигурации */
     private final Platform platform;
 
-    /** @param configFile путь к файлу конфигурации типа json. */
-    public TGBotConfig(String configFile){
-        String str;
-        try {
-            str = FileUtils.readFileToString(new File(configFile), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            System.err.println("something went wrong");
-            throw new RuntimeException("file not founded");
-        }
-        JSONObject jo = new JSONObject(str);
-        platform = Platform.TELEGRAM;
-        name = jo.getString("name");
-        token = jo.getString("token");
+    /** @param token токен бота */
+    public TGBotConfig(String token){
+        this.name = "novocolcovo_bot";
+        this.token = token;
+        this.platform = Platform.TELEGRAM;
     }
 
     /** Возвращает имя бота */

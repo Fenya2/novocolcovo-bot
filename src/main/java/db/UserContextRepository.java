@@ -54,14 +54,13 @@ public class UserContextRepository extends Repository{
     }
 
     /**
-     * Возвращает контекст пользователя с переданным идентификатором, если он(контекст) существует.
+     * Возвращает контекст пользователя с переданным идентификатором.
      * @param userId идентификатор пользователя.
      * @return {@link UserContext контекст} пользователя с переданным идентификатором.
-     * Если контекста нет, то <b>null</b>
      */
     public UserContext getUserContext(long userId) throws SQLException {
         if(userId <= 0) {
-            return null;
+            throw new SQLException("No user with id %d".formatted(userId));
         }
 
         String request = "SELECT state, state_num FROM user_contexts WHERE user_id = %d;"
@@ -69,7 +68,7 @@ public class UserContextRepository extends Repository{
         Statement statement = db.getStatement();
         ResultSet resultSet = statement.executeQuery(request);
         if(!resultSet.next()) {
-            return null;
+            throw new SQLException("No user with id %d".formatted(userId));
         }
         UserContext userContext = new UserContext(
                 UserState.valueOf(resultSet.getString("state")),
@@ -87,7 +86,7 @@ public class UserContextRepository extends Repository{
      * <b>-1</b> Если контекст у пользователя с переданным идентификаторон не существует.
      * @throws SQLException
      */
-    public int updateUserContext(long userId, UserContext userContext) throws SQLException{
+    public int updateUserContext(long userId, UserContext userContext) throws SQLException {
         if(userId <= 0) {
             return -1;
         }
