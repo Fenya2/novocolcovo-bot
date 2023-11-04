@@ -10,7 +10,8 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/** Класс, отвечающий за работу с таблицей logged_users базы данных. */
+/** Класс, отвечающий за работу с таблицей logged_users базы данных.<br>
+ * Позволяет опознать пользователя в системе.*/
 public class LoggedUsersRepository extends Repository {
     private static final Logger log = Logger.getLogger(LoggedUsersRepository.class.getName());
     private final UserRepository userRepository;
