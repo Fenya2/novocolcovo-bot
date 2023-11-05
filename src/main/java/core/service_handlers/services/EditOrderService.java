@@ -92,4 +92,16 @@ public class EditOrderService {
         }
     }
 
+    /**
+     * Возвращает пользователя в контекст {@link models.UserState#NO_STATE NO_STATE}.<br>
+     * Выводит "ok" если команда выполнена успешно, иначе сообщение об ошибке
+     */
+    public String cancel(long userId){
+        try {
+            userContextRepository.updateUserContext(userId,new UserContext());
+            return "ok";
+        } catch (SQLException e) {
+            return e.getMessage();
+        }
+    }
 }

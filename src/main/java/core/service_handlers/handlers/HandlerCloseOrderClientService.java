@@ -24,10 +24,21 @@ public class HandlerCloseOrderClientService {
             msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
             return;
         }
-
-        if(msg.getText().charAt(0)=='/'){
-            String message = "Я вас не понимаю. Вызовите /help";
-            msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+        switch (msg.getText()){
+            case "/help"->{
+                String message = "Ты сейчас находишься в контексте заверения заказа." +
+                        "Просто напиши закрыт заказ или нет, /yes или /no соответственно и я от тебя отстану."+
+                        "Учти, что из команд доступны только /help , /yes и /no, на остальное я не смогу тебе ответить";
+                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+            }
+            case "/yes", "/no" -> {
+                String message = closeOrderClientService.continueSession(msg.getUser().getId(),msg.getText());
+                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+            }
+            default -> {
+                String message = "Прости, но я не знаю, что на это ответить. Вызови команду /help ";
+                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+            }
         }
     }
 }

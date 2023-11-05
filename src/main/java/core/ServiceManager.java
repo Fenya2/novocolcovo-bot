@@ -101,7 +101,7 @@ public class ServiceManager {
             }
             if (allOrderUser.isEmpty())
                 return "у вас нет ни одного заказа";
-            UserContext userContext = new UserContext(UserState.ORDER_EDITING, 0);
+            UserContext userContext = new UserContext(UserState.ORDER_EDITING);
             userContextRepository.updateUserContext(idUser, userContext);
             return "Какой заказ вы хотите обновить.?\n"
                     .concat(allOrderUser.toString());
