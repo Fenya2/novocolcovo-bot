@@ -1,6 +1,6 @@
 package models;
 
-import bot.Bot;
+import bots.Bot;
 
 /** Message - тип сообщений, с которым работает core логика проекта. */
 public class Message {
@@ -34,9 +34,12 @@ public class Message {
         this.userContext = new UserContext(UserState.NO_STATE,0);
     }
 
-    /** Конструктор для работы с telegram. */
+    /**
+     * Конструктор для работы с telegram.
+     */
     public Message(org.telegram.telegrambots.meta.api.objects.Message message) {
         this.platform = Platform.TELEGRAM;
+
         setText(message.getText());
         this.userIdOnPlatform = String.valueOf(message.getChatId());
     }
