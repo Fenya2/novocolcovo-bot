@@ -77,7 +77,6 @@ public class LoggedUsersRepository extends Repository {
      */
     public User getUserByPlatformAndIdOnPlatform(Platform platform, String idOnPlatform) throws SQLException {
         if (platform == null || idOnPlatform == null) return null;
-        //todo или делать один sql запрос, cразу возвращая нужную строку таблицы users, если она найдется?
         String request = """
                 SELECT user_id FROM logged_users
                 WHERE platform = "%s"
@@ -94,6 +93,34 @@ public class LoggedUsersRepository extends Repository {
         resultSet.close();
         statement.close();
         return userRepository.getById(userId);
+    }
+
+    /**
+     * Возвращает идентификатор пользователя на платформе по id пользователя и платформе.
+     * @param userId id пользоваетеля.
+     * @param platform платформа
+     * @return идентификатор пользователя на указанной платформе. Если он не находится, <b>null</b>.
+     */
+    public String getUserIdOnPlatformByUserIdAndPlatform(long userId, Platform platform)
+            throws SQLException {
+        if(userId <= 0)
+            return null;
+        String request = """
+                SELECT id_on_platform FROM logged_users
+                WHERE user_id = %d
+                AND platform = "%s";
+                """.formatted(userId, platform);
+        Statement statement = db.getStatement();
+        ResultSet resultSet = statement.executeQuery(request);
+        if (!resultSet.next()) {
+            resultSet.close();
+            statement.close();
+            return null;
+        }
+        String userIdOnPlatform= resultSet.getString("id_on_platform");
+        resultSet.close();
+        statement.close();
+        return  userIdOnPlatform;
     }
 
     /**
