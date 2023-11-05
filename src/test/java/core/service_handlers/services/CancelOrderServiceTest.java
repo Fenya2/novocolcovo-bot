@@ -1,4 +1,4 @@
-package core.service_handlers.services.services;
+package core.service_handlers.services;
 
 import db.OrderRepository;
 import db.UserContextRepository;
@@ -34,7 +34,7 @@ public class CancelOrderServiceTest {
      * и когда контекст выходит за границы допустимых значений
      */
     @Test
-    public void continueSession() throws SQLException, ParseException {
+    public void testContinueSession() throws SQLException, ParseException {
         UserContext userContext1 = new UserContext(UserState.ORDER_EDITING, 10);
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(userContext1);

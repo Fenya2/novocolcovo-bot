@@ -1,4 +1,4 @@
-package core.service_handlers.services.services;
+package core.service_handlers.services;
 
 import db.LoggedUsersRepository;
 import db.OrderRepository;
@@ -89,7 +89,7 @@ public class ServiceManagerTest {
      * и когда список заказов не пустой
      */
     @Test
-    public void startCancelOrder() throws SQLException, ParseException {
+    public void testStartCancelOrder() throws SQLException, ParseException {
         ArrayList<Order> listAllOrder = new ArrayList<>(1);
         Order order = new Order(1);
         order.setDescription("");
@@ -107,7 +107,7 @@ public class ServiceManagerTest {
      * В случае когда у пользователя имеется хотя бы один заказ.
      */
     @Test
-    public void showOrder() throws SQLException, ParseException {
+    public void testShowOrder() throws SQLException, ParseException {
         ArrayList<Order> listAllOrder = new ArrayList<>(1);
         Order order = new Order(1);
         order.setDescription("");

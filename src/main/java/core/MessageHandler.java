@@ -62,12 +62,15 @@ public class MessageHandler {
         this.handlerCloseOrderService = handlerCloseOrderService;
     }
 
-    /** Первичный метод обработки сообщения. Если у пользователя, отправившего сообщение есть
+    /**
+     * Первичный метод обработки сообщения. Если у пользователя, отправившего сообщение есть
      * контекст, направляет сообщение в соответствующий сервисный обработчик, если отправленное
      * сообщение является командой, перенаправляет сообщение в обработчик команд. Иначе сообщает
      * пользователю, что сообщение некорректно.
+     * @return 1, если сообщение написано пользователем впервые. 2, если пользователь пишет, не
+     * находявь с контексте. 3, если пользователь пишет, находясь в контексте.
      */
-    public void handle(Message msg) {
+    public int handle(Message msg) {
         User user;
         UserContext userContext;
         try {
@@ -80,19 +83,19 @@ public class MessageHandler {
                     msg.getUserIdOnPlatform(),
                     "Проблемы с доступом к базе данных " + e.getMessage()
             );
-            return;
+            return -1;
         }
 
         if(user == null) {
             if (msg.getText().equals("/start")) {
                 commandHandler.handle(msg);
-                return;
+                return 1;
             }
             msg.getBotFrom().sendTextMessage(
                     msg.getUserIdOnPlatform(),
                     "отправьте /start для последующей работы."
             );
-            return;
+            return 1;
         }
 
         msg.setUser(user);
@@ -101,12 +104,15 @@ public class MessageHandler {
             msg.getBotFrom().sendTextMessage(
                     msg.getUserIdOnPlatform(),
                     "Проблемы с доступом к базе данных " + e.getMessage());
-            return;
+            return -1;
         }
 
         msg.setUserContext(userContext);
         switch(userContext.getState()) {
-            case NO_STATE -> commandHandler.handle(msg);
+            case NO_STATE -> {
+                commandHandler.handle(msg);
+                return 2;
+            }
             case EDIT_USER -> handlerEditUserService.handle(msg);
             case ORDER_CREATING -> handlerCreateOrderService.handle(msg);
             case ORDER_EDITING -> handlerEditOrderService.handle(msg);
@@ -115,5 +121,6 @@ public class MessageHandler {
             case ORDER_CLOSING_COURIER,
                     ORDER_CLOSING_CLIENT -> handlerCloseOrderService.handle(msg);
         }
+        return 3;
     }
 }

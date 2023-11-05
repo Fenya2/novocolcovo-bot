@@ -1,9 +1,8 @@
-package core.service_handlers.services.services;
+package core.service_handlers.services;
 
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.*;
-import core.service_handlers.services.EditOrderService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +36,7 @@ public class EditOrderServiceTest {
      * так же проверяет случай когда все условия соблюдены
      */
     @Test
-    public void continueSession0() throws SQLException, ParseException {
+    public void testContinueSession0() throws SQLException, ParseException {
         UserContext userContext1 = new UserContext(UserState.ORDER_EDITING, 10);
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(userContext1);
@@ -78,7 +77,7 @@ public class EditOrderServiceTest {
      * проверяет кореектность работы метода, иначе проверяет сообщение об ошибке
      */
     @Test
-    public void continueSession1() throws SQLException, ParseException {
+    public void testContinueSession1() throws SQLException, ParseException {
         UserContext userContext1 = new UserContext(UserState.ORDER_EDITING, 1);
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(userContext1);

@@ -1,4 +1,4 @@
-package core.service_handlers.services.services;
+package core.service_handlers.services;
 
 import core.service_handlers.services.EditUserService;
 import db.UserContextRepository;
@@ -25,7 +25,7 @@ public class EditUserServiceTest {
     private UserContextRepository userContextRepository;
 
     @Before
-    public void init() throws SQLException {
+    public void init() {
         MockitoAnnotations.openMocks(this);
     }
 
@@ -41,7 +41,7 @@ public class EditUserServiceTest {
 
     /** Принимает новое имя и пользователя, возвращает пользователя с новым именем. */
     @Test
-    public void updateUsernameTest() throws SQLException {
+    public void testUpdateUsername() throws SQLException {
         User user = new User(1, "name", "description");
         editUserService.updateUsername("new_name", user);
         Assert.assertEquals("new_name" , user.getName());
@@ -52,7 +52,7 @@ public class EditUserServiceTest {
      * возвращает пользователя с новым описанием.
      */
     @Test
-    public void updateDescriptionTest() throws SQLException {
+    public void testUpdateDescription() throws SQLException {
         User user = new User(1, "name", "description");
         editUserService.updateDescription("new_description", user);
         Assert.assertEquals("new_description", user.getDescription());
@@ -63,7 +63,7 @@ public class EditUserServiceTest {
      * который захочет изменить имя.
      */
     @Test
-    public void setEditUsernameContextTest() throws SQLException {
+    public void testSetEditUsernameContext() throws SQLException {
         UserContext userContext =  editUserService.setEditUsernameContext(10);
         Assert.assertEquals("EDIT_USER", userContext.getState().toString());
         Assert.assertEquals(1, userContext.getStateNum());
@@ -74,7 +74,7 @@ public class EditUserServiceTest {
      * который захочет изменить описание.
      */
     @Test
-    public void setEditDescriptionContextTest() throws SQLException {
+    public void testSetEditDescriptionContext() throws SQLException {
         UserContext userContext =  editUserService.setEditDescriptionContext(10);
         Assert.assertEquals("EDIT_USER", userContext.getState().toString());
         Assert.assertEquals(2, userContext.getStateNum());
@@ -86,7 +86,7 @@ public class EditUserServiceTest {
      * пользователя
      */
     @Test
-    public void resetEditContextTest() throws SQLException {
+    public void testResetEditContext() throws SQLException {
         UserContext userContext =  editUserService.resetEditContext(10);
         Assert.assertEquals("EDIT_USER", userContext.getState().toString());
         Assert.assertEquals(0, userContext.getStateNum());
@@ -94,7 +94,7 @@ public class EditUserServiceTest {
 
     /** Возвращает приветственное сообщение. */
     @Test
-    public void startSessionTest() throws SQLException {
+    public void testStartSession() throws SQLException {
         Assert.assertEquals("""
             Обновление вашего аккаунта.
             Напишите:
@@ -107,7 +107,7 @@ public class EditUserServiceTest {
 
     /** Возврващет сообщение с прощанием */
     @Test
-    public void endSessionTest() {
+    public void testEndSession() {
         Assert.assertEquals("Изменения успешно сохранены.",
                 editUserService.endSession(10));
     }
