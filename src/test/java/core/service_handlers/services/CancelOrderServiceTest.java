@@ -3,7 +3,6 @@ package core.service_handlers.services;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.*;
-import core.service_handlers.services.CancelOrderService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package bot;
+package bots;
 
 import models.Message;
 import core.MessageHandler;

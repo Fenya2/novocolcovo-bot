@@ -1,6 +1,5 @@
 package core.service_handlers.services;
 
-import core.service_handlers.services.EditUserService;
 import db.UserContextRepository;
 import db.UserRepository;
 import models.User;

@@ -1,6 +1,6 @@
 package strubs;
 
-import bot.Bot;
+import bots.Bot;
 
 public class BotStrub implements Bot {
     @Override

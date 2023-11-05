@@ -1,7 +1,6 @@
-package core.service_handlers;
+package core;
 
-import bot.Bot;
-import core.MessageHandler;
+import bots.Bot;
 import core.service_handlers.handlers.*;
 import db.LoggedUsersRepository;
 import db.UserContextRepository;
@@ -112,7 +111,7 @@ public class MessageHandlerTest {
         Bot bot = new BotStrub();
         Message message = new Message();
         message.setText("some context text. want to create order.");
-        message.setUserIdOnPlatform("some id on some platform(telegram).");
+        message.setUserIdOnPlatform("some id on some platform (telegram).");
         message.setPlatform(Platform.TELEGRAM);
         message.setBotFrom(bot);
         User user = new User();

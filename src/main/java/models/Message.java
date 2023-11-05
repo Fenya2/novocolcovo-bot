@@ -1,6 +1,6 @@
 package models;
 
-import bot.Bot;
+import bots.Bot;
 
 /** Message - тип сообщений, с которым работает core логика проекта. */
 public class Message {

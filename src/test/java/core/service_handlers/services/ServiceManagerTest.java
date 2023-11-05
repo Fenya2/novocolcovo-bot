@@ -5,7 +5,6 @@ import db.OrderRepository;
 import db.UserContextRepository;
 import db.UserRepository;
 import models.*;
-import core.service_handlers.services.ServiceManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

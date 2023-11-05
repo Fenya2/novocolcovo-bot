@@ -38,6 +38,7 @@ public class CommandHandler {
             case "/start" -> {
                 String startMessage = serviceManager.start(msg);
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
+                return 2;
             }
             case "/help" -> {
                 String message = """
@@ -52,6 +53,7 @@ public class CommandHandler {
                         /close_order - завершить заказ.
                         """;
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+                return 2;
             }
             case "/edit_user" -> {
                 String startMessage = serviceManager.startEditUserService(msg.getUser().getId());
