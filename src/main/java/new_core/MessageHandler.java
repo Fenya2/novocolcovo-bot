@@ -36,7 +36,8 @@ public class MessageHandler {
     /** @see HandlerCancelOrderService */
     private final HandlerCancelOrderService handlerCancelOrderService;
     private final HandlerAcceptOrderService handlerAcceptOrderService;
-    private final HandlerCloseOrderService handlerCloseOrderService;
+    private final HandlerCloseOrderCourierService handlerCloseOrderCourierService;
+    private final HandlerCloseOrderClientService handlerCloseOrderClientService;
 
 
     /** Конструктор {@link MessageHandler MessageHandler}*/
@@ -49,8 +50,8 @@ public class MessageHandler {
             HandlerEditOrderService handlerEditOrderService,
             HandlerCancelOrderService handlerCancelOrderService,
             HandlerAcceptOrderService handlerAcceptOrderService,
-            HandlerCloseOrderService handlerCloseOrderService
-    ) {
+            HandlerCloseOrderCourierService handlerCloseOrderService,
+            HandlerCloseOrderClientService handlerCloseOrderClientService) {
         this.userContextRepository = userContextRepository;
         this.loggedUsersRepository = loggedUsersRepository;
         this.commandHandler = commandHandler;
@@ -59,7 +60,8 @@ public class MessageHandler {
         this.handlerEditOrderService = handlerEditOrderService;
         this.handlerCancelOrderService = handlerCancelOrderService;
         this.handlerAcceptOrderService = handlerAcceptOrderService;
-        this.handlerCloseOrderService = handlerCloseOrderService;
+        this.handlerCloseOrderCourierService = handlerCloseOrderService;
+        this.handlerCloseOrderClientService = handlerCloseOrderClientService;
     }
 
     /** Первичный метод обработки сообщения. Если у пользователя, отправившего сообщение есть
@@ -112,8 +114,8 @@ public class MessageHandler {
             case ORDER_EDITING -> handlerEditOrderService.handle(msg);
             case ORDER_CANCELING-> handlerCancelOrderService.handle(msg);
             case ORDER_ACCEPTING -> handlerAcceptOrderService.handle(msg);
-            case ORDER_CLOSING_COURIER,
-                    ORDER_CLOSING_CLIENT -> handlerCloseOrderService.handle(msg);
+            case ORDER_CLOSING_COURIER -> handlerCloseOrderCourierService.handle(msg);
+            case ORDER_CLOSING_CLIENT -> handlerCloseOrderClientService.handle(msg);
         }
     }
 }

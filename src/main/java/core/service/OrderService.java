@@ -62,7 +62,7 @@ public class OrderService {
             if (userContext.getStateNum() == 0) {
                 Order order = orderRepository.getOrderByIdUserAndStatus(idUser, OrderStatus.UPDATING);
                 order.setDescription(text);
-                orderRepository.updateWithId(order);
+                orderRepository.update(order);
                 orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                 userContextRepository.deleteUserContext(idUser);
                 return "Заказ создан";
@@ -144,7 +144,7 @@ public class OrderService {
                 case 1 -> {
                     Order order = orderRepository.getOrderByIdUserAndStatus(idUser, OrderStatus.UPDATING);
                     order.setDescription(text);
-                    orderRepository.updateWithId(order);
+                    orderRepository.update(order);
                     orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                     userContextRepository.deleteUserContext(idUser);
                     return "Заказ изменен";

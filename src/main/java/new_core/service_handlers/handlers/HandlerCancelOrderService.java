@@ -2,7 +2,6 @@ package new_core.service_handlers.handlers;
 
 import models.Message;
 import new_core.service_handlers.services.CancelOrderService;
-import new_core.service_handlers.services.EditUserService;
 
 /** Обработчик контекста {@link models.UserState#ORDER_CANCELING ORDER_CANCELING}. */
 public class HandlerCancelOrderService {

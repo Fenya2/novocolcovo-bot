@@ -49,22 +49,22 @@ public class EditOrderServiceTest {
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(userContext);
         String continueEditOrder1 = editOrderService.continueSession(1, "no digit");
-        Assert.assertEquals("Заказ не найден. Попробуйте еще раз(1)", continueEditOrder1);
+        Assert.assertEquals("Заказ не найден. Попробуйте еще раз", continueEditOrder1);
 
         String continueEditOrder2 = editOrderService.continueSession(1, "1234567891234567899");
-        Assert.assertEquals("Заказ не найден. Попробуйте еще раз(1)", continueEditOrder2);
+        Assert.assertEquals("Заказ не найден. Попробуйте еще раз", continueEditOrder2);
 
         Mockito.when(orderRepository.getById(0))
                 .thenReturn(null);
         String continueEditOrder3 = editOrderService.continueSession(1, "123456789");
-        Assert.assertEquals("Заказ не найден. Попробуйте еще раз(2)", continueEditOrder3);
+        Assert.assertEquals("Заказ не найден. Попробуйте еще раз", continueEditOrder3);
 
         Mockito.when(orderRepository.getById(11254))
                 .thenReturn(new Order(1));
         Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, OrderStatus.PENDING))
                 .thenReturn(null);
         String continueEditOrder4 = editOrderService.continueSession(1, "11254");
-        Assert.assertEquals("Заказ не найден. Попробуйте еще раз(3)", continueEditOrder4);
+        Assert.assertEquals("Заказ не найден. Попробуйте еще раз", continueEditOrder4);
 
         Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, OrderStatus.UPDATING))
                 .thenReturn(new Order(1));

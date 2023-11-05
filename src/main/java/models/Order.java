@@ -2,7 +2,6 @@ package models;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Formatter;
 
 /**
  * Класс заказа
@@ -16,7 +15,9 @@ public class Order {
 
     /** Идентификатор доставщика заказа. Может быть <b>0</b>, что значит, что заказ никем не принят. */
     private long courierId;
+
     private Date dateCreated;
+
     private String description;
 
     /** статус заказа */
@@ -40,6 +41,15 @@ public class Order {
         setStatus(status);
     }
 
+    public Order(long creatorId, long courierId, OrderStatus status) {
+        this.id = -42;
+        setCreatorId(creatorId);
+        setCourierId(courierId);
+        this.dateCreated = new Date();
+        description = "default description";
+        setStatus(status);
+    }
+
     /**
      * Облегченный конструктор. Ведь только эта id создателя известен при создании заказа.
      * <ul>
@@ -60,18 +70,6 @@ public class Order {
         this.dateCreated = new Date();
     }
 
-    /**
-     * //todo перепиши updateOrderStatus, и удали его, пж)
-     * Конструктор копирования
-     */
-    public Order(Order order) {
-        this.id = order.id;
-        this.courierId = order.courierId;
-        setCreatorId(order.creatorId);
-        setDescription(order.description);
-        setStatus(order.status);
-        this.dateCreated = order.dateCreated;
-    }
 
     /**
      * <ul>
@@ -111,9 +109,8 @@ public class Order {
     }
 
     /**
-     * Устанавливат идентификатор заказчика.
+     * Устанавливаeт идентификатор заказчика.
      * @param creatorId идентификатор заказчика.
-     * @throws IllegalArgumentException
      */
     public void setCreatorId(long creatorId) throws IllegalArgumentException {
         this.creatorId = creatorId;
@@ -127,7 +124,6 @@ public class Order {
     /**
      * Устанавливает идентификатор доставщика заказа.
      * @param courierId идентификатор заказчика
-     * @throws IllegalArgumentException
      */
     public void setCourierId(long courierId) throws IllegalArgumentException {
         this.courierId = courierId;
@@ -142,7 +138,6 @@ public class Order {
     /**
      * Устанавливает дату создания заказа.
      * @param dateCreated не <b>null</b>
-     * @throws IllegalArgumentException
      */
     public void setDateCreated(Date dateCreated) throws IllegalArgumentException{
         if(dateCreated == null) {
@@ -164,7 +159,6 @@ public class Order {
     /**
      * Устанавливает описание к заказу.
      * @param description описание заказа. Не <b>null</b>.
-     * @throws IllegalArgumentException
      */
     public void setDescription(String description) throws IllegalArgumentException {
         if (description == null) {
@@ -182,7 +176,6 @@ public class Order {
     /**
      * Устанавливает статус заказа.
      * @param status статус заказа. Не <b>null</b>.
-     * @throws IllegalArgumentException
      */
     public void setStatus(OrderStatus status) throws IllegalArgumentException {
         if(status == null)

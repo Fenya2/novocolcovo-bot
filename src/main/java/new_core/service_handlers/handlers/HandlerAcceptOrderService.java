@@ -2,12 +2,12 @@ package new_core.service_handlers.handlers;
 
 import models.Message;
 import new_core.service_handlers.services.AcceptOrderService;
-import new_core.service_handlers.services.CloseOrderService;
+import new_core.service_handlers.services.CloseOrderCourierService;
 
 /** Обработчик контекстов {@link models.UserState#ORDER_ACCEPTING ORDER_ACCEPTING}*/
 public class HandlerAcceptOrderService {
 
-    /** @see CloseOrderService */
+    /** @see CloseOrderCourierService */
     private final AcceptOrderService acceptOrderService;
 
     /** Конструктор {@link HandlerAcceptOrderService}*/

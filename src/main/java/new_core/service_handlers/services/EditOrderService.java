@@ -24,6 +24,29 @@ public class EditOrderService {
         this.orderRepository = orderRepository;
         this.userContextRepository = userContextRepository;
     }
+
+    /**
+     * Проверяет можно принять введенный заказ или нет
+     * @param userId id курьера
+     * @param text id заказа
+     * @return true/false может/не может принять введенный заказ
+     */
+    private boolean validation(long userId, String text) throws SQLException, ParseException {
+        if (!text.chars().allMatch(Character::isDigit) || text.length() > 18)
+            return false;
+        long idOrder = Long.parseLong(text);
+        Order order = orderRepository.getById(idOrder);
+        if (order == null)
+            return false;
+
+        orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
+        Order orderCheck = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
+        if (orderCheck == null) {
+            orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
+            return false;
+        }
+        return true;
+    }
     /**
      * Продолжение обновления. Диалог с пользователем<br>
      * <p>
@@ -45,28 +68,17 @@ public class EditOrderService {
             UserContext userContext = userContextRepository.getUserContext(userId);
             switch (userContext.getStateNum()) {
                 case 0 -> {
-                    if (!text.chars().allMatch(Character::isDigit) || text.length() > 18)
-                        return "Заказ не найден. Попробуйте еще раз(1)";
-                    long idOrder = Long.parseLong(text);
-                    Order order = orderRepository.getById(idOrder);
-                    if (order == null)
-                        return "Заказ не найден. Попробуйте еще раз(2)";
-
-                    orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
-                    Order orderCheck = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
-                    if (orderCheck == null) {
-                        orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
-                        return "Заказ не найден. Попробуйте еще раз(3)";
-                    }
-
-                    userContext.setStateNum(userContext.getStateNum() + 1);
+                    if(!validation(userId,text))
+                        return "Заказ не найден. Попробуйте еще раз";
+                    userContext.incrementStateNum();
+                    userContext.setStateNum(userContext.getStateNum());
                     userContextRepository.updateUserContext(userId, userContext);
                     return "Напишите новый список продуктов";
                 }
                 case 1 -> {
                     Order order = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
                     order.setDescription(text);
-                    orderRepository.updateWithId(order);
+                    orderRepository.update(order);
                     orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                     userContextRepository.updateUserContext(userId,new UserContext());
                     return "Заказ изменен";

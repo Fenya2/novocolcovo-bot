@@ -3,6 +3,8 @@ import bot.TGBot;
 import config.SQLiteDBconfig;
 import config.TGBotConfig;
 import db.*;
+import new_core.ServiceManager;
+import new_core.CommandHandler;
 import new_core.service_handlers.handlers.*;
 import new_core.MessageHandler;
 import new_core.service_handlers.services.*;
@@ -29,16 +31,19 @@ public class Main {
         CreateOrderService createOrderService = new CreateOrderService(or, uc);
         EditOrderService editOrderService = new EditOrderService(or,uc);
         CancelOrderService cancelOrderService = new CancelOrderService(or,uc);
-        CloseOrderService closeOrderService = new CloseOrderService(or,uc);
         AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc);
+        CloseOrderCourierService closeOrderCourierService = new CloseOrderCourierService(or,uc);
+        CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
 
         HandlerEditUserService handlerUpdateUserService = new HandlerEditUserService(updateUserService);
         HandlerCreateOrderService handlerCreateOrderService = new HandlerCreateOrderService(createOrderService);
         HandlerEditOrderService handlerEditOrderService = new HandlerEditOrderService(editOrderService);
         HandlerCancelOrderService handlerCancelOrderService = new HandlerCancelOrderService(cancelOrderService);
         HandlerAcceptOrderService handlerAcceptOrderService = new HandlerAcceptOrderService(acceptOrderService);
-        HandlerCloseOrderService handlerCloseOrderService = new HandlerCloseOrderService(closeOrderService);
-
+        HandlerCloseOrderCourierService handlerCloseOrderCourierService =
+                new HandlerCloseOrderCourierService(closeOrderCourierService);
+        HandlerCloseOrderClientService handlerCloseOrderClientService =
+                new HandlerCloseOrderClientService(closeOrderClientService);
         CommandHandler commandHandler = new CommandHandler(serviceManager);
         MessageHandler messageHandler = new MessageHandler(uc, lg,
                 commandHandler,
@@ -47,7 +52,8 @@ public class Main {
                 handlerEditOrderService,
                 handlerCancelOrderService,
                 handlerAcceptOrderService,
-                handlerCloseOrderService);
+                handlerCloseOrderCourierService,
+                handlerCloseOrderClientService);
 
         TGBotConfig tgBotConfig = new TGBotConfig("src/main/resources/config/TGBotConfig.json");
 

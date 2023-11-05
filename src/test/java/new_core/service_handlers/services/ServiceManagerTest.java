@@ -1,13 +1,11 @@
 package new_core.service_handlers.services;
 
-import core.CommandHandler;
-import core.TextHandler;
-import core.service.OrderService;
 import db.LoggedUsersRepository;
 import db.OrderRepository;
 import db.UserContextRepository;
 import db.UserRepository;
 import models.*;
+import new_core.ServiceManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +18,6 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
-import static org.junit.Assert.*;
 
 public class ServiceManagerTest {
     @Before
@@ -36,9 +33,9 @@ public class ServiceManagerTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private UserContextRepository userContextRepository;
-    @Mock
     private OrderRepository orderRepository;
+    @Mock
+    private UserContextRepository userContextRepository;
     /**
      * Проверяет случай когда пользователь вводит команду /start.
      */
@@ -67,7 +64,7 @@ public class ServiceManagerTest {
     }
 
     /**
-     * Проверяет работу startEditOrder
+     * Проверяет работу startEditOrder,
      * рассматривает случаи когда нет ни одного заказа
      * и когда список заказов не пустой
      */
@@ -88,7 +85,7 @@ public class ServiceManagerTest {
     }
 
     /**
-     * Проверяет работу startCancelOrder
+     * Проверяет работу startCancelOrder,
      * рассматривает случаи когда нет ни одного заказа
      * и когда список заказов не пустой
      */
@@ -125,5 +122,31 @@ public class ServiceManagerTest {
         Assert.assertEquals("-42: \n", showOrder2);
 
     }
-    
+
+    @Test
+    public void showPendingOrders() throws SQLException, ParseException {
+//        Order aa1 = new Order(1,1,OrderStatus.PENDING);
+//        Order aa2 = new Order(2,3,OrderStatus.PENDING);
+//        Order aa3 = new Order(3,4,OrderStatus.UPDATING);
+//        ArrayList<Order> a = new ArrayList<>();
+//        a.add(aa1);
+//        a.add(aa2);
+//        a.add(aa3);
+//        Mockito.when(orderRepository.getAll()).
+//                thenReturn(a);
+//        String showPendingOrders = serviceManager.showPendingOrders();
+//        Assert.assertEquals();
+    }
+
+    @Test
+    public void startAcceptOrder() {
+    }
+
+    @Test
+    public void showAcceptOrder() {
+    }
+
+    @Test
+    public void startCloseOrder() {
+    }
 }

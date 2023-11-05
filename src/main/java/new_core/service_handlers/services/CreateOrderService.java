@@ -39,7 +39,7 @@ public class CreateOrderService {
             if (userContext.getStateNum() == 0) {
                 Order order = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
                 order.setDescription(text);
-                orderRepository.updateWithId(order);
+                orderRepository.update(order);
                 orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                 userContextRepository.updateUserContext(userId,new UserContext());
                 return "Заказ создан";
