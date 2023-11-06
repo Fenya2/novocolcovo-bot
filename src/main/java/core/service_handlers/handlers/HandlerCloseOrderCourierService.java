@@ -16,31 +16,38 @@ public class HandlerCloseOrderCourierService {
         this.closeOrderCourierService = closeOrderService;
     }
 
-    /**Обработчик команд связаных с контекстом {@link models.UserState#ORDER_CLOSING_CLIENT ORDER_CLOSING_COURIER}
-     {@link models.UserState#ORDER_CLOSING_COURIER ORDER_CLOSING_COURIER }
+    /**Обработчик команд связаных с контекстом
+     * {@link models.UserState#ORDER_CLOSING_COURIER ORDER_CLOSING_COURIER}
+     * @return
+     * 1, если текст переданного сообщения - коррекстная команда
+     * 2, если текст переданного сообщения - не команда и оно должно обрабатываться в сервисе.
+     * 3, если текст переданного сообщение - некорректная команда.
      */
-    public void handle(Message msg) {
+    public int handle(Message msg) {
         switch (msg.getText()){
             case "/help"->{
                 String message = "Ты сейчас находишься в контексте завершения заказа." +
                         "Напиши номер заказа, который ты уже отдал."+
                         "Если ты не знаешь этого номера, то тогда выйди из контекста, "+
-                        "написав команду /cancel и вызови команду /show_pending_orders. "+
+                        "написав команду /cancel и вызови команду /show_pending_orders. "+ //todo здесь /show_accept_orders?
                         "Учти, что из команд доступны только /help и /cancel, на остальное я не смогу тебе ответить";;
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+                return 1;
             }
             case "/cancel" -> {
                 String message = closeOrderCourierService.cancel(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+                return 1;
             }
             default -> {
                 if (msg.getText().charAt(0) == '/'){
                     String message = "Прости, но я не знаю, что на это ответить. Вызови команду /help ";
                     msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
-                    return;
+                    return 3;
                 }
                 String message = closeOrderCourierService.continueSession(msg.getUser().getId(),msg.getText());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+                return 2;
             }
         }
     }

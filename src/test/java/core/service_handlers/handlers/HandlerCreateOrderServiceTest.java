@@ -1,6 +1,6 @@
 package core.service_handlers.handlers;
 
-import core.service_handlers.services.EditOrderService;
+import core.service_handlers.services.CreateOrderService;
 import models.Message;
 import models.User;
 import models.UserContext;
@@ -13,11 +13,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import strubs.BotStrub;
 
-public class HandlerEditOrderServiceTest {
+public class HandlerCreateOrderServiceTest {
     @InjectMocks
-    private HandlerEditOrderService handlerEditOrderService;
+    HandlerCreateOrderService handlerCreateOrderService;
     @Mock
-    private EditOrderService editOrderService;
+    CreateOrderService createOrderService;
     @Before
     public void init() {
         MockitoAnnotations.openMocks(this);
@@ -33,9 +33,9 @@ public class HandlerEditOrderServiceTest {
         message.setUser(new User(10, "name", "description"));
         message.setBotFrom(new BotStrub());
         message.setText("/cancel");
-        Assert.assertEquals(1, handlerEditOrderService.handle(message));
+        Assert.assertEquals(1, handlerCreateOrderService.handle(message));
         message.setText("/help");
-        Assert.assertEquals(1, handlerEditOrderService.handle(message));
+        Assert.assertEquals(1, handlerCreateOrderService.handle(message));
     }
 
     /**
@@ -49,7 +49,7 @@ public class HandlerEditOrderServiceTest {
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
         message.setBotFrom(new BotStrub());
         message.setText("/some_not_valid_command");
-        Assert.assertEquals(3, handlerEditOrderService.handle(message));
+        Assert.assertEquals(3, handlerCreateOrderService.handle(message));
     }
 
     /**
@@ -63,8 +63,8 @@ public class HandlerEditOrderServiceTest {
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
         message.setBotFrom(new BotStrub());
         message.setText("some_message_not_command");
-        Assert.assertEquals(2, handlerEditOrderService.handle(message));
+        Assert.assertEquals(2, handlerCreateOrderService.handle(message));
         message.setText("451");
-        Assert.assertEquals(2, handlerEditOrderService.handle(message));
+        Assert.assertEquals(2, handlerCreateOrderService.handle(message));
     }
 }
