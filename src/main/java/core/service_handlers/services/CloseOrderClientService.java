@@ -1,5 +1,6 @@
 package core.service_handlers.services;
 
+import core.MessageSender;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -11,6 +12,9 @@ import java.text.ParseException;
 
 /** Сервис для работы с контекстом {@link models.UserState#ORDER_CLOSING_CLIENT ORDER_CLOSING_CLIENT}**/
 public class CloseOrderClientService {
+
+    /** @see MessageSender*/
+    private MessageSender messageSender;
     /** @see OrderRepository */
     private final OrderRepository orderRepository;
 
@@ -37,14 +41,16 @@ public class CloseOrderClientService {
      */
     public String continueSession(long userId, String text){
         try {
+            Order order = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.CLOSING);
             if (text.equals("/yes")) {
-                Order order = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.CLOSING);
                 orderRepository.updateOrderStatus(order.getId(), OrderStatus.CLOSED);
                 userContextRepository.updateUserContext(userId,new UserContext());
+                messageSender.sendTextMessage(order.getCourierId(),"Заказ успешно закрыт");
                 return "Заказ успешно закрыт";
             } else if (text.equals("/no")) {
-                Order order = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.CLOSING);
                 orderRepository.updateOrderStatus(order.getId(), OrderStatus.NOT_CLOSED);
+                userContextRepository.updateUserContext(userId,new UserContext());
+                messageSender.sendTextMessage(order.getCourierId(),"Заказ не закрыт. Свяжитесь с заказчиком");
                 return "Заказ не закрыт. Свяжитесь с курьером";
             } else {
                 return "Извините я вас не понимаю. Напиши /help";
@@ -54,4 +60,7 @@ public class CloseOrderClientService {
         }
     }
 
+    public void setMessageSender(MessageSender messageSender) {
+        this.messageSender = messageSender;
+    }
 }

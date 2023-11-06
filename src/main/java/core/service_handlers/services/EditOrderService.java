@@ -69,11 +69,11 @@ public class EditOrderService {
             switch (userContext.getStateNum()) {
                 case 0 -> {
                     if(!validation(userId,text))
-                        return "Заказ не найден. Попробуйте еще раз";
+                        return "Заказ не найден. Попробуй еще раз";
                     userContext.incrementStateNum();
                     userContext.setStateNum(userContext.getStateNum());
                     userContextRepository.updateUserContext(userId, userContext);
-                    return "Напишите новый список продуктов";
+                    return "Напиши новый список продуктов";
                 }
                 case 1 -> {
                     Order order = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
@@ -99,7 +99,7 @@ public class EditOrderService {
     public String cancel(long userId){
         try {
             userContextRepository.updateUserContext(userId,new UserContext());
-            return "ok";
+            return "Поздравляю, ты вернулся назад!";
         } catch (SQLException e) {
             return e.getMessage();
         }

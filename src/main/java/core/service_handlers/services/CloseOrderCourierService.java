@@ -13,7 +13,7 @@ import java.text.ParseException;
 
 /** Сервис для работы с контекстом {@link models.UserState#ORDER_CLOSING_COURIER ORDER_CLOSING_COURIER}**/
 public class CloseOrderCourierService {
-
+    /** @see MessageSender*/
     private MessageSender messageSender;
 
     /** @see OrderRepository */
@@ -101,7 +101,7 @@ public class CloseOrderCourierService {
     public String cancel(long userId){
         try {
             userContextRepository.updateUserContext(userId,new UserContext());
-            return "ok";
+            return "Поздравляю, ты вернулся назад!";
         } catch (SQLException e) {
             return e.getMessage();
         }

@@ -72,5 +72,6 @@ public class Main {
         MessageSender messageSender = new MessageSender(lg, telegramBot);
         closeOrderCourierService.setMessageSender(messageSender);
         acceptOrderService.setMessageSender(messageSender);
+        closeOrderClientService.setMessageSender(messageSender);
     }
 }

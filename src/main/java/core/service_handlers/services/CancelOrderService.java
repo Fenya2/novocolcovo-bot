@@ -60,7 +60,7 @@ public class CancelOrderService {
             UserContext userContext = userContextRepository.getUserContext(userId);
             if (userContext.getStateNum() == 0) {
                 if(!validation(userId,text))
-                    return "Заказ не найден. Попробуйте еще раз";
+                    return "Заказ не найден. Попробуй еще раз";
 
                 long idOrder = Long.parseLong(text);
                 Order order = orderRepository.getById(idOrder);
@@ -81,7 +81,7 @@ public class CancelOrderService {
     public String cancel(long userId){
         try {
             userContextRepository.updateUserContext(userId,new UserContext());
-            return "ok";
+            return "Поздравляю, ты вернулся назад!";
         } catch (SQLException e) {
             return e.getMessage();
         }

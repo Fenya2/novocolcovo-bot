@@ -28,8 +28,8 @@ public class CreateOrderServiceTest {
     private OrderRepository orderRepository;
 
     /**
-     * Проверяет работу continueCreateOrder
-     * рассматривает случаи, когда конекст имеет допустимое значени
+     * Проверяет работу continueCreateOrder,
+     * рассматривает случаи, когда контекст имеет допустимое значение
      * и когда контекст выходит за границы допустимых значений
      */
     @Test
@@ -49,5 +49,9 @@ public class CreateOrderServiceTest {
         String continueCreateOrder2 = createOrderService.continueSession(user.getId(), "anyText");
         Assert.assertEquals("Заказ создан", continueCreateOrder2);
 
+    }
+
+    @Test
+    public void cancel() {
     }
 }

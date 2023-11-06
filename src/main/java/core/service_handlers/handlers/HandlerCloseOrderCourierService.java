@@ -29,8 +29,10 @@ public class HandlerCloseOrderCourierService {
                         "Учти, что из команд доступны только /help и /cancel, на остальное я не смогу тебе ответить";;
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
             }
-            case "/cancel" -> closeOrderCourierService.cancel(msg.getUser().getId());
-
+            case "/cancel" -> {
+                String message = closeOrderCourierService.cancel(msg.getUser().getId());
+                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+            }
             default -> {
                 if (msg.getText().charAt(0) == '/'){
                     String message = "Прости, но я не знаю, что на это ответить. Вызови команду /help ";

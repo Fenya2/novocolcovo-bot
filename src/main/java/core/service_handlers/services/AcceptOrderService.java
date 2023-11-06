@@ -13,6 +13,7 @@ import java.text.ParseException;
 /** Сервис для работы с контекстом {@link models.UserState#ORDER_ACCEPTING ORDER_ACCEPTING}*/
 public class AcceptOrderService {
 
+    /** @see MessageSender*/
     private MessageSender messageSender;
 
     /** @see OrderRepository */
@@ -86,7 +87,7 @@ public class AcceptOrderService {
     public String cancel(long userId){
         try {
             userContextRepository.updateUserContext(userId,new UserContext());
-            return "ok";
+            return "Поздравляю, ты вернулся назад!";
         } catch (SQLException e) {
             return e.getMessage();
         }

@@ -60,7 +60,7 @@ public class CreateOrderService {
             Order order = orderRepository.getOrderByIdUserAndStatus(userId,OrderStatus.UPDATING);
             orderRepository.delete(order.getId());
             userContextRepository.updateUserContext(userId,new UserContext());
-            return "ok";
+            return "Поздравляю, ты вернулся назад!";
         } catch (SQLException | ParseException e) {
             return e.getMessage();
         }

@@ -1,4 +1,4 @@
-package core.service_handlers.services;
+package core;
 
 import core.ServiceManager;
 import db.LoggedUsersRepository;
@@ -46,11 +46,11 @@ public class ServiceManagerTest {
                 .thenReturn(null);
         Mockito.when(userRepository.save(Mockito.any()))
                 .thenReturn(new User());
-        Assert.assertEquals("Привет. Напишите /help",serviceManager.start(msg));
+        Assert.assertEquals("Привет, команда /help поможет тебе разобраться, что тут происходит",serviceManager.start(msg));
 
         Mockito.when(loggedUsersRepository.getUserByPlatformAndIdOnPlatform(Mockito.any(),Mockito.any()))
                 .thenReturn(new User());
-        Assert.assertEquals("Привет. Напишите /help",serviceManager.start(msg));
+        Assert.assertEquals("Привет, команда /help поможет тебе разобраться, что тут происходит",serviceManager.start(msg));
     }
     /** Проверяет работу startCreateOrder */
     @Test
@@ -76,7 +76,7 @@ public class ServiceManagerTest {
         Mockito.when(orderRepository.getAll())
                 .thenReturn(listAllOrder);
         String startEditOrder1 = serviceManager.startEditOrder(-1);
-        Assert.assertEquals("у вас нет ни одного заказа", startEditOrder1);
+        Assert.assertEquals("У вас нет ни одного заказа", startEditOrder1);
 
         String startEditOrder2 = serviceManager.startEditOrder(1);
         Assert.assertEquals("Какой заказ вы хотите обновить.?\n-42: \n", startEditOrder2);
@@ -97,7 +97,7 @@ public class ServiceManagerTest {
         Mockito.when(orderRepository.getAll())
                 .thenReturn(listAllOrder);
         String startEditOrder1 = serviceManager.startCancelOrder(-1);
-        Assert.assertEquals("у вас нет ни одного заказа", startEditOrder1);
+        Assert.assertEquals("У вас нет ни одного заказа", startEditOrder1);
 
         String startEditOrder2 = serviceManager.startCancelOrder(1);
         Assert.assertEquals("Какой заказ вы хотите удалить.?\n-42: \n", startEditOrder2);
@@ -115,7 +115,7 @@ public class ServiceManagerTest {
         Mockito.when(orderRepository.getAll())
                 .thenReturn(listAllOrder);
         String showOrder1 = serviceManager.showOrder(-1);
-        Assert.assertEquals("у вас нет ни одного заказа", showOrder1);
+        Assert.assertEquals("У вас нет ни одного заказа", showOrder1);
 
         String showOrder2 = serviceManager.showOrder(1);
         Assert.assertEquals("-42: \n", showOrder2);
