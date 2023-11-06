@@ -59,7 +59,6 @@ public class Message {
 
     /**
      * @param text текст сообщения. не <b>null</b>.
-     * @throws IllegalArgumentException
      */
     public void setText(String text) throws IllegalArgumentException {
         if(text == null)

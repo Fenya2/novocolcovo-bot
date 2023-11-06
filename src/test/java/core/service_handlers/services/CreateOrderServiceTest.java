@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import java.sql.SQLException;
 import java.text.ParseException;
 
+/**Класс тестирующий {@link CreateOrderService CreateOrderService}*/
 public class CreateOrderServiceTest {
     @Before
     public void init() {
@@ -28,8 +29,8 @@ public class CreateOrderServiceTest {
     private OrderRepository orderRepository;
 
     /**
-     * Проверяет работу continueCreateOrder
-     * рассматривает случаи, когда конекст имеет допустимое значени
+     * Проверяет работу continueCreateOrder,
+     * рассматривает случаи, когда контекст имеет допустимое значение
      * и когда контекст выходит за границы допустимых значений
      */
     @Test

@@ -2,13 +2,14 @@ import bots.Bot;
 import bots.TGBot;
 import config.SQLiteDBconfig;
 import config.TGBotConfig;
+import core.MessageHandler;
 import core.MessageSender;
 import core.service_handlers.handlers.*;
 import core.service_handlers.services.*;
 import db.*;
+import core.ServiceManager;
+import core.CommandHandler;
 
-import core.MessageHandler;
-import models.Platform;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
@@ -36,8 +37,9 @@ public class Main {
         CreateOrderService createOrderService = new CreateOrderService(or, uc);
         EditOrderService editOrderService = new EditOrderService(or,uc);
         CancelOrderService cancelOrderService = new CancelOrderService(or,uc);
-        CloseOrderService closeOrderService = new CloseOrderService(or,uc);
         AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc);
+        CloseOrderCourierService closeOrderCourierService = new CloseOrderCourierService(or,uc);
+        CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
 
         // Обработчики сервисов
         HandlerEditUserService handlerUpdateUserService = new HandlerEditUserService(updateUserService);
@@ -45,8 +47,10 @@ public class Main {
         HandlerEditOrderService handlerEditOrderService = new HandlerEditOrderService(editOrderService);
         HandlerCancelOrderService handlerCancelOrderService = new HandlerCancelOrderService(cancelOrderService);
         HandlerAcceptOrderService handlerAcceptOrderService = new HandlerAcceptOrderService(acceptOrderService);
-        HandlerCloseOrderService handlerCloseOrderService = new HandlerCloseOrderService(closeOrderService);
-
+        HandlerCloseOrderCourierService handlerCloseOrderCourierService =
+                new HandlerCloseOrderCourierService(closeOrderCourierService);
+        HandlerCloseOrderClientService handlerCloseOrderClientService =
+                new HandlerCloseOrderClientService(closeOrderClientService);
         CommandHandler commandHandler = new CommandHandler(serviceManager);
         MessageHandler messageHandler = new MessageHandler(uc, lg,
                 commandHandler,
@@ -55,7 +59,8 @@ public class Main {
                 handlerEditOrderService,
                 handlerCancelOrderService,
                 handlerAcceptOrderService,
-                handlerCloseOrderService);
+                handlerCloseOrderCourierService,
+                handlerCloseOrderClientService);
 
         TGBotConfig tgBotConfig = new TGBotConfig(args[0]);
 
@@ -65,5 +70,8 @@ public class Main {
 
         // todo вот эту штуку подключай в сервис, где отправляются сообщения.
         MessageSender messageSender = new MessageSender(lg, telegramBot);
+        closeOrderCourierService.setMessageSender(messageSender);
+        acceptOrderService.setMessageSender(messageSender);
+        closeOrderClientService.setMessageSender(messageSender);
     }
 }

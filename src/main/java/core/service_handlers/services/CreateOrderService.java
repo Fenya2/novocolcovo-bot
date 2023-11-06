@@ -39,7 +39,7 @@ public class CreateOrderService {
             if (userContext.getStateNum() == 0) {
                 Order order = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
                 order.setDescription(text);
-                orderRepository.updateWithId(order);
+                orderRepository.update(order);
                 orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                 userContextRepository.updateUserContext(userId,new UserContext());
                 return "Заказ создан";
@@ -47,6 +47,22 @@ public class CreateOrderService {
                 return "Выход за пределы контекста";
         } catch (SQLException | ParseException e) {
             return "что-то пошло не так";
+        }
+    }
+
+    /**
+     * Удаляет созданный заказ.
+     * Возвращает пользователя в контекст {@link models.UserState#NO_STATE NO_STATE}.<br>
+     * Выводит "ok" если команда выполнена успешно, иначе сообщение об ошибке
+     */
+    public String cancel(long userId){
+        try {
+            Order order = orderRepository.getOrderByIdUserAndStatus(userId,OrderStatus.UPDATING);
+            orderRepository.delete(order.getId());
+            userContextRepository.updateUserContext(userId,new UserContext());
+            return "Поздравляю, ты вернулся назад!";
+        } catch (SQLException | ParseException e) {
+            return e.getMessage();
         }
     }
 }

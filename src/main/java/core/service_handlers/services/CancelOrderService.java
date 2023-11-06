@@ -25,32 +25,46 @@ public class CancelOrderService {
     }
 
     /**
+     * Проверяет можно принять введенный заказ или нет
+     * @param userId id курьера
+     * @param text id заказа
+     * @return true/false может/не может принять введенный заказ
+     */
+    private boolean validation(long userId, String text) throws SQLException, ParseException {
+        if (!text.chars().allMatch(Character::isDigit) || text.length() > 18)
+            return false;
+        long idOrder = Long.parseLong(text);
+        Order order = orderRepository.getById(idOrder);
+        if (order == null)
+            return false;
+        if(!(order.getStatus().equals(OrderStatus.NO_STATUS) || order.getStatus().equals(OrderStatus.PENDING)))
+           return false;
+        orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
+        Order orderCheck = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
+        if (orderCheck == null) {
+            orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
+            return false;
+        }
+        return true;
+    }
+    /**
      * Продолжение удаления заказа. Диалог с пользователем<br><br>
      * 1)Получает контекст пользователя и заказ, удаляет заказ в бд<br>
      * Удаляет контекст пользователя и меняет статус заказа так как создание закончилось
      *
      * @param userId id пользователя, который удаляет заказ
-     * @param text   string
+     * @param text id заказа
      * @return сообщение об успешном удалении заказа
      */
     public String continueSession(long userId, String text){
         try {
             UserContext userContext = userContextRepository.getUserContext(userId);
             if (userContext.getStateNum() == 0) {
-                if(text.length() > 18 || !text.chars().allMatch(Character::isDigit))
-                    return "Заказ не найден. Попробуйте еще раз(1)";
+                if(!validation(userId,text))
+                    return "Заказ не найден или выполняется курьером. Попробуй еще раз";
+
                 long idOrder = Long.parseLong(text);
                 Order order = orderRepository.getById(idOrder);
-                if (order == null)
-                    return "Заказ не найден. Попробуйте еще раз(2)";
-
-                orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
-                Order orderCheck = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
-                if (orderCheck == null) {
-                    orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
-                    return "Заказ не найден. Попробуйте еще раз(3)";
-                }
-
                 orderRepository.delete(order.getId());
                 userContextRepository.updateUserContext(userId,new UserContext());
                 return "Заказ удален";
@@ -58,6 +72,19 @@ public class CancelOrderService {
                 return "Выход за пределы контекста";
         } catch (SQLException | ParseException e) {
             return "что-то пошло не так";
+        }
+    }
+
+    /**
+     * Возвращает пользователя в контекст {@link models.UserState#NO_STATE NO_STATE}.<br>
+     * Выводит "ok" если команда выполнена успешно, иначе сообщение об ошибке
+     */
+    public String cancel(long userId){
+        try {
+            userContextRepository.updateUserContext(userId,new UserContext());
+            return "Поздравляю, ты вернулся назад!";
+        } catch (SQLException e) {
+            return e.getMessage();
         }
     }
 }

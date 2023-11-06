@@ -11,7 +11,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Класс, отвечающий за работу с таблицей orders базы данных. <br>
@@ -127,7 +126,7 @@ public class OrderRepository extends Repository{
     }
 
     /**
-     * Обновляет существующий заказ. //todo надо переименовать просто в update. Тут же id не передается.
+     * Обновляет существующий заказ.
      * @param order заказ, который нужно сохранить. Должен существовать.
      *              {@link Order#getCourierId()}  Идентификатор доставщика заказа}
      *              должен быть 0 или должен существовать пользователь с таким идентификатором.
@@ -137,7 +136,7 @@ public class OrderRepository extends Repository{
      * -1, если заказ с заданным идентификатором не существует.
      * 0, если идентификаторы создателя или доставщика некорректны.
      */
-    public int updateWithId(Order order) throws SQLException, ParseException {
+    public int update(Order order) throws SQLException, ParseException {
         if(getById(order.getId()) == null) {
             return -1;
         }
@@ -175,7 +174,7 @@ public class OrderRepository extends Repository{
     }
 
     /**
-     * удаляет заказ с переданным идентификатором из таблицы orders.
+     * Удаляет заказ с переданным идентификатором из таблицы orders.
      * @param orderId идентификатор заказа.
      * @return 1, если заказ был удален. Иначе 0.
      */
@@ -217,7 +216,6 @@ public class OrderRepository extends Repository{
     }
 
     /**
-     * /todo АРТУР! в таком случает тебе не нужно передавать статус заказа. Ты же ищешь только UPDATING заказ, заказов с другими статусами у пользователя может быть несколько. Возникнет неопределенность при возвращении.
      * У одного пользователя может изменятся только один заказ, а значит можно
      * @param userId по пользователю
      * @param status и статусу заказа
@@ -233,7 +231,6 @@ public class OrderRepository extends Repository{
     }
 
     /**
-     * //todo АРТУР! Проверь, все ли правильно? У тебя не сломалась логика?
      * Обновляет статус у заказа на новый
      * @return вовзращает 1 при удачно обновлении и 0 иначе
      */
@@ -243,7 +240,7 @@ public class OrderRepository extends Repository{
             return 0;
         }
         order.setStatus(orderStatus);
-        if(updateWithId(order) != 1)
+        if(update(order) != 1)
             return 0;
         return 1;
     }

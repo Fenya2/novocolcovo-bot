@@ -1,6 +1,7 @@
 package core.service_handlers.handlers;
 
-import core.service_handlers.services.ServiceManager;
+import core.CommandHandler;
+import core.ServiceManager;
 import models.Message;
 import models.User;
 import org.junit.Assert;

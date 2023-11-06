@@ -36,7 +36,9 @@ public class MessageHandlerTest {
     @Mock
     private HandlerAcceptOrderService handlerAcceptOrderService;
     @Mock
-    private HandlerCloseOrderService handlerCloseOrderService;
+    private HandlerCloseOrderCourierService handlerCloseOrderCourierService;
+    @Mock
+    private HandlerCloseOrderClientService handlerCloseOrderClientService;
 
     @Before
     public void init() {

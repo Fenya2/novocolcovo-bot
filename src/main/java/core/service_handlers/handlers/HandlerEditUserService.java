@@ -5,6 +5,7 @@ import models.Message;
 import core.service_handlers.services.EditUserService;
 
 import java.sql.SQLException;
+
 /** Обработчик контекста изменения пользователя. */
 public class HandlerEditUserService {
 
@@ -17,9 +18,8 @@ public class HandlerEditUserService {
     }
 
     /**
-     * Обрабатывает сообщение пользователя, когда тот находится в контексте обновления аккаунта
-     * пользователя.
-     * @param msg
+     * Обрабатывает сообщение пользователя, когда тот
+     * находится в контексте обновления аккаунта пользователя.
      */
     public void handle(Message msg) {
         switch (msg.getText()) {
