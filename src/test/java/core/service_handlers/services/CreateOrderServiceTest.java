@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import java.sql.SQLException;
 import java.text.ParseException;
 
+/**Класс тестирующий {@link CreateOrderService CreateOrderService}*/
 public class CreateOrderServiceTest {
     @Before
     public void init() {
@@ -49,9 +50,5 @@ public class CreateOrderServiceTest {
         String continueCreateOrder2 = createOrderService.continueSession(user.getId(), "anyText");
         Assert.assertEquals("Заказ создан", continueCreateOrder2);
 
-    }
-
-    @Test
-    public void cancel() {
     }
 }

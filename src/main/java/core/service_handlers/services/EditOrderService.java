@@ -38,7 +38,8 @@ public class EditOrderService {
         Order order = orderRepository.getById(idOrder);
         if (order == null)
             return false;
-
+        if(!(order.getStatus().equals(OrderStatus.NO_STATUS) || order.getStatus().equals(OrderStatus.PENDING)))
+            return false;
         orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
         Order orderCheck = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
         if (orderCheck == null) {
@@ -69,7 +70,7 @@ public class EditOrderService {
             switch (userContext.getStateNum()) {
                 case 0 -> {
                     if(!validation(userId,text))
-                        return "Заказ не найден. Попробуй еще раз";
+                        return "Заказ не найден или выполняется курьером. Попробуй еще раз";
                     userContext.incrementStateNum();
                     userContext.setStateNum(userContext.getStateNum());
                     userContextRepository.updateUserContext(userId, userContext);

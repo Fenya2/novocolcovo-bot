@@ -42,7 +42,7 @@ public class AcceptOrderService {
             UserContext userContext = userContextRepository.getUserContext(userId);
             if (userContext.getStateNum() == 0) {
                 if(!validation(userId,text))
-                    return "Заказ не найден. Попробуйте еще раз";
+                    return "Заказ не найден. Попробуй еще раз";
 
                 long idOrder = Long.parseLong(text);
                 orderRepository.updateOrderStatus(idOrder,OrderStatus.RUNNING);

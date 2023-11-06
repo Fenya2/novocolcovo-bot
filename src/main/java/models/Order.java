@@ -41,12 +41,12 @@ public class Order {
         setStatus(status);
     }
 
-    public Order(long creatorId, long courierId, OrderStatus status) {
+    public Order(long creatorId, long courierId, OrderStatus status,String description) {
         this.id = -42;
         setCreatorId(creatorId);
         setCourierId(courierId);
         this.dateCreated = new Date();
-        description = "default description";
+        this.description = description;
         setStatus(status);
     }
 

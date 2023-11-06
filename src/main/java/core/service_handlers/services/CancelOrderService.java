@@ -37,7 +37,8 @@ public class CancelOrderService {
         Order order = orderRepository.getById(idOrder);
         if (order == null)
             return false;
-
+        if(!(order.getStatus().equals(OrderStatus.NO_STATUS) || order.getStatus().equals(OrderStatus.PENDING)))
+           return false;
         orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
         Order orderCheck = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
         if (orderCheck == null) {
@@ -60,7 +61,7 @@ public class CancelOrderService {
             UserContext userContext = userContextRepository.getUserContext(userId);
             if (userContext.getStateNum() == 0) {
                 if(!validation(userId,text))
-                    return "Заказ не найден. Попробуй еще раз";
+                    return "Заказ не найден или выполняется курьером. Попробуй еще раз";
 
                 long idOrder = Long.parseLong(text);
                 Order order = orderRepository.getById(idOrder);

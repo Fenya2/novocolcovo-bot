@@ -1,6 +1,5 @@
 package core;
 
-import core.ServiceManager;
 import db.LoggedUsersRepository;
 import db.OrderRepository;
 import db.UserContextRepository;
@@ -121,30 +120,93 @@ public class ServiceManagerTest {
         Assert.assertEquals("-42: \n", showOrder2);
     }
 
+    /**
+     * Проверяет команду /showPendingOrders, случаи <br>
+     * 1)вывод всех заказов (у курьера нет заказов)<br>
+     * 2)вывод всех заказов, кроме заказов курьера<br>
+     * 3)вывод сообщений об отсутствии заказов
+     */
     @Test
     public void showPendingOrders() throws SQLException, ParseException {
-//        Order aa1 = new Order(1,1,OrderStatus.PENDING);
-//        Order aa2 = new Order(2,3,OrderStatus.PENDING);
-//        Order aa3 = new Order(3,4,OrderStatus.UPDATING);
-//        ArrayList<Order> a = new ArrayList<>();
-//        a.add(aa1);
-//        a.add(aa2);
-//        a.add(aa3);
-//        Mockito.when(orderRepository.getAll()).
-//                thenReturn(a);
-//        String showPendingOrders = serviceManager.showPendingOrders();
-//        Assert.assertEquals();
+        Order aa1 = new Order(1,0,OrderStatus.PENDING,"заказ1");
+        Order aa2 = new Order(2,0,OrderStatus.PENDING,"заказ2");
+        Order aa3 = new Order(3,0,OrderStatus.UPDATING,"заказ3");
+        ArrayList<Order> a = new ArrayList<>();
+        a.add(aa1);
+        a.add(aa2);
+        a.add(aa3);
+        Mockito.when(orderRepository.getAll()).
+                thenReturn(a);
+        String showPendingOrders1 = serviceManager.showPendingOrders(3);
+        Assert.assertEquals("-42: заказ1\n-42: заказ2\n",showPendingOrders1);
+
+        String showPendingOrders2 = serviceManager.showPendingOrders(1);
+        Assert.assertEquals("-42: заказ2\n",showPendingOrders2);
+
+        a.remove(1);
+        String showPendingOrders3 = serviceManager.showPendingOrders(1);
+        Assert.assertEquals("У вас нет ни одного заказа", showPendingOrders3);
     }
 
+    /**
+     * Проверяет команду /startAcceptOrder, случаи <br>
+     * 1) можно принять хотя бы 1 заказ
+     * 2) нет ни одного заказа для принятия
+     */
     @Test
-    public void startAcceptOrder() {
+    public void startAcceptOrder() throws SQLException, ParseException {
+        Order aa1 = new Order(1,0,OrderStatus.PENDING,"заказ1");
+        ArrayList<Order> a = new ArrayList<>();
+        a.add(aa1);
+        Mockito.when(orderRepository.getAll()).
+                thenReturn(a);
+        String startCloseOrder1 = serviceManager.startAcceptOrder(3);
+        Assert.assertEquals("Введите заказ который хотите принять",startCloseOrder1);
+
+        String startCloseOrder2 = serviceManager.startAcceptOrder(1);
+        Assert.assertEquals("У вас нет ни одного заказа",startCloseOrder2);
+
     }
 
+    /**
+     * Проверяет команду /showAcceptOrder, случаи <br>
+     * 1)вывод всех заказов <br>
+     * 2)вывод сообщений об отсутствии заказов
+     */
     @Test
-    public void showAcceptOrder() {
+    public void showAcceptOrder() throws SQLException, ParseException {
+        Order aa1 = new Order(1,3,OrderStatus.RUNNING,"заказ1");
+        Order aa2 = new Order(2,3,OrderStatus.RUNNING,"заказ2");
+        Order aa3 = new Order(3,1,OrderStatus.UPDATING,"заказ3");
+        ArrayList<Order> a = new ArrayList<>();
+        a.add(aa1);
+        a.add(aa2);
+        a.add(aa3);
+        Mockito.when(orderRepository.getAll()).
+                thenReturn(a);
+        String showAcceptOrders1 = serviceManager.showAcceptOrder(3);
+        Assert.assertEquals("-42: заказ1\n-42: заказ2\n",showAcceptOrders1);
+
+        String showAcceptOrders2 = serviceManager.showAcceptOrder(1);
+        Assert.assertEquals("У вас нет ни одного заказа",showAcceptOrders2);
     }
 
+    /**
+     * Проверяет команду /startCloseOrder, случаи <br>
+     * 1) можно завершить хотя бы 1 заказ
+     * 2) нет ни одного заказа для завершения
+     */
     @Test
-    public void startCloseOrder() {
+    public void startCloseOrder() throws SQLException, ParseException {
+        Order aa1 = new Order(1,3,OrderStatus.RUNNING,"заказ1");
+        ArrayList<Order> a = new ArrayList<>();
+        a.add(aa1);
+        Mockito.when(orderRepository.getAll()).
+                thenReturn(a);
+        String startCloseOrder1 = serviceManager.startCloseOrder(3);
+        Assert.assertEquals("Введите заказ который хотите завершить",startCloseOrder1);
+
+        String startCloseOrder2 = serviceManager.startCloseOrder(1);
+        Assert.assertEquals("У вас нет ни одного заказа",startCloseOrder2);
     }
 }

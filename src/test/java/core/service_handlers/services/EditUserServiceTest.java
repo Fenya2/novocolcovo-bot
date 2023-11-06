@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.sql.SQLException;
 
+/**Класс тестирующий {@link EditUserService EditUserServiceTest}*/
 public class EditUserServiceTest {
     @InjectMocks
     private EditUserService editUserService;

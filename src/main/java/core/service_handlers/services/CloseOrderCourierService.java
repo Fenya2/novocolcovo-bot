@@ -45,7 +45,7 @@ public class CloseOrderCourierService {
             UserContext userContextCourier = userContextRepository.getUserContext(userId);
             if (userContextCourier.getStateNum() == 0) {
                 if(!validation(userId,text))
-                    return "Заказ не найден. Попробуйте еще раз";
+                    return "Заказ не найден. Попробуй еще раз";
 
                 long idOrder = Long.parseLong(text);
                 Order order = orderRepository.getById(idOrder);
