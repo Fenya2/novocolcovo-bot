@@ -55,9 +55,8 @@ public class ServiceManager {
                 loggedUsersRepository.linkUserIdAndUserPlatform(userWithID.getId(), platform, userIdOnPlatform);
                 userContextRepository.saveUserContext(userWithID.getId(), new UserContext(UserState.NO_STATE));
             }
-            return "Привет, команда /help поможет тебе разобраться, что тут происходит";
+            return "Привет \uD83D\uDC4B Команда /help поможет тебе разобраться, что тут происходит";
         } catch (Exception e) {
-            System.out.println("Здесь?");
             return "Что-то пошло не так"+ e.getMessage();
         }
     }
@@ -164,12 +163,12 @@ public class ServiceManager {
         } catch (SQLException e) {
             return "Ошибка при обращении к базе данных." + e.getMessage();
         }
-        return EditUserServiceConfig.START_MESSAGE.getStr();
+        return EditUserServiceConfig.HELP_MESSAGE.getStr();
     }
 
      /**
       * Выбирает из списка всех заказов заказы с состоянием {@link OrderStatus#PENDING PENDING}
-      * и такие что курьер c userId не был равен {@link Order#creatorId заказчику} и выводит их
+      * и такие что курьер c userId не был равен {@link Order#getCreatorId()}  заказчику} и выводит их
       * @param userId пользователя, который хочет посмотреть список заказов
      */
     public String showPendingOrders(long userId) {
@@ -212,7 +211,7 @@ public class ServiceManager {
 
     /**
      * Выбирает из списка всех заказов заказы с состоянием {@link OrderStatus#RUNNING RUNNING} 
-     * и такие что userId курьера = {@link Order#courierId courierId} и выводит их
+     * и такие что userId курьера = {@link Order#getCourierId()}  courierId} и выводит их
      * @param userId курьер, который хочет посмотреть свои заказы
      */
     public String showAcceptOrder(long userId) {

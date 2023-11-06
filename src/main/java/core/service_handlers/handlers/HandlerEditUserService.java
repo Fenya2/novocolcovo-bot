@@ -23,6 +23,13 @@ public class HandlerEditUserService {
      */
     public void handle(Message msg) {
         switch (msg.getText()) {
+            case "/show_profile": {
+                msg.getBotFrom().sendTextMessage(
+                        msg.getUserIdOnPlatform(),
+                        editUserService.generateProfileMessage(msg.getUser().getId())
+                );
+                return;
+            }
             case "/edit_username": {
                 try {
                     editUserService.setEditUsernameContext(msg.getUser().getId());
@@ -54,7 +61,7 @@ public class HandlerEditUserService {
                 return;
             }
 
-            case "/cancel": {
+            case "/done": {
                 String text = editUserService.endSession(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(
                         msg.getUserIdOnPlatform(),
@@ -66,7 +73,7 @@ public class HandlerEditUserService {
             case "/help": {
                 msg.getBotFrom().sendTextMessage(
                         msg.getUserIdOnPlatform(),
-                        EditUserServiceConfig.START_MESSAGE.getStr()
+                        EditUserServiceConfig.HELP_MESSAGE.getStr()
                 );
                 return;
             }
@@ -108,7 +115,7 @@ public class HandlerEditUserService {
 
         msg.getBotFrom().sendTextMessage(
                 msg.getUserIdOnPlatform(),
-                "Введите команду."
+                "Неопределенное поведение. Введите команду /help для справки."
         );
     }
 }
