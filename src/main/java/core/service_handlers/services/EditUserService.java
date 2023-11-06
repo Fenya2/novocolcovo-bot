@@ -38,7 +38,7 @@ public class EditUserService extends Service {
         assert user != null;
         return """
                 Ваш профиль:
-                Имя: %s,
+                Имя: %s
                 Описание: %s
                 """.formatted(user.getName(), user.getDescription());
     }

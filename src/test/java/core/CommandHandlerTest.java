@@ -1,4 +1,4 @@
-package core.service_handlers.handlers;
+package core;
 
 import core.CommandHandler;
 import core.ServiceManager;
@@ -37,7 +37,7 @@ public class CommandHandlerTest {
     public void testHandleWhenCommandIsValid() {
         Message message = new Message();
         message.setUser(new User(10, "username", "description"));
-        message.setText("/edit_user");
+        message.setText("/profile");
         message.setBotFrom(new BotStrub());
         Assert.assertEquals(2, commandHandler.handle(message));
         message.setText("/create_order");

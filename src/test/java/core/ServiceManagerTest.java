@@ -45,11 +45,11 @@ public class ServiceManagerTest {
                 .thenReturn(null);
         Mockito.when(userRepository.save(Mockito.any()))
                 .thenReturn(new User());
-        Assert.assertEquals("Привет, команда /help поможет тебе разобраться, что тут происходит",serviceManager.start(msg));
+        Assert.assertEquals("Привет \uD83D\uDC4B Команда /help поможет тебе разобраться, что тут происходит",serviceManager.start(msg));
 
         Mockito.when(loggedUsersRepository.getUserByPlatformAndIdOnPlatform(Mockito.any(),Mockito.any()))
                 .thenReturn(new User());
-        Assert.assertEquals("Привет, команда /help поможет тебе разобраться, что тут происходит",serviceManager.start(msg));
+        Assert.assertEquals("Привет \uD83D\uDC4B Команда /help поможет тебе разобраться, что тут происходит",serviceManager.start(msg));
     }
     /** Проверяет работу startCreateOrder */
     @Test
