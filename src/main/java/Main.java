@@ -68,7 +68,6 @@ public class Main {
         TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
         botsApi.registerBot((LongPollingBot) telegramBot);
 
-        // todo вот эту штуку подключай в сервис, где отправляются сообщения.
         MessageSender messageSender = new MessageSender(lg, telegramBot);
         closeOrderCourierService.setMessageSender(messageSender);
         acceptOrderService.setMessageSender(messageSender);

@@ -4,15 +4,16 @@ package config.services;
  * Класс, хранящий строковые константы, отправляемые сервисом UpdateUserService.
  */
 public enum EditUserServiceConfig {
-    START_MESSAGE("""
-            Обновление вашего аккаунта.
-            Напишите:
-            /edit_username , чтобы изменить имя пользователя.
-            /edit_description, чтобы изменить описание к вашему аккаунту.
-            Напишите:
-            /cancel для отмены действия.
-            """),
 
+    HELP_MESSAGE(
+            """
+                Напишите:
+                /show_profile, чтобы посмотреть, как выглядит ваш профиль.
+                /edit_username , чтобы изменить имя пользователя.
+                /edit_description, чтобы изменить описание к вашему аккаунту.
+                /done для выхода.
+                """
+    ),
     EDIT_USER_MESSAGE("""
             Введите новое имя пользователя.
             """),
@@ -21,7 +22,7 @@ public enum EditUserServiceConfig {
     DESCRIPTION_UPDATED_SUCCESFULLY("Готово! Описание пользователя изменено."),
 
     EDIT_DESCRIPTION_MESSAGE("""
-            Введите новое для вашего аккаунта.
+            Введите новое описание для вашего профиля.
             """),
     END_MESSAGE("Изменения успешно сохранены.");
     private String str;

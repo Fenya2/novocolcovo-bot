@@ -94,15 +94,14 @@ public class EditUserServiceTest {
 
     /** Возвращает приветственное сообщение. */
     @Test
-    public void testStartSession() throws SQLException {
+    public void testGenerateProfileMessage() throws SQLException {
+        Mockito.when(userRepository.getById(10))
+                .thenReturn(new User(10, "name of 10 user", "10 description"));
         Assert.assertEquals("""
-            Обновление вашего аккаунта.
-            Напишите:
-            /edit_username , чтобы изменить имя пользователя.
-            /edit_description, чтобы изменить описание к вашему аккаунту.
-            Напишите:
-            /cancel для отмены действия.
-            """, editUserService.startSession(10));
+                Ваш профиль:
+                Имя: name of 10 user
+                Описание: 10 description
+                """, editUserService.generateProfileMessage(10));
     }
 
     /** Возврващет сообщение с прощанием */

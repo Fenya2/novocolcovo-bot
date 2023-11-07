@@ -41,7 +41,7 @@ public class CommandHandler {
             }
             case "/help" -> {
                 String message = """
-                        /edit_user - изменить имя и описание о себе.
+                        /profile - информация о профиле, настройка профиля.
                         /create_order - создать заказ.
                         /edit_order - изменить заказ.
                         /cancel_order - удалить заказ.
@@ -54,7 +54,7 @@ public class CommandHandler {
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                 return 2;
             }
-            case "/edit_user" -> {
+            case "/profile" -> {
                 String startMessage = serviceManager.startEditUserService(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
                 return 2;

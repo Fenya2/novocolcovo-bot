@@ -22,21 +22,25 @@ public class EditUserService extends Service {
     }
 
     /**
-     * Начинает процедуру изменения описания пользователя в системе, меняет контекст пользователя на
-     * {@link UserState EDIT_USER}
-     *
-     * @param userId id пользователя, с которым нужно начать сессию.
-     * @return приветственное сообщение сервиса. Содержащее команды, с помощью которых можно
-     * изменить описание пользователя, его имя.
+     * Герерирует сообщение с информацией о пользователе.
+     * @param userId id пользователя
+     * @return
      */
-    @Override
-    public String startSession(long userId) {
+    public String generateProfileMessage(long userId) {
+        assert userId >= 0;
+        User user;
         try {
+            user = ur.getById(userId);
             setEditUserContext(userId);
         } catch (SQLException e) {
             return "Ошибка при обращении к базе данных." + e.getMessage();
         }
-        return EditUserServiceConfig.START_MESSAGE.getStr();
+        assert user != null;
+        return """
+                Ваш профиль:
+                Имя: %s
+                Описание: %s
+                """.formatted(user.getName(), user.getDescription());
     }
 
     /**
@@ -56,7 +60,7 @@ public class EditUserService extends Service {
 
     @Override
     public String getHelpMessage() {
-        return EditUserServiceConfig.START_MESSAGE.getStr();
+        return EditUserServiceConfig.HELP_MESSAGE.getStr();
     }
 
     /**
@@ -67,6 +71,9 @@ public class EditUserService extends Service {
      * @return переданный пользователь с новым именем.
      */
     public User updateUsername(String username, User user) throws SQLException {
+        assert username != null;
+        assert user != null;
+        assert user.getId() >= 0;
         user.setName(username);
         ur.updateUser(user);
         return user;

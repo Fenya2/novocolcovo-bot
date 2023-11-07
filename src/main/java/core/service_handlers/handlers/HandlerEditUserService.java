@@ -20,9 +20,19 @@ public class HandlerEditUserService {
     /**
      * Обрабатывает сообщение пользователя, когда тот
      * находится в контексте обновления аккаунта пользователя.
+     * @return 1, если текст сообщения корректная команда,
+     * 2, если введенный текст привязан к контексту одной из команд {@link EditUserService}
+     * 3, если введенный тест не является ни тем, ни другим.
      */
-    public void handle(Message msg) {
+    public int handle(Message msg) {
         switch (msg.getText()) {
+            case "/show_profile": {
+                msg.getBotFrom().sendTextMessage(
+                        msg.getUserIdOnPlatform(),
+                        editUserService.generateProfileMessage(msg.getUser().getId())
+                );
+                return 1;
+            }
             case "/edit_username": {
                 try {
                     editUserService.setEditUsernameContext(msg.getUser().getId());
@@ -35,7 +45,7 @@ public class HandlerEditUserService {
                 }
                 String message = EditUserServiceConfig.EDIT_USER_MESSAGE.getStr();
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(),message);
-                return;
+                return 1;
             }
             case "/edit_description": {
                 try {
@@ -51,24 +61,24 @@ public class HandlerEditUserService {
                         msg.getUserIdOnPlatform(),
                         EditUserServiceConfig.EDIT_DESCRIPTION_MESSAGE.getStr()
                 );
-                return;
+                return 1;
             }
 
-            case "/cancel": {
+            case "/done": {
                 String text = editUserService.endSession(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(
                         msg.getUserIdOnPlatform(),
                         text
                 );
-                return;
+                return 1;
             }
 
             case "/help": {
                 msg.getBotFrom().sendTextMessage(
                         msg.getUserIdOnPlatform(),
-                        EditUserServiceConfig.START_MESSAGE.getStr()
+                        EditUserServiceConfig.HELP_MESSAGE.getStr()
                 );
-                return;
+                return 1;
             }
         }
 
@@ -87,7 +97,7 @@ public class HandlerEditUserService {
 
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(),
                         EditUserServiceConfig.USERNAME_UPDATED_SUCCESFULLY.getStr());
-                return;
+                return 2;
             }
             case 2: {
                 try {
@@ -102,13 +112,14 @@ public class HandlerEditUserService {
                 }
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(),
                         EditUserServiceConfig.DESCRIPTION_UPDATED_SUCCESFULLY.getStr());
-                return;
+                return 2;
             }
         }
 
         msg.getBotFrom().sendTextMessage(
                 msg.getUserIdOnPlatform(),
-                "Введите команду."
+                "Неопределенное поведение. Введите команду /help для справки."
         );
+        return 3;
     }
 }
