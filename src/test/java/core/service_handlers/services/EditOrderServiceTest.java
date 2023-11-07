@@ -65,6 +65,8 @@ public class EditOrderServiceTest {
         String continueEditOrder4 = editOrderService.continueSession(1, "11254");
         Assert.assertEquals("Заказ не найден или выполняется курьером. Попробуй еще раз", continueEditOrder4);
 
+        Mockito.when(orderRepository.getById(11254))
+                .thenReturn(new Order(1,1,OrderStatus.PENDING,"any"));
         Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, OrderStatus.UPDATING))
                 .thenReturn(new Order(1));
         String continueEditOrder5 = editOrderService.continueSession(1, "11254");
