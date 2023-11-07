@@ -30,7 +30,7 @@ public class AcceptOrderService {
 
     /**
      * Меняет у введенного курьером заказа статус на {@link models.OrderStatus#RUNNING RUNNING} <br>
-     * Меняет поле {@link models.Order#courierId courierId} на id курьера <br>
+     * Меняет поле {@link Order#getCourierId()}  courierId} на id курьера <br>
      * Меняет контекст курьера на {@link models.UserState#NO_STATE NO_STATE}
      * Отправляет сообщение, что заказ принят или ошибку
      * TODO так же должен отправить сообщение заказчику что его заказ приняли

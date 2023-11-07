@@ -41,11 +41,11 @@ public class HandlerCloseOrderClientService {
                 if(msg.getText().charAt(0) == '/'){
                     String message = closeOrderClientService.continueSession(msg.getUser().getId(),msg.getText());
                     msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
-                    return 2;
+                    return 3;
                 }
                 String message = "Прости, но я не знаю, что на это ответить. Вызови команду /help ";
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
-                return 3;
+                return 2;
             }
         }
     }
