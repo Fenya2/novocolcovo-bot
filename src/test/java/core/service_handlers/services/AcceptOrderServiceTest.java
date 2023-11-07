@@ -1,13 +1,9 @@
 package core.service_handlers.services;
 
-import bots.Bot;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import core.MessageSender;
-import db.LoggedUsersRepository;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
-import models.User;
 import models.UserContext;
 import models.UserState;
 import org.junit.Assert;

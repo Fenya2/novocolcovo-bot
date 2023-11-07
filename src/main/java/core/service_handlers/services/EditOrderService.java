@@ -38,7 +38,8 @@ public class EditOrderService {
         Order order = orderRepository.getById(idOrder);
         if (order == null)
             return false;
-        if(!(order.getStatus().equals(OrderStatus.NO_STATUS) || order.getStatus().equals(OrderStatus.PENDING)))
+        System.out.println(order.getStatus()+"      dfogjdfigkodfkbf");
+        if(!(order.getStatus()==(OrderStatus.PENDING)))
             return false;
         orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
         Order orderCheck = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);

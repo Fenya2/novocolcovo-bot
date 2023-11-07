@@ -45,9 +45,17 @@ public class AcceptOrderService {
                     return "Заказ не найден. Попробуй еще раз";
 
                 long idOrder = Long.parseLong(text);
-                orderRepository.updateOrderStatus(idOrder,OrderStatus.RUNNING);
+
                 Order order = orderRepository.getById(idOrder);
+                if(order.getStatus() != OrderStatus.PENDING){
+                    messageSender.sendTextMessage(
+                            order.getCreatorId(),
+                            "Курьер хочет принять заказ, заверши выполнение команды."
+                    );
+                    return "В этот момент заказ изменяется.";
+                }
                 order.setCourierId(userId);
+                order.setStatus(OrderStatus.RUNNING);
                 orderRepository.update(order);
                 userContextRepository.updateUserContext(userId,new UserContext());
 
