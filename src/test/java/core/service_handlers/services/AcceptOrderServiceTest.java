@@ -4,6 +4,7 @@ import core.MessageSender;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
+import models.OrderStatus;
 import models.UserContext;
 import models.UserState;
 import org.junit.Assert;
@@ -80,6 +81,12 @@ public class AcceptOrderServiceTest {
                 .thenReturn(new Order(1));
 
         String continueSession4 = acceptOrderService.continueSession(2,"11");
-        Assert.assertEquals("Заказ принят",continueSession4);
+        Assert.assertEquals("В этот момент заказ изменяется.",continueSession4);
+
+        Mockito.when(orderRepository.getById(11))
+                .thenReturn(new Order(1,1, OrderStatus.PENDING,"any"));
+
+        String continueSession5 = acceptOrderService.continueSession(2,"11");
+        Assert.assertEquals("Заказ принят",continueSession5);
     }
 }
