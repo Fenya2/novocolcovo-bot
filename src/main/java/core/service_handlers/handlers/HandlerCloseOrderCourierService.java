@@ -29,7 +29,7 @@ public class HandlerCloseOrderCourierService {
                 String message = "Ты сейчас находишься в контексте завершения заказа." +
                         "Напиши номер заказа, который ты уже отдал."+
                         "Если ты не знаешь этого номера, то тогда выйди из контекста, "+
-                        "написав команду /cancel и вызови команду /show_pending_orders. "+ //todo здесь /show_accept_orders?
+                        "написав команду /cancel и вызови команду /show_accept_orders. "+
                         "Учти, что из команд доступны только /help и /cancel, на остальное я не смогу тебе ответить";;
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                 return 1;

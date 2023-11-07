@@ -57,6 +57,10 @@ public class CloseOrderCourierService {
                     );
                 }
                 else{
+                    messageSender.sendTextMessage(
+                            order.getCreatorId(),
+                            "Курьер хочет завершить заказ, заверши выполнение команды."
+                    );
                     return "Заказчик не может сейчас завершить заказ, попробуйте позже";
                 }
                 orderRepository.updateOrderStatus(idOrder, OrderStatus.CLOSING);
@@ -64,7 +68,7 @@ public class CloseOrderCourierService {
 
                 messageSender.sendTextMessage(
                         order.getCreatorId(),
-                        "Подтвердите что ваш заказ приняли, написав /yes /no."
+                        "Подтвердите что ваш заказ приняли, написав \n/yes /no."
                 );
                 return "Завершение заказа отправлено на подтверждение заказчику";
             } else
