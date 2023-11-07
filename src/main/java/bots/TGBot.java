@@ -1,15 +1,17 @@
-package bot;
+package bots;
 
 import core.MessageHandler;
 import models.Message;
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import config.TGBotConfig;
 
-/** Класс для связи с telegram через бота. */
+/** Класс для связи с telegram через бот. */
 public class TGBot extends TelegramLongPollingBot implements Bot {
     private static final Logger log = Logger.getLogger(TGBot.class.getName());
     /** Конфигурация для работы с ботом. */
@@ -21,7 +23,7 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
      * @param botConfig объект конфигурации бота
      * @param messageHandler обработчик сообщений
      */
-    public TGBot(TGBotConfig botConfig,MessageHandler messageHandler) {
+    public TGBot(TGBotConfig botConfig, MessageHandler messageHandler) {
         super(botConfig.getToken());
         this.botConfig = botConfig;
         this.messageHandler = messageHandler;
@@ -39,12 +41,12 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
         if(update.hasMessage()) {
             if(update.getMessage().hasText()) {
                 Message message = new Message(update.getMessage());
-                String text = messageHandler.handle(message);
-                sendTextMessage(String.valueOf(update.getMessage().getChatId()), text);
+                message.setBotFrom(this);
+                messageHandler.handle(message);
             }
             else {
-               sendTextMessage(update.getMessage().getChatId().toString(),
-                       "Сейчас бот работает только с текстом.");
+                sendTextMessage(update.getMessage().getChatId().toString(),
+                        "Сейчас бот работает только с текстом.");
             }
         } else {
             // todo обработка другого рода обновлений.
@@ -57,8 +59,7 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
      * @param text текст сообщения. Не <b>null</b>
      */
     @Override
-    public void sendTextMessage(String userIdOnPlatform, String text)
-            throws IllegalArgumentException {
+    public void sendTextMessage(String userIdOnPlatform, String text) throws IllegalArgumentException {
         if(userIdOnPlatform == null)
             throw new IllegalArgumentException("userIdOnPlatform must be not null.");
         if(text == null)
@@ -72,6 +73,17 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
         } catch (TelegramApiException e) {
             log.warn("can't send message with text %s to telegram user with id \"%s\""
                     .formatted(text, userIdOnPlatform));
+        }
+    }
+
+    public void sendSticker(String recipientId, String stickerToken) throws TelegramApiException {
+        SendSticker sendSticker = new SendSticker();
+        sendSticker.setChatId(recipientId);
+        sendSticker.setSticker(new InputFile(stickerToken));
+        try {
+            execute(sendSticker);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 }

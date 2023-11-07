@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 
 /** Класс конфигурации для базы данных (возможно не только sqlite) */
 public class SQLiteDBconfig {
-    /** Подключение, пеоедваемое DriverManager */
+    /** Подключение, передуваемое DriverManager */
     private final String connection;
 
     /** @param configure путь к файлу конфигурации типа json */

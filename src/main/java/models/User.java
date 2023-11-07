@@ -4,11 +4,11 @@ package models;
  * Класс, описывающий пользователя в программе
  */
 public class User {
-    /** идентификатор пользователя. */
+    /** Идентификатор пользователя. */
     private long id;
-    /** имя пользователя. */
+    /** Имя пользователя. */
     private String name;
-    /** описание пользователя. */
+    /** Описание пользователя. */
     private String description;
 
     /**
@@ -45,7 +45,6 @@ public class User {
 
     /**
      * @param name имя пользователя. Не <b>null</b>.
-     * @throws IllegalArgumentException
      */
     public void setName(String name) throws IllegalArgumentException {
         if(name == null)
