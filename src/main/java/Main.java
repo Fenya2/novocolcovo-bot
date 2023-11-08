@@ -1,7 +1,10 @@
+import api.longpoll.bots.exceptions.VkApiException;
 import bots.Bot;
 import bots.TGBot;
+import bots.VkBot;
 import config.SQLiteDBconfig;
 import config.TGBotConfig;
+import config.VkBotConfig;
 import core.MessageHandler;
 import core.MessageSender;
 import core.service_handlers.handlers.*;
@@ -21,7 +24,7 @@ import java.sql.SQLException;
 /** Main class */
 public class Main {
     /** Entry point */
-    public static void main(String[] args) throws SQLException, ClassNotFoundException, TelegramApiException {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException, TelegramApiException, VkApiException {
         // БД
         DB db = new SQLiteDB(new SQLiteDBconfig("src/main/resources/config/dbconfig.json"));
 
@@ -51,8 +54,12 @@ public class Main {
                 new HandlerCloseOrderCourierService(closeOrderCourierService);
         HandlerCloseOrderClientService handlerCloseOrderClientService =
                 new HandlerCloseOrderClientService(closeOrderClientService);
+
+        // "главные" обработчики
         CommandHandler commandHandler = new CommandHandler(serviceManager);
-        MessageHandler messageHandler = new MessageHandler(uc, lg,
+        MessageHandler messageHandler = new MessageHandler(
+                uc,
+                lg,
                 commandHandler,
                 handlerUpdateUserService,
                 handlerCreateOrderService,
@@ -60,17 +67,23 @@ public class Main {
                 handlerCancelOrderService,
                 handlerAcceptOrderService,
                 handlerCloseOrderCourierService,
-                handlerCloseOrderClientService);
+                handlerCloseOrderClientService
+        );
 
-        TGBotConfig tgBotConfig = new TGBotConfig(args[0]);
-
-        Bot telegramBot = new TGBot(tgBotConfig, messageHandler);
+        // Боты
+        TGBotConfig tgBotConfig = new TGBotConfig(System.getenv("TG_BOT_TOKEN"));
+        Bot tgBot = new TGBot(tgBotConfig, messageHandler);
         TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-        botsApi.registerBot((LongPollingBot) telegramBot);
+        botsApi.registerBot((LongPollingBot) tgBot);
 
-        MessageSender messageSender = new MessageSender(lg, telegramBot);
+        VkBotConfig vkBotConfig = new VkBotConfig(System.getenv("VK_BOT_TOKEN"));
+        Bot vkBot = new VkBot(vkBotConfig, messageHandler);
+
+        MessageSender messageSender = new MessageSender(lg, tgBot, vkBot);
         closeOrderCourierService.setMessageSender(messageSender);
         acceptOrderService.setMessageSender(messageSender);
         closeOrderClientService.setMessageSender(messageSender);
+
+        ((VkBot) vkBot).startPolling();
     }
 }
