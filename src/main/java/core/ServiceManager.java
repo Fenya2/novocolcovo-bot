@@ -134,7 +134,11 @@ public class ServiceManager {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();
             for (Order s : listAllOrder) {
-                if (s.getCreatorId() == idUser)
+                if (
+                        s.getCreatorId() == idUser
+                        && s.getStatus() != OrderStatus.CLOSED
+                        && s.getStatus() != OrderStatus.NOT_CLOSED
+                )
                     allOrderUser.append(
                             Long.toString(s.getId()).concat(": ")
                                     .concat(s.getDescription()).concat("\n")
