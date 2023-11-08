@@ -13,7 +13,9 @@ public enum UserState {
     /** Пользователь(заказчик) находится внутри выполнения команды /edit_user */
     EDIT_USER,
     /** Пользователь(исполнитель) находится внутри выполнения команды /accept_order */
-    ORDER_ACCEPTING,
+    ORDER_ACCEPTING_COURIER,
+    /** Пользователь(исполнитель) находится внутри выполнения команды /accept_order */
+    ORDER_ACCEPTING_CLIENT,
     /** Пользователь(исполнитель) находится внутри выполнения команды /close_order */
     ORDER_CLOSING_COURIER,
     /** Пользователь(заказчик) находится внутри выполнения команды /accept_order */

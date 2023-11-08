@@ -36,9 +36,18 @@ public class MessageHandler {
 
     /** @see HandlerCancelOrderService */
     private final HandlerCancelOrderService handlerCancelOrderService;
-    private final HandlerAcceptOrderService handlerAcceptOrderService;
+
+    /** @see HandlerAcceptOrderCourierService*/
+    private final HandlerAcceptOrderCourierService handlerAcceptOrderCourierService;
+
+    /** @see HandlerCloseOrderCourierService */
     private final HandlerCloseOrderCourierService handlerCloseOrderCourierService;
+
+    /** @see HandlerCloseOrderClientService */
     private final HandlerCloseOrderClientService handlerCloseOrderClientService;
+
+    /** @see HandlerAcceptOrderClientService*/
+    private final HandlerAcceptOrderClientService handlerAcceptOrderClientService;
 
 
     /** Конструктор {@link MessageHandler MessageHandler}*/
@@ -50,9 +59,11 @@ public class MessageHandler {
             HandlerCreateOrderService handlerCreateOrderService,
             HandlerEditOrderService handlerEditOrderService,
             HandlerCancelOrderService handlerCancelOrderService,
-            HandlerAcceptOrderService handlerAcceptOrderService,
+            HandlerAcceptOrderCourierService handlerAcceptOrderService,
+            HandlerAcceptOrderClientService handlerAcceptOrderClientService,
             HandlerCloseOrderCourierService handlerCloseOrderService,
-            HandlerCloseOrderClientService handlerCloseOrderClientService) {
+            HandlerCloseOrderClientService handlerCloseOrderClientService
+    ) {
         this.userContextRepository = userContextRepository;
         this.loggedUsersRepository = loggedUsersRepository;
         this.commandHandler = commandHandler;
@@ -60,7 +71,8 @@ public class MessageHandler {
         this.handlerCreateOrderService = handlerCreateOrderService;
         this.handlerEditOrderService = handlerEditOrderService;
         this.handlerCancelOrderService = handlerCancelOrderService;
-        this.handlerAcceptOrderService = handlerAcceptOrderService;
+        this.handlerAcceptOrderCourierService = handlerAcceptOrderService;
+        this.handlerAcceptOrderClientService = handlerAcceptOrderClientService;
         this.handlerCloseOrderCourierService = handlerCloseOrderService;
         this.handlerCloseOrderClientService = handlerCloseOrderClientService;
     }
@@ -120,7 +132,8 @@ public class MessageHandler {
             case ORDER_CREATING -> handlerCreateOrderService.handle(msg);
             case ORDER_EDITING -> handlerEditOrderService.handle(msg);
             case ORDER_CANCELING-> handlerCancelOrderService.handle(msg);
-            case ORDER_ACCEPTING -> handlerAcceptOrderService.handle(msg);
+            case ORDER_ACCEPTING_COURIER -> handlerAcceptOrderCourierService.handle(msg);
+            case ORDER_ACCEPTING_CLIENT -> handlerAcceptOrderClientService.handle(msg);
             case ORDER_CLOSING_COURIER -> handlerCloseOrderCourierService.handle(msg);
             case ORDER_CLOSING_CLIENT -> handlerCloseOrderClientService.handle(msg);
         }
