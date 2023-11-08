@@ -65,7 +65,7 @@ public class CloseOrderClientServiceTest {
                 1,"any"
         );
         Assert.assertEquals(
-                "Извините я вас не понимаю. Напиши /help",
+                "Прости, но я не знаю, что на это ответить. Вызови команду /help",
                 continueSession3
         );
     }

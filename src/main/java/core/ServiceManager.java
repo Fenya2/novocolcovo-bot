@@ -179,8 +179,11 @@ public class ServiceManager {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();
+            UserContext client;
             for (Order s: listAllOrder){
-                if(userId != s.getCreatorId() && s.getStatus().equals(OrderStatus.PENDING)){
+                client = userContextRepository.getUserContext(s.getId());
+                if(userId != s.getCreatorId() && s.getStatus().equals(OrderStatus.PENDING)
+                        && client.getState() == UserState.NO_STATE){
                     allOrderUser.append(
                             Long.toString(s.getId()).concat(": ")
                                     .concat(s.getDescription()).concat("\n")
@@ -197,13 +200,13 @@ public class ServiceManager {
     }
 
     /**
-     * @param userId Добавляет пользователя с этим userId в контекст {@link UserState#ORDER_ACCEPTING ORDER_ACCEPTING}
+     * @param userId Добавляет пользователя с этим userId в контекст {@link UserState#ORDER_ACCEPTING_COURIER ORDER_ACCEPTING}
      * @return Выводит сообщение с просьбой ввести курьера userId заказа, который он хочется принять 
      */
     public String startAcceptOrder(long userId){
         if (showPendingOrders(userId).equals("У вас нет ни одного заказа"))
             return "У вас нет ни одного заказа";
-        UserContext userContext = new UserContext(UserState.ORDER_ACCEPTING);
+        UserContext userContext = new UserContext(UserState.ORDER_ACCEPTING_COURIER);
         try {
             userContextRepository.updateUserContext(userId, userContext);
         } catch (SQLException e) {
@@ -222,8 +225,11 @@ public class ServiceManager {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();
+            UserContext client;
             for (Order s: listAllOrder){
-                if(userId == s.getCourierId() && s.getStatus().equals(OrderStatus.RUNNING)){
+                client = userContextRepository.getUserContext(s.getId());
+                if(userId == s.getCourierId() && s.getStatus().equals(OrderStatus.RUNNING)
+                        && client.getState() == UserState.NO_STATE){
                     allOrderUser.append(
                             Long.toString(s.getId()).concat(": ")
                                     .concat(s.getDescription()).concat("\n")
