@@ -3,6 +3,7 @@ package core;
 import db.LoggedUsersRepository;
 import db.UserContextRepository;
 import models.Message;
+import models.Platform;
 import models.User;
 import models.UserContext;
 
@@ -20,10 +21,16 @@ public class MessageHandler {
     private final UserContextRepository userContextRepository;
 
     /** @see LoggedUsersRepository*/
-    private final LoggedUsersRepository loggedUsersRepository;
+    private final LoggedUsersRepository loginUsersRepository;
 
     /** @see CommandHandler */
     private final CommandHandler commandHandler;
+
+    /** @see HandlerAcceptOrderClientService*/
+    private final HandlerRegistrationService handlerRegistrationService;
+
+    /** @see HandlerLoginService */
+    private final HandlerLoginService handlerLoginService;
 
     /** @see HandlerEditUserService */
     private final HandlerEditUserService handlerEditUserService;
@@ -50,23 +57,26 @@ public class MessageHandler {
     private final HandlerAcceptOrderClientService handlerAcceptOrderClientService;
 
 
+
     /** Конструктор {@link MessageHandler MessageHandler}*/
     public MessageHandler(
             UserContextRepository userContextRepository,
             LoggedUsersRepository loggedUsersRepository,
             CommandHandler commandHandler,
-            HandlerEditUserService updateUserServiceHandler,
+            HandlerRegistrationService handlerRegistrationService,
+            HandlerLoginService handlerLoggedService, HandlerEditUserService updateUserServiceHandler,
             HandlerCreateOrderService handlerCreateOrderService,
             HandlerEditOrderService handlerEditOrderService,
             HandlerCancelOrderService handlerCancelOrderService,
             HandlerAcceptOrderCourierService handlerAcceptOrderService,
             HandlerAcceptOrderClientService handlerAcceptOrderClientService,
             HandlerCloseOrderCourierService handlerCloseOrderService,
-            HandlerCloseOrderClientService handlerCloseOrderClientService
-    ) {
+            HandlerCloseOrderClientService handlerCloseOrderClientService) {
         this.userContextRepository = userContextRepository;
-        this.loggedUsersRepository = loggedUsersRepository;
+        this.loginUsersRepository = loggedUsersRepository;
         this.commandHandler = commandHandler;
+        this.handlerRegistrationService = handlerRegistrationService;
+        this.handlerLoginService = handlerLoggedService;
         this.handlerEditUserService = updateUserServiceHandler;
         this.handlerCreateOrderService = handlerCreateOrderService;
         this.handlerEditOrderService = handlerEditOrderService;
@@ -89,7 +99,7 @@ public class MessageHandler {
         User user;
         UserContext userContext;
         try {
-            user = loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
+            user = loginUsersRepository.getUserByPlatformAndIdOnPlatform(
                     msg.getPlatform(),
                     msg.getUserIdOnPlatform()
             );
@@ -102,16 +112,58 @@ public class MessageHandler {
         }
 
         if(user == null) {
-            if (msg.getText().equals("/start")) {
+            if (msg.getText().equals("/start") || msg.getText().equals("/registration")) {
                 commandHandler.handle(msg);
+                return 1;
+            }
+            else if (msg.getText().equals("/help")) {
+                msg.getBotFrom().sendTextMessage(
+                        msg.getUserIdOnPlatform(),
+                        "/registration - зарегистрироваться в системе.\n"+
+                                "/login - войти"
+                );
                 return 1;
             }
             msg.getBotFrom().sendTextMessage(
                     msg.getUserIdOnPlatform(),
-                    "отправьте /start для последующей работы."
+                    "Для пользования ботом тебе нужно зарегистрироваться. Это можно сделать командой /registration."
             );
             return 1;
         }
+
+        //TODO это можно вынести в другой класс(сервис)
+        if (msg.getText().equals("/login")) {
+            Platform platform = null;
+            String idonp;
+            for (Platform p : Platform.values()) {
+                try {
+                    idonp = loginUsersRepository.getUserIdOnPlatformByUserIdAndPlatform(user.getId(), p);
+                } catch (SQLException e) {
+                    msg.getBotFrom().sendTextMessage(
+                            msg.getUserIdOnPlatform(),
+                            "Проблемы с доступом к базе данных " + e.getMessage());
+                    return -1;
+                }
+                if (idonp == null) continue;
+                switch (p) {
+                    case TELEGRAM -> platform = Platform.TELEGRAM;
+                    case VK -> platform = Platform.VK;
+                }
+            }
+            if (platform != null) {
+                msg.setPlatform(platform);
+                try {
+                    msg.setUserIdOnPlatform(
+                            loginUsersRepository.getUserIdOnPlatformByUserIdAndPlatform(user.getId(), platform)
+                    );
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                handlerLoginService.handle(msg);
+                return 1;
+            }
+        }
+
 
         msg.setUser(user);
         try {userContext = userContextRepository.getUserContext(user.getId());}
@@ -128,6 +180,8 @@ public class MessageHandler {
                 commandHandler.handle(msg);
                 return 2;
             }
+            case REGISTRATION -> handlerRegistrationService.handle(msg);
+            case LOGGED -> handlerLoginService.handle(msg);
             case EDIT_USER -> handlerEditUserService.handle(msg);
             case ORDER_CREATING -> handlerCreateOrderService.handle(msg);
             case ORDER_EDITING -> handlerEditOrderService.handle(msg);

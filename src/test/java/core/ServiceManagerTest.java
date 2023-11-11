@@ -139,7 +139,7 @@ public class ServiceManagerTest {
         Assert.assertEquals("-42: заказ1\n", showPendingOrders1);
 
         String showPendingOrders2 = serviceManager.showPendingOrders(1);
-        Assert.assertEquals("У вас нет ни одного заказа", showPendingOrders2);
+        Assert.assertEquals("Нет ни одного заказа, готового к выполнению", showPendingOrders2);
     }
     /**
      * Проверяет команду /startAcceptOrder, случаи <br>
@@ -159,7 +159,7 @@ public class ServiceManagerTest {
         Assert.assertEquals("Введите заказ который хотите принять",startCloseOrder1);
 
         String startCloseOrder2 = serviceManager.startAcceptOrder(1);
-        Assert.assertEquals("У вас нет ни одного заказа",startCloseOrder2);
+        Assert.assertEquals("Нет ни одного заказа, готового к выполнению",startCloseOrder2);
 
     }
 
@@ -185,7 +185,7 @@ public class ServiceManagerTest {
         Assert.assertEquals("-42: заказ1\n-42: заказ2\n",showAcceptOrders1);
 
         String showAcceptOrders2 = serviceManager.showAcceptOrder(1);
-        Assert.assertEquals("У вас нет ни одного заказа",showAcceptOrders2);
+        Assert.assertEquals("Нет ни одного заказа, готового к выполнению",showAcceptOrders2);
     }
 
     /**
@@ -206,6 +206,6 @@ public class ServiceManagerTest {
         Assert.assertEquals("Введите заказ который хотите завершить",startCloseOrder1);
 
         String startCloseOrder2 = serviceManager.startCloseOrder(1);
-        Assert.assertEquals("У вас нет ни одного заказа",startCloseOrder2);
+        Assert.assertEquals("Нет ни одного заказа, готового к выполнению",startCloseOrder2);
     }
 }

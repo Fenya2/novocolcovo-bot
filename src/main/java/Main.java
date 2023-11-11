@@ -2,13 +2,10 @@ import bots.Bot;
 import bots.TGBot;
 import config.SQLiteDBconfig;
 import config.TGBotConfig;
-import core.MessageHandler;
-import core.MessageSender;
+import core.*;
 import core.service_handlers.handlers.*;
 import core.service_handlers.services.*;
 import db.*;
-import core.ServiceManager;
-import core.CommandHandler;
 
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -32,6 +29,8 @@ public class Main {
         OrderRepository or = new OrderRepository(db,ur);
 
         // Сервисы
+        RegistrationService registrationService = new RegistrationService(ur, uc);
+        LoginService loggedService = new LoginService(lg, uc);
         ServiceManager serviceManager = new ServiceManager(lg,or,ur,uc);
         EditUserService updateUserService = new EditUserService(uc, ur);
         CreateOrderService createOrderService = new CreateOrderService(or, uc);
@@ -43,6 +42,10 @@ public class Main {
         CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
 
         // Обработчики сервисов
+        HandlerRegistrationService handlerRegistrationService =
+                new HandlerRegistrationService(registrationService);
+        HandlerLoginService handlerLoggedService =
+                new HandlerLoginService(loggedService);
         HandlerEditUserService handlerUpdateUserService =
                 new HandlerEditUserService(updateUserService);
         HandlerCreateOrderService handlerCreateOrderService =
@@ -63,6 +66,8 @@ public class Main {
 
         MessageHandler messageHandler = new MessageHandler(uc, lg,
                 commandHandler,
+                handlerRegistrationService,
+                handlerLoggedService,
                 handlerUpdateUserService,
                 handlerCreateOrderService,
                 handlerEditOrderService,
@@ -83,5 +88,7 @@ public class Main {
         closeOrderCourierService.setMessageSender(messageSender);
         acceptOrderCourierService.setMessageSender(messageSender);
         closeOrderClientService.setMessageSender(messageSender);
+        acceptOrderClientService.setMessageSender(messageSender);
+
     }
 }

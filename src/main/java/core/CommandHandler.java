@@ -54,6 +54,11 @@ public class CommandHandler {
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                 return 2;
             }
+            case "/registration" -> {
+                String startMessage = serviceManager.startRegistrationService(msg);
+                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
+                return 2;
+            }
             case "/profile" -> {
                 String startMessage = serviceManager.startEditUserService(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
