@@ -181,7 +181,7 @@ public class MessageHandler {
                 return 2;
             }
             case REGISTRATION -> handlerRegistrationService.handle(msg);
-            case LOGGED -> handlerLoginService.handle(msg);
+            case LOGGING -> handlerLoginService.handle(msg);
             case EDIT_USER -> handlerEditUserService.handle(msg);
             case ORDER_CREATING -> handlerCreateOrderService.handle(msg);
             case ORDER_EDITING -> handlerEditOrderService.handle(msg);

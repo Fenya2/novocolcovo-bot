@@ -1,6 +1,5 @@
 package core.service_handlers.services;
 
-import core.MessageSender;
 import db.LoggedUsersRepository;
 import db.UserContextRepository;
 import models.Message;
@@ -10,7 +9,7 @@ import models.UserState;
 
 import java.sql.SQLException;
 
-/** Сервис для работы с контекстом {@link models.UserState#LOGGED LOGGED}*/
+/** Сервис для работы с контекстом {@link models.UserState#LOGGING LOGGING}*/
 public class LoginService {
 
     /** @see LoggedUsersRepository*/
@@ -19,11 +18,18 @@ public class LoginService {
     /** @see UserContextRepository*/
     private final UserContextRepository userContextRepository;
 
+    /** Конструктор {@link LoginService LoginService}*/
     public LoginService(LoggedUsersRepository loggedUsersRepository, UserContextRepository userContextRepository) {
         this.loggedUsersRepository = loggedUsersRepository;
         this.userContextRepository = userContextRepository;
     }
 
+    /**
+     * Получает пользователя в платформе в которой он уже зарегистрирован.
+     * Генерирует код и сохраняет в {@link UserContext#stateNum номере состояния} контекста
+     * @param msg
+     * @return сообщение с кодом подтверждения
+     */
     public String start(Message msg) {
         try {
             User user = loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
@@ -34,7 +40,7 @@ public class LoginService {
             String code = "1000";
             userContextRepository.updateUserContext(
                     user.getId(),
-                    new UserContext(UserState.LOGGED,Integer.parseInt(code))
+                    new UserContext(UserState.LOGGING,Integer.parseInt(code))
             );
             return "Ваш код подтверждения: "+ code;
         } catch (SQLException e) {
@@ -42,6 +48,11 @@ public class LoginService {
         }
     }
 
+    /**
+     * Проверяет правильно ли пользователь ввел код подтверждения
+     * @param msg
+     * @return
+     */
     public String continueSession(Message msg) {
         long id = msg.getUser().getId();
         String text = msg.getText();
@@ -49,6 +60,7 @@ public class LoginService {
             UserContext userContext = userContextRepository.getUserContext(id);
             if (text.equals(Integer.toString(userContext.getStateNum()))){
                 loggedUsersRepository.linkUserIdAndUserPlatform(id,msg.getPlatform(),msg.getUserIdOnPlatform());
+                userContextRepository.updateUserContext(id,new UserContext());
                 return "Поздравляю, ты вошел";
             }
             return "Неверный код. Попробуй еще раз";

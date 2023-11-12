@@ -4,7 +4,7 @@ import core.service_handlers.services.LoginService;
 import core.service_handlers.services.RegistrationService;
 import models.Message;
 
-/** Обработчик контекста {@link models.UserState#LOGGED LOGGED}. */
+/** Обработчик контекста {@link models.UserState#LOGGING LOGGING}. */
 public class HandlerLoginService {
 
     /** @see RegistrationService */
@@ -16,7 +16,7 @@ public class HandlerLoginService {
     }
 
     /**
-     * Обработчик команд связаных с контекстом {@link models.UserState#LOGGED LOGGED}
+     * Обработчик команд связаных с контекстом {@link models.UserState#LOGGING LOGGING}
      * */
     public int handle(Message msg) {
         if(msg.getText().length()>5){
