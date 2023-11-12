@@ -33,7 +33,7 @@ public class MessageHandlerTest {
     @Mock
     private HandlerCancelOrderService handlerCancelOrderService;
     @Mock
-    private HandlerAcceptOrderService handlerAcceptOrderService;
+    private HandlerAcceptOrderCourierService handlerAcceptOrderService;
     @Mock
     private HandlerCloseOrderCourierService handlerCloseOrderCourierService;
     @Mock

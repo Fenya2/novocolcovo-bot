@@ -82,7 +82,7 @@ public class CloseOrderCourierServiceTest {
                 );
         String continueSession4 = closeOrderCourierService.continueSession(2,"11");
         Assert.assertEquals(
-                "Заказчик не может сейчас завершить заказ, попробуйте позже"
+                "Извини, но сейчас заказ нельзя принять."
                 ,continueSession4
         );
 

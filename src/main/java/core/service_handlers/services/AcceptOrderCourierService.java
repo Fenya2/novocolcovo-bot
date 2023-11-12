@@ -6,12 +6,13 @@ import db.UserContextRepository;
 import models.Order;
 import models.OrderStatus;
 import models.UserContext;
+import models.UserState;
 
 import java.sql.SQLException;
 import java.text.ParseException;
 
-/** Сервис для работы с контекстом {@link models.UserState#ORDER_ACCEPTING ORDER_ACCEPTING}*/
-public class AcceptOrderService {
+/** Сервис для работы с контекстом {@link models.UserState#ORDER_ACCEPTING_COURIER ORDER_ACCEPTING}*/
+public class AcceptOrderCourierService {
 
     /** @see MessageSender*/
     private MessageSender messageSender;
@@ -22,18 +23,18 @@ public class AcceptOrderService {
     /** @see UserContextRepository */
     private final UserContextRepository userContextRepository;
 
-    /** Конструктор {@link AcceptOrderService}*/
-    public AcceptOrderService(OrderRepository orderRepository, UserContextRepository userContextRepository) {
+    /** Конструктор {@link AcceptOrderCourierService}*/
+    public AcceptOrderCourierService(OrderRepository orderRepository, UserContextRepository userContextRepository) {
         this.orderRepository = orderRepository;
         this.userContextRepository = userContextRepository;
     }
 
     /**
-     * Меняет у введенного курьером заказа статус на {@link models.OrderStatus#RUNNING RUNNING} <br>
+     * Меняет у введенного курьером заказа статус на {@link models.OrderStatus#ACCEPTING ACCEPTING} <br>
      * Меняет поле {@link Order#getCourierId()}  courierId} на id курьера <br>
      * Меняет контекст курьера на {@link models.UserState#NO_STATE NO_STATE}
      * Отправляет сообщение, что заказ принят или ошибку
-     * TODO так же должен отправить сообщение заказчику что его заказ приняли
+     * так же отправляет сообщение заказчику, что его заказ хотят принять
      * @param userId id курьера
      * @param text id заказа
      */
@@ -45,22 +46,29 @@ public class AcceptOrderService {
                     return "Заказ не найден. Попробуй еще раз";
 
                 long idOrder = Long.parseLong(text);
-
                 Order order = orderRepository.getById(idOrder);
-                if(order.getStatus() != OrderStatus.PENDING){
+                UserContext userContextClient = userContextRepository.getUserContext(order.getCreatorId());
+                if(userContextClient.getState() != UserState.NO_STATE){
                     messageSender.sendTextMessage(
                             order.getCreatorId(),
                             "Курьер хочет принять заказ, заверши выполнение команды."
                     );
-                    return "В этот момент заказ изменяется.";
+                    return "Извини, но сейчас заказ нельзя принять.";
                 }
+                userContextRepository.updateUserContext(
+                        order.getCreatorId(),
+                        new UserContext(UserState.ORDER_ACCEPTING_CLIENT)
+                );
                 order.setCourierId(userId);
-                order.setStatus(OrderStatus.RUNNING);
+                order.setStatus(OrderStatus.ACCEPTING);
                 orderRepository.update(order);
-                userContextRepository.updateUserContext(userId,new UserContext());
+                userContextRepository.updateUserContext(userId, new UserContext());
 
-                messageSender.sendTextMessage(order.getCreatorId(), "Ваш заказ %s принят".formatted(order.getDescription()));
-                return "Заказ принят";
+                messageSender.sendTextMessage(
+                        order.getCreatorId(),
+                        "Подтвердите, что вы готовы отдать курьеру заказ, напив \n/yes /no"
+                );
+                return "Принятие заказа отправлено на подтверждение заказчику";
             } else
                 return "Выход за пределы контекста";
         } catch (SQLException | ParseException e) {

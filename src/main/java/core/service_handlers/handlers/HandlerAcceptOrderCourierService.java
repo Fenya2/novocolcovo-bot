@@ -1,20 +1,20 @@
 package core.service_handlers.handlers;
 
 import models.Message;
-import core.service_handlers.services.AcceptOrderService;
+import core.service_handlers.services.AcceptOrderCourierService;
 
-/** Обработчик контекстов {@link models.UserState#ORDER_ACCEPTING ORDER_ACCEPTING}*/
-public class HandlerAcceptOrderService {
+/** Обработчик контекстов {@link models.UserState#ORDER_ACCEPTING_COURIER ORDER_ACCEPTING}*/
+public class HandlerAcceptOrderCourierService {
 
-    /** @see AcceptOrderService */
-    private final AcceptOrderService acceptOrderService;
+    /** @see AcceptOrderCourierService */
+    private final AcceptOrderCourierService acceptOrderCourierService;
 
-    /** Конструктор {@link HandlerAcceptOrderService}*/
-    public HandlerAcceptOrderService(AcceptOrderService acceptOrderService) {
-        this.acceptOrderService = acceptOrderService;
+    /** Конструктор {@link HandlerAcceptOrderCourierService}*/
+    public HandlerAcceptOrderCourierService(AcceptOrderCourierService acceptOrderService) {
+        this.acceptOrderCourierService = acceptOrderService;
     }
 
-    /**Обработчик команд связаных с контекстом {@link models.UserState#ORDER_ACCEPTING ORDER_ACCEPTING}
+    /**Обработчик команд связаных с контекстом {@link models.UserState#ORDER_ACCEPTING_COURIER ORDER_ACCEPTING}
      * @return 1, если текст сообщения - корректная команда, которую можно обработать
      * 2, если текст сообщения не команда и будет обрабатываеться сервисом,
      * 3, если текст является некорректной командой или не привязан к какому-либо внутреннему
@@ -32,7 +32,7 @@ public class HandlerAcceptOrderService {
                 return 1;
             }
             case "/cancel" -> {
-                String message = acceptOrderService.cancel(msg.getUser().getId());
+                String message = acceptOrderCourierService.cancel(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                 return 1;
             }
@@ -42,7 +42,7 @@ public class HandlerAcceptOrderService {
                     msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                     return 3;
                 }
-                String message = acceptOrderService.continueSession(msg.getUser().getId(),msg.getText());
+                String message = acceptOrderCourierService.continueSession(msg.getUser().getId(),msg.getText());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                 return 2;
             }
