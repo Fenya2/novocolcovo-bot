@@ -1,15 +1,14 @@
 package core;
 
+import config.BotMessages;
 import config.services.EditUserServiceConfig;
-import db.LoggedUsersRepository;
-import db.OrderRepository;
-import db.UserContextRepository;
-import db.UserRepository;
+import db.*;
 import models.*;
 
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 /** Главный сервис. Работает c контекстом {@link UserState#NO_STATE NO_STATE}*/
@@ -40,23 +39,40 @@ public class ServiceManager {
 
     /**
      * Проверяет наличие пользователя в системе, если нет то добавляет в таблицы User и LoggedUsers
+     * и таблицу контекста, меняет контекст пользователя на EDIT_USER, чтобы он сразу мог начать
+     * настраивать аккаунт. Если пользователь пишет команду из аккаунта, сообщает об этом.
      *
      * @param msg сообщение от {@link core.MessageHandler}.
      * @return сообщение с приветствием.
      * В случае ошибки возвращает сообщение об ошибке.
      */
-    public String start(Message msg) {
+    public String register(Message msg) {
+
+        if(msg.getUser() != null) {
+            return BotMessages.REGISTER_MESSAGE_WHEN_USER_LOGIN.getMessage();
+        }
+
         Platform platform = msg.getPlatform();
         String userIdOnPlatform = msg.getUserIdOnPlatform();
         try {
-            User user = new User(0, "User", "Я есть user");
-            if (loggedUsersRepository.getUserByPlatformAndIdOnPlatform(platform, userIdOnPlatform) == null) {
-                User userWithID = userRepository.save(user);
-                loggedUsersRepository.linkUserIdAndUserPlatform(userWithID.getId(), platform, userIdOnPlatform);
-                userContextRepository.saveUserContext(userWithID.getId(), new UserContext(UserState.NO_STATE));
-            }
-            return "Привет \uD83D\uDC4B Команда /help поможет тебе разобраться, что тут происходит";
-        } catch (Exception e) {
+            User user = new User(
+                    0,
+                    "User",
+                    "Я есть user",
+                    "login"+new Date().getTime()
+            );
+            userRepository.save(user);
+            loggedUsersRepository.linkUserIdAndUserPlatform(
+                    user.getId(),
+                    platform,
+                    userIdOnPlatform
+            );
+            userContextRepository.saveUserContext(
+                    user.getId(),
+                    new UserContext(UserState.EDIT_USER)
+            );
+            return BotMessages.REGISTER_MESSAGE.getMessage();
+        } catch (SQLException | DBException e) {
             return "Что-то пошло не так"+ e.getMessage();
         }
     }
@@ -76,7 +92,7 @@ public class ServiceManager {
             UserContext userContext = new UserContext(UserState.ORDER_CREATING);
             userContextRepository.updateUserContext(idUser, userContext);
             return "Введите список продуктов";
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException | DBException e) {
             return "что-то пошло не так"+ e.getMessage();
         }
     }

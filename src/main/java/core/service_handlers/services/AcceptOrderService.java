@@ -1,6 +1,7 @@
 package core.service_handlers.services;
 
 import core.MessageSender;
+import db.DBException;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -63,7 +64,7 @@ public class AcceptOrderService {
                 return "Заказ принят";
             } else
                 return "Выход за пределы контекста";
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException | DBException e) {
             return "что-то пошло не так";
         }
     }

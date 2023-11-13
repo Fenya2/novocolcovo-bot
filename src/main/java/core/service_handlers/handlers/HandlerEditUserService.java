@@ -1,12 +1,13 @@
 package core.service_handlers.handlers;
 
 import config.services.EditUserServiceConfig;
+import db.DBException;
 import models.Message;
 import core.service_handlers.services.EditUserService;
 
 import java.sql.SQLException;
 
-/** Обработчик контекста изменения пользователя. */
+/** Обработчик контекста изменения пользователя. работае с EDIT_ */
 public class HandlerEditUserService {
 
     /** @see EditUserService*/
@@ -36,6 +37,8 @@ public class HandlerEditUserService {
             case "/edit_username": {
                 try {
                     editUserService.setEditUsernameContext(msg.getUser().getId());
+                    String message = EditUserServiceConfig.EDIT_USER_MESSAGE.getStr();
+                    msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(),message);
                 } catch (SQLException e) {
                     msg.getBotFrom().sendTextMessage(
                             msg.getUserIdOnPlatform(),
@@ -43,13 +46,15 @@ public class HandlerEditUserService {
                                     e.getMessage()
                     );
                 }
-                String message = EditUserServiceConfig.EDIT_USER_MESSAGE.getStr();
-                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(),message);
                 return 1;
             }
             case "/edit_description": {
                 try {
                     editUserService.setEditDescriptionContext(msg.getUser().getId());
+                    msg.getBotFrom().sendTextMessage(
+                            msg.getUserIdOnPlatform(),
+                            EditUserServiceConfig.EDIT_DESCRIPTION_MESSAGE.getStr()
+                    );
                 } catch (SQLException e) {
                     msg.getBotFrom().sendTextMessage(
                             msg.getUserIdOnPlatform(),
@@ -57,10 +62,23 @@ public class HandlerEditUserService {
                                     e.getMessage()
                     );
                 }
-                msg.getBotFrom().sendTextMessage(
-                        msg.getUserIdOnPlatform(),
-                        EditUserServiceConfig.EDIT_DESCRIPTION_MESSAGE.getStr()
-                );
+                return 1;
+            }
+
+            case "/edit_login": {
+                try {
+                    editUserService.setEditLoginContext(msg.getUser().getId());
+                    msg.getBotFrom().sendTextMessage(
+                            msg.getUserIdOnPlatform(),
+                            EditUserServiceConfig.EDIT_LOGIN_MESSAGE.getStr()
+                    );
+                } catch (SQLException e) {
+                    msg.getBotFrom().sendTextMessage(
+                            msg.getUserIdOnPlatform(),
+                            "Проблемы с базой данных" +
+                                    e.getMessage()
+                    );
+                }
                 return 1;
             }
 
@@ -87,32 +105,58 @@ public class HandlerEditUserService {
                 try {
                     editUserService.updateUsername(msg.getText(), msg.getUser());
                     editUserService.resetEditContext(msg.getUser().getId());
-                } catch (SQLException e) {
+                    msg.getBotFrom().sendTextMessage(
+                            msg.getUserIdOnPlatform(),
+                            EditUserServiceConfig.USERNAME_UPDATED_SUCCESFULLY.getStr()
+                    );
+                    return 2;
+                } catch (SQLException | DBException e) {
                     msg.getBotFrom().sendTextMessage(
                             msg.getUserIdOnPlatform(),
                             "Проблемы с базой данных" +
                                     e.getMessage()
                     );
                 }
-
-                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(),
-                        EditUserServiceConfig.USERNAME_UPDATED_SUCCESFULLY.getStr());
-                return 2;
             }
             case 2: {
                 try {
                     editUserService.updateDescription(msg.getText(), msg.getUser());
                     editUserService.resetEditContext(msg.getUser().getId());
-                } catch (SQLException e) {
+                    msg.getBotFrom().sendTextMessage(
+                            msg.getUserIdOnPlatform(),
+                            EditUserServiceConfig.DESCRIPTION_UPDATED_SUCCESFULLY.getStr()
+                    );
+                    return 2;
+                } catch (SQLException | DBException e) {
                     msg.getBotFrom().sendTextMessage(
                             msg.getUserIdOnPlatform(),
                             "Проблемы с базой данных" +
                                     e.getMessage()
                     );
                 }
-                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(),
-                        EditUserServiceConfig.DESCRIPTION_UPDATED_SUCCESFULLY.getStr());
-                return 2;
+            }
+            case 3: {
+                try {
+                    if(editUserService.updateLogin(msg.getText(), msg.getUser())) {
+                        msg.getBotFrom().sendTextMessage(
+                                msg.getUserIdOnPlatform(),
+                                EditUserServiceConfig.LOGIN_UPDATED_SUCCESFULLY.getStr()
+                        );
+                        editUserService.resetEditContext(msg.getUser().getId());
+                        return 2;
+                    }
+                    msg.getBotFrom().sendTextMessage(
+                            msg.getUserIdOnPlatform(),
+                            EditUserServiceConfig.LOGIN_EXIST_ERROR.getStr()
+                    );
+                    return 2;
+                } catch (SQLException | DBException e) {
+                    msg.getBotFrom().sendTextMessage(
+                            msg.getUserIdOnPlatform(),
+                            "Проблемы с базой данных" +
+                                    e.getMessage()
+                    );
+                }
             }
         }
 

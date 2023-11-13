@@ -13,6 +13,7 @@ import db.*;
 import core.ServiceManager;
 import core.CommandHandler;
 
+import models.User;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
@@ -24,10 +25,12 @@ import java.sql.SQLException;
 /** Main class */
 public class Main {
     /** Entry point */
-    public static void main(String[] args) throws SQLException, ClassNotFoundException, TelegramApiException, VkApiException {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException, TelegramApiException, VkApiException, DBException {
         // БД
         DB db = new SQLiteDB(new SQLDBconfig("src/main/resources/config/dbconfig.json"));
         db.connect();
+        db.clearScheme();
+        db.initScheme();
 
         // Репозитории
         UserRepository ur = new UserRepository(db);

@@ -1,9 +1,6 @@
 package core;
 
-import db.LoggedUsersRepository;
-import db.OrderRepository;
-import db.UserContextRepository;
-import db.UserRepository;
+import db.*;
 import models.*;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,25 +32,35 @@ public class ServiceManagerTest {
     @Mock
     private UserContextRepository userContextRepository;
     /**
-     * Проверяет случай когда пользователь вводит команду /start.
+     * Проверяет случай когда пользователь вводит команду /register и не авторизован.
      */
     @Test
-    public void start() throws SQLException {
+    public void registerWhenUserNotAutorized() {
         Message msg = new Message();
-        msg.setText("/start");
-        Mockito.when(loggedUsersRepository.getUserByPlatformAndIdOnPlatform(Mockito.any(),Mockito.any()))
-                .thenReturn(null);
-        Mockito.when(userRepository.save(Mockito.any()))
-                .thenReturn(new User());
-        Assert.assertEquals("Привет \uD83D\uDC4B Команда /help поможет тебе разобраться, что тут происходит",serviceManager.start(msg));
-
-        Mockito.when(loggedUsersRepository.getUserByPlatformAndIdOnPlatform(Mockito.any(),Mockito.any()))
-                .thenReturn(new User());
-        Assert.assertEquals("Привет \uD83D\uDC4B Команда /help поможет тебе разобраться, что тут происходит",serviceManager.start(msg));
+        msg.setUser(null); // важно
+        System.out.println(msg.getUser());
+        msg.setText("/register");
+        Assert.assertEquals("""
+            Готово! Аккаунт создан.
+            Вы находитесь в меню редактирования пользователя.
+            Введитете /help для справки.
+            """, serviceManager.register(msg));
     }
+
+    /**
+     * Проверяет случай когда пользователь вводит команду /register и авторизован.
+     */
+    @Test
+    public void registerWhenUserAutorized() {
+        Message msg = new Message();
+        msg.setUser(Mockito.mock(User.class)); // важно
+        msg.setText("/register");
+        Assert.assertEquals("Вы уже зарегистрированы.", serviceManager.register(msg));
+    }
+
     /** Проверяет работу startCreateOrder */
     @Test
-    public void startCreateOrder() throws SQLException {
+    public void startCreateOrder() throws SQLException, DBException {
         User user = new User();
         Mockito.when(orderRepository.save(Mockito.any()))
                 .thenReturn(new Order());

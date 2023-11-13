@@ -1,6 +1,7 @@
 package core.service_handlers.services;
 
 import core.MessageSender;
+import db.DBException;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -55,7 +56,7 @@ public class CloseOrderClientService {
             } else {
                 return "Извините я вас не понимаю. Напиши /help";
             }
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException | DBException e) {
             return "что-то пошло не так";
         }
     }

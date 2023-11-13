@@ -1,5 +1,6 @@
 package core;
 
+import db.DBException;
 import db.LoggedUsersRepository;
 import db.UserContextRepository;
 import models.Message;
@@ -81,7 +82,7 @@ public class MessageHandler {
                     msg.getPlatform(),
                     msg.getUserIdOnPlatform()
             );
-        } catch (SQLException e) {
+        } catch (SQLException | DBException e) {
             msg.getBotFrom().sendTextMessage(
                     msg.getUserIdOnPlatform(),
                     "Проблемы с доступом к базе данных " + e.getMessage()
@@ -90,9 +91,11 @@ public class MessageHandler {
         }
 
         if(user == null) {
-            if (msg.getText().equals("/start")) {
-                commandHandler.handle(msg);
-                return 1;
+            switch (msg.getText()) {
+                case "/start", "/register": {
+                    commandHandler.handle(msg);
+                    return 1;
+                }
             }
             msg.getBotFrom().sendTextMessage(
                     msg.getUserIdOnPlatform(),

@@ -31,7 +31,7 @@ public class HandlerCancelOrderServiceTest {
     @Test
     public void testHandleWhenCommandValid() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
+        message.setUser(new User(10, "name", "description", "login"));
         message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("/cancel");
         Assert.assertEquals(1, handlerCancelOrderService.handle(message));
@@ -46,7 +46,7 @@ public class HandlerCancelOrderServiceTest {
     @Test
     public void testHandleWhenMessageIsNotValidCommand() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
+        message.setUser(new User(10, "name", "description", "login"));
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
         message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("/some_not_valid_command");
@@ -60,7 +60,7 @@ public class HandlerCancelOrderServiceTest {
     @Test
     public void testHandleWhenMessageIsNotCommand() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
+        message.setUser(new User(10, "name", "description", "login"));
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
         message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("some_message_not_command");

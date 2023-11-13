@@ -34,7 +34,7 @@ public class LoggedUsersRepository extends Repository {
      * некорректны, <b>0</b>, если связь уже существует.
      * @throws SQLException,
      */
-    public int linkUserIdAndUserPlatform(long userId, Platform platform, String userIdOnPLatform) throws SQLException {
+    public int linkUserIdAndUserPlatform(long userId, Platform platform, String userIdOnPLatform) throws SQLException, DBException {
         if (userId <= 0
                 || platform == null
                 || userIdOnPLatform == null
@@ -75,7 +75,7 @@ public class LoggedUsersRepository extends Repository {
      * Иначе <b>null</b>.
      * @throws SQLException
      */
-    public User getUserByPlatformAndIdOnPlatform(Platform platform, String idOnPlatform) throws SQLException {
+    public User getUserByPlatformAndIdOnPlatform(Platform platform, String idOnPlatform) throws SQLException, DBException {
         if (platform == null || idOnPlatform == null) return null;
         String request = """
                 SELECT user_id FROM logged_users

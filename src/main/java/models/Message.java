@@ -3,6 +3,7 @@ package models;
 import bots.Bot;
 
 /** Message - тип сообщений, с которым работает core логика проекта. */
+//todo прописать везде инициализацию null у user и не только.
 public class Message {
 
     /** Интерфейс бота, от которого пришло сообщение пользователя */
@@ -24,14 +25,14 @@ public class Message {
     /**
      * поля text, platform, userIdOnPlatform выставляются в
      * "empty constructor text", {@link Platform NO_PLATFORM}, "empty constructor id"
-     * соответственно.
+     * соответственно. user выставляется в null
      */
-
     public Message() {
         this.text = "empty constructor text";
         this.platform = Platform.NO_PLATFORM;
         this.userIdOnPlatform = "empty constructor id";
         this.userContext = new UserContext(UserState.NO_STATE,0);
+        this.user = null;
     }
 
     /** Конструктор для работы с telegram. */

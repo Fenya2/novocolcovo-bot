@@ -22,6 +22,7 @@ public class User {
         id = -42;
         name = "default name";
         description = "default description";
+        login = "default login";
     }
 
     /**
@@ -29,10 +30,11 @@ public class User {
      * @param name имя пользователя.
      * @param description описание пользователя.
      */
-    public User(long id, String name, String description) {
+    public User(long id, String name, String description, String login) {
         this.id = id;
         setName(name);
         setDescription(description);
+        setLogin(login);
     }
     public long getId() {
         return id;
@@ -86,6 +88,7 @@ public class User {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", login='" + login + '\'' +
                 '}';
     }
 }
