@@ -1,6 +1,6 @@
 package core.service_handlers.services;
 
-import core.MessageSender;
+import core.UserNotifier;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -71,8 +71,8 @@ public class AcceptOrderServiceTest {
         Assert.assertEquals("Заказ не найден. Попробуй еще раз",continueSession3);
 
 
-        MessageSender messageSender = Mockito.mock(MessageSender.class);
-        acceptOrderService.setMessageSender(messageSender);
+        UserNotifier userNotifier = Mockito.mock(UserNotifier.class);
+        acceptOrderService.setMessageSender(userNotifier);
         Mockito.when(userContextRepository.getUserContext(2))
                 .thenReturn(
                         new UserContext(UserState.ORDER_ACCEPTING,0)

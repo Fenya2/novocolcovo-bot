@@ -1,6 +1,6 @@
 package core.service_handlers.services;
 
-import core.MessageSender;
+import core.UserNotifier;
 import db.DBException;
 import db.OrderRepository;
 import db.UserContextRepository;
@@ -14,8 +14,8 @@ import java.text.ParseException;
 
 /** Сервис для работы с контекстом {@link models.UserState#ORDER_CLOSING_COURIER ORDER_CLOSING_COURIER}**/
 public class CloseOrderCourierService {
-    /** @see MessageSender*/
-    private MessageSender messageSender;
+    /** @see UserNotifier */
+    private UserNotifier userNotifier;
 
     /** @see OrderRepository */
     private final OrderRepository orderRepository;
@@ -58,7 +58,7 @@ public class CloseOrderCourierService {
                     );
                 }
                 else{
-                    messageSender.sendTextMessage(
+                    userNotifier.sendTextMessage(
                             order.getCreatorId(),
                             "Курьер хочет завершить заказ, заверши выполнение команды."
                     );
@@ -67,7 +67,7 @@ public class CloseOrderCourierService {
                 orderRepository.updateOrderStatus(idOrder, OrderStatus.CLOSING);
                 userContextRepository.updateUserContext(userId,new UserContext());
 
-                messageSender.sendTextMessage(
+                userNotifier.sendTextMessage(
                         order.getCreatorId(),
                         "Подтвердите что ваш заказ приняли, написав \n/yes /no."
                 );
@@ -112,7 +112,7 @@ public class CloseOrderCourierService {
         }
     }
 
-    public void setMessageSender(MessageSender messageSender) {
-        this.messageSender = messageSender;
+    public void setMessageSender(UserNotifier userNotifier) {
+        this.userNotifier = userNotifier;
     }
 }

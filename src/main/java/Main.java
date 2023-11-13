@@ -6,14 +6,14 @@ import config.SQLDBconfig;
 import config.TGBotConfig;
 import config.VkBotConfig;
 import core.MessageHandler;
-import core.MessageSender;
+import core.UserNotifier;
 import core.service_handlers.handlers.*;
 import core.service_handlers.services.*;
 import db.*;
 import core.ServiceManager;
 import core.CommandHandler;
 
-import models.User;
+import models.Domain;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
@@ -32,64 +32,67 @@ public class Main {
         db.clearScheme();
         db.initScheme();
 
-        // Репозитории
-        UserRepository ur = new UserRepository(db);
-        LoggedUsersRepository lg = new LoggedUsersRepository(db,ur);
-        UserContextRepository uc = new UserContextRepository(db,ur);
-        OrderRepository or = new OrderRepository(db,ur);
+        LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);
+        loggingUsersRepository.saveDomain(new Domain());
 
-        // Сервисы
-        ServiceManager serviceManager = new ServiceManager(lg,or,ur,uc);
-        EditUserService updateUserService = new EditUserService(uc, ur);
-        CreateOrderService createOrderService = new CreateOrderService(or, uc);
-        EditOrderService editOrderService = new EditOrderService(or,uc);
-        CancelOrderService cancelOrderService = new CancelOrderService(or,uc);
-        AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc);
-        CloseOrderCourierService closeOrderCourierService = new CloseOrderCourierService(or,uc);
-        CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
-
-        // Обработчики сервисов
-        HandlerEditUserService handlerUpdateUserService = new HandlerEditUserService(updateUserService);
-        HandlerCreateOrderService handlerCreateOrderService = new HandlerCreateOrderService(createOrderService);
-        HandlerEditOrderService handlerEditOrderService = new HandlerEditOrderService(editOrderService);
-        HandlerCancelOrderService handlerCancelOrderService = new HandlerCancelOrderService(cancelOrderService);
-        HandlerAcceptOrderService handlerAcceptOrderService = new HandlerAcceptOrderService(acceptOrderService);
-        HandlerCloseOrderCourierService handlerCloseOrderCourierService =
-                new HandlerCloseOrderCourierService(closeOrderCourierService);
-        HandlerCloseOrderClientService handlerCloseOrderClientService =
-                new HandlerCloseOrderClientService(closeOrderClientService);
-
-        // "главные" обработчики
-        CommandHandler commandHandler = new CommandHandler(serviceManager);
-        MessageHandler messageHandler = new MessageHandler(
-                uc,
-                lg,
-                commandHandler,
-                handlerUpdateUserService,
-                handlerCreateOrderService,
-                handlerEditOrderService,
-                handlerCancelOrderService,
-                handlerAcceptOrderService,
-                handlerCloseOrderCourierService,
-                handlerCloseOrderClientService
-        );
-
-        // Боты
-        TGBotConfig tgBotConfig = new TGBotConfig(System.getenv("TG_BOT_TOKEN"));
-        Bot tgBot = new TGBot(tgBotConfig, messageHandler);
-        TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-        botsApi.registerBot((LongPollingBot) tgBot);
-
-        VkBotConfig vkBotConfig = new VkBotConfig(System.getenv("VK_BOT_TOKEN"));
-        Bot vkBot = new VkBot(vkBotConfig, messageHandler);
-
-        MessageSender messageSender = new MessageSender(lg, tgBot, vkBot);
-        closeOrderCourierService.setMessageSender(messageSender);
-        acceptOrderService.setMessageSender(messageSender);
-        closeOrderClientService.setMessageSender(messageSender);
-
-        ((VkBot) vkBot).startPolling();
-
-        db.disconnect();
+//        // Репозитории
+//        UserRepository ur = new UserRepository(db);
+//        LoggedUsersRepository lg = new LoggedUsersRepository(db,ur);
+//        UserContextRepository uc = new UserContextRepository(db,ur);
+//        OrderRepository or = new OrderRepository(db,ur);
+//
+//        // Сервисы
+//        ServiceManager serviceManager = new ServiceManager(lg,or,ur,uc);
+//        EditUserService updateUserService = new EditUserService(uc, ur);
+//        CreateOrderService createOrderService = new CreateOrderService(or, uc);
+//        EditOrderService editOrderService = new EditOrderService(or,uc);
+//        CancelOrderService cancelOrderService = new CancelOrderService(or,uc);
+//        AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc);
+//        CloseOrderCourierService closeOrderCourierService = new CloseOrderCourierService(or,uc);
+//        CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
+//
+//        // Обработчики сервисов
+//        HandlerEditUserService handlerUpdateUserService = new HandlerEditUserService(updateUserService);
+//        HandlerCreateOrderService handlerCreateOrderService = new HandlerCreateOrderService(createOrderService);
+//        HandlerEditOrderService handlerEditOrderService = new HandlerEditOrderService(editOrderService);
+//        HandlerCancelOrderService handlerCancelOrderService = new HandlerCancelOrderService(cancelOrderService);
+//        HandlerAcceptOrderService handlerAcceptOrderService = new HandlerAcceptOrderService(acceptOrderService);
+//        HandlerCloseOrderCourierService handlerCloseOrderCourierService =
+//                new HandlerCloseOrderCourierService(closeOrderCourierService);
+//        HandlerCloseOrderClientService handlerCloseOrderClientService =
+//                new HandlerCloseOrderClientService(closeOrderClientService);
+//
+//        // "главные" обработчики
+//        CommandHandler commandHandler = new CommandHandler(serviceManager);
+//        MessageHandler messageHandler = new MessageHandler(
+//                uc,
+//                lg,
+//                commandHandler,
+//                handlerUpdateUserService,
+//                handlerCreateOrderService,
+//                handlerEditOrderService,
+//                handlerCancelOrderService,
+//                handlerAcceptOrderService,
+//                handlerCloseOrderCourierService,
+//                handlerCloseOrderClientService
+//        );
+//
+//        // Боты
+//        TGBotConfig tgBotConfig = new TGBotConfig(System.getenv("TG_BOT_TOKEN"));
+//        Bot tgBot = new TGBot(tgBotConfig, messageHandler);
+//        TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+//        botsApi.registerBot((LongPollingBot) tgBot);
+//
+//        VkBotConfig vkBotConfig = new VkBotConfig(System.getenv("VK_BOT_TOKEN"));
+//        Bot vkBot = new VkBot(vkBotConfig, messageHandler);
+//
+//        UserNotifier userNotifier = new UserNotifier(lg, tgBot, vkBot);
+//        closeOrderCourierService.setMessageSender(userNotifier);
+//        acceptOrderService.setMessageSender(userNotifier);
+//        closeOrderClientService.setMessageSender(userNotifier);
+//
+//        ((VkBot) vkBot).startPolling();
+//
+//        db.disconnect();
     }
 }

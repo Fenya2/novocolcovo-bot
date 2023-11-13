@@ -5,29 +5,28 @@ import db.LoggedUsersRepository;
 import models.Platform;
 
 import java.sql.SQLException;
-import java.util.BitSet;
 
 /**
  * Класс для отправки сообщений другим пользоваетелям.
  */
-public class MessageSender {
+public class UserNotifier {
     /** @see LoggedUsersRepository */
     private final LoggedUsersRepository loggedUsersRepository;
 
     /** Список доступных ботов, связянных с платформами. */
-    private final Bot telegramBot;
+    private final Bot tgBot;
     private final Bot vkBot;
 
     /**
      * @param loggedUsersRepository таблица с залогинившимися пользователями
      * @param telegramBot телеграм бот
      */
-    public MessageSender(LoggedUsersRepository loggedUsersRepository,
-                         Bot telegramBot,
-                         Bot vkBot
+    public UserNotifier(LoggedUsersRepository loggedUsersRepository,
+                        Bot telegramBot,
+                        Bot vkBot
     ) {
         this.loggedUsersRepository = loggedUsersRepository;
-        this.telegramBot = telegramBot;
+        this.tgBot = telegramBot;
         this.vkBot = vkBot;
     }
 
@@ -45,7 +44,7 @@ public class MessageSender {
             idonp = loggedUsersRepository.getUserIdOnPlatformByUserIdAndPlatform(userId, platform);
             if(idonp == null) continue;
             switch (platform) {
-                case TELEGRAM -> telegramBot.sendTextMessage(idonp, text);
+                case TELEGRAM -> tgBot.sendTextMessage(idonp, text);
                 case VK -> vkBot.sendTextMessage(idonp, text);
             }
             flag = true;

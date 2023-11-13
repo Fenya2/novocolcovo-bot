@@ -3,8 +3,10 @@ CREATE TABLE users
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	name TEXT NOT NULL,
 	description TEXT NOT NULL DEFAULT "average novocolcovo enjoyer description",
+	login TEXT NOT NULL UNIQUE,
 	date_created DATE NOT NULL
 );
+
 CREATE TABLE logged_users(
 	user_id INTEGER,
 	platform TEXT NOT NULL,
@@ -12,12 +14,14 @@ CREATE TABLE logged_users(
 	login_date DATE NOT NULL,
 	FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
 CREATE TABLE user_contexts(
 	user_id INTEGER,
 	state TEXT NOT NULL,
 	state_num INTEGER NOT NULL,
 	FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
 CREATE TABLE orders(
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	creator_id INTEGER NOT NULL,
@@ -27,6 +31,15 @@ CREATE TABLE orders(
 	status TEXT NOT NULL,
 	FOREIGN KEY (creator_id) REFERENCES users(id)
 	FOREIGN KEY (courier_id) REFERENCES users(id)
+);
+
+CREATE TABLE logging_users(
+	login_context INTEGER NOT NULL,
+	required_login TEXT NOT NULL,
+	from_platform TEXT NOT NULL,
+	id_on_platform TEXT NOT NULL,
+	verification_platform TEXT NOT NULL,
+	verification_code INTEGER NOT NULL
 );
 
 
