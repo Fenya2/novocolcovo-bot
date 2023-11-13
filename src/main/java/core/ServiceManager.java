@@ -39,8 +39,7 @@ public class ServiceManager {
     }
 
     /**
-     * Проверяет наличие пользователя в системе, если нет то добавляет в таблицы User и LoggedUsers
-     *
+     * Выводит приветственное сообщение
      * @param msg сообщение от {@link core.MessageHandler}.
      * @return сообщение с приветствием.
      * В случае ошибки возвращает сообщение об ошибке.
@@ -49,13 +48,32 @@ public class ServiceManager {
         Platform platform = msg.getPlatform();
         String userIdOnPlatform = msg.getUserIdOnPlatform();
         try {
+            if (loggedUsersRepository.getUserByPlatformAndIdOnPlatform(platform, userIdOnPlatform) == null)
+                return "Привет пожалуйста, зарегистрируйся с помощью команды /registration";
+        } catch (SQLException e) {
+            return "Что-то пошло не так"+ e.getMessage();
+        }
+        return "Привет, команда /help поможет тебе разобраться что тут происходит";
+    }
+
+    /**
+     * Проверяет наличие пользователя в системе, если нет то добавляет в таблицы User и LoggedUsers
+     *
+     * @param msg сообщение от {@link core.MessageHandler}.
+     * @return сообщение с приветствием.
+     * В случае ошибки возвращает сообщение об ошибке.
+     */
+    public String startRegistration(Message msg) {
+        Platform platform = msg.getPlatform();
+        String userIdOnPlatform = msg.getUserIdOnPlatform();
+        try {
             User user = new User(0, "User", "Я есть user");
             if (loggedUsersRepository.getUserByPlatformAndIdOnPlatform(platform, userIdOnPlatform) == null) {
                 User userWithID = userRepository.save(user);
                 loggedUsersRepository.linkUserIdAndUserPlatform(userWithID.getId(), platform, userIdOnPlatform);
-                userContextRepository.saveUserContext(userWithID.getId(), new UserContext(UserState.NO_STATE));
+                userContextRepository.saveUserContext(userWithID.getId(), new UserContext(UserState.REGISTRATION));
             }
-            return "Привет \uD83D\uDC4B Команда /help поможет тебе разобраться, что тут происходит";
+            return "Привет, давай начнем регистрацию. Как тебя зовут?";
         } catch (Exception e) {
             return "Что-то пошло не так"+ e.getMessage();
         }
@@ -252,4 +270,6 @@ public class ServiceManager {
 
         return "Введите заказ который хотите завершить";
     }
+
+
 }

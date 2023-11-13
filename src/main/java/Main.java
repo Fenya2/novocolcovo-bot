@@ -33,6 +33,7 @@ public class Main {
 
         // Сервисы
         ServiceManager serviceManager = new ServiceManager(lg,or,ur,uc);
+        RegistrationService registrationService = new RegistrationService(ur,uc);
         EditUserService updateUserService = new EditUserService(uc, ur);
         CreateOrderService createOrderService = new CreateOrderService(or, uc);
         EditOrderService editOrderService = new EditOrderService(or,uc);
@@ -42,11 +43,18 @@ public class Main {
         CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
 
         // Обработчики сервисов
-        HandlerEditUserService handlerUpdateUserService = new HandlerEditUserService(updateUserService);
-        HandlerCreateOrderService handlerCreateOrderService = new HandlerCreateOrderService(createOrderService);
-        HandlerEditOrderService handlerEditOrderService = new HandlerEditOrderService(editOrderService);
-        HandlerCancelOrderService handlerCancelOrderService = new HandlerCancelOrderService(cancelOrderService);
-        HandlerAcceptOrderService handlerAcceptOrderService = new HandlerAcceptOrderService(acceptOrderService);
+        HandlerEditUserService handlerUpdateUserService =
+                new HandlerEditUserService(updateUserService);
+        HandlerRegistrationService handlerRegistrationService =
+                new HandlerRegistrationService(registrationService);
+        HandlerCreateOrderService handlerCreateOrderService =
+                new HandlerCreateOrderService(createOrderService);
+        HandlerEditOrderService handlerEditOrderService =
+                new HandlerEditOrderService(editOrderService);
+        HandlerCancelOrderService handlerCancelOrderService =
+                new HandlerCancelOrderService(cancelOrderService);
+        HandlerAcceptOrderService handlerAcceptOrderService =
+                new HandlerAcceptOrderService(acceptOrderService);
         HandlerCloseOrderCourierService handlerCloseOrderCourierService =
                 new HandlerCloseOrderCourierService(closeOrderCourierService);
         HandlerCloseOrderClientService handlerCloseOrderClientService =
@@ -54,6 +62,7 @@ public class Main {
         CommandHandler commandHandler = new CommandHandler(serviceManager);
         MessageHandler messageHandler = new MessageHandler(uc, lg,
                 commandHandler,
+                handlerRegistrationService,
                 handlerUpdateUserService,
                 handlerCreateOrderService,
                 handlerEditOrderService,

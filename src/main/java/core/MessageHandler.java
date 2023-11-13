@@ -25,6 +25,9 @@ public class MessageHandler {
     /** @see CommandHandler */
     private final CommandHandler commandHandler;
 
+    /** @see HandlerRegistrationService */
+    private final HandlerRegistrationService handlerRegistrationService;
+
     /** @see HandlerEditUserService */
     private final HandlerEditUserService handlerEditUserService;
 
@@ -46,7 +49,7 @@ public class MessageHandler {
             UserContextRepository userContextRepository,
             LoggedUsersRepository loggedUsersRepository,
             CommandHandler commandHandler,
-            HandlerEditUserService updateUserServiceHandler,
+            HandlerRegistrationService registrationService, HandlerEditUserService updateUserServiceHandler,
             HandlerCreateOrderService handlerCreateOrderService,
             HandlerEditOrderService handlerEditOrderService,
             HandlerCancelOrderService handlerCancelOrderService,
@@ -56,6 +59,7 @@ public class MessageHandler {
         this.userContextRepository = userContextRepository;
         this.loggedUsersRepository = loggedUsersRepository;
         this.commandHandler = commandHandler;
+        this.handlerRegistrationService = registrationService;
         this.handlerEditUserService = updateUserServiceHandler;
         this.handlerCreateOrderService = handlerCreateOrderService;
         this.handlerEditOrderService = handlerEditOrderService;
@@ -90,13 +94,13 @@ public class MessageHandler {
         }
 
         if(user == null) {
-            if (msg.getText().equals("/start")) {
+            if (msg.getText().equals("/start") || msg.getText().equals("/registration") ) {
                 commandHandler.handle(msg);
                 return 1;
             }
             msg.getBotFrom().sendTextMessage(
                     msg.getUserIdOnPlatform(),
-                    "отправьте /start для последующей работы."
+                    "Привет пожалуйста, зарегистрируйся с этим тебе поможет команда /registration"
             );
             return 1;
         }
@@ -116,6 +120,7 @@ public class MessageHandler {
                 commandHandler.handle(msg);
                 return 2;
             }
+            case REGISTRATION -> handlerRegistrationService.handle(msg);
             case EDIT_USER -> handlerEditUserService.handle(msg);
             case ORDER_CREATING -> handlerCreateOrderService.handle(msg);
             case ORDER_EDITING -> handlerEditOrderService.handle(msg);

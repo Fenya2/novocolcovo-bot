@@ -28,8 +28,7 @@ public class CommandHandler {
      */
     public int handle(Message msg) {
         if (msg.getText().charAt(0) != '/') {
-            String message =
-                    "Прости, но я не знаю, что на это ответить. Вызови команду /help";
+            String message = "Прости, но я не знаю, что на это ответить. Вызови команду /help";
             msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
             return 1;
         }
@@ -52,6 +51,11 @@ public class CommandHandler {
                         /close_order - завершить заказ.
                         """;
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+                return 2;
+            }
+            case "/registration"->{
+                String startMessage = serviceManager.startRegistration(msg);
+                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
                 return 2;
             }
             case "/profile" -> {
