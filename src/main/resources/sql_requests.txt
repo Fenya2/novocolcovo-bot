@@ -5,7 +5,6 @@ CREATE TABLE users
 	description TEXT NOT NULL DEFAULT "average novocolcovo enjoyer description",
 	date_created DATE NOT NULL
 );
-
 CREATE TABLE logged_users(
 	user_id INTEGER,
 	platform TEXT NOT NULL,
@@ -13,14 +12,12 @@ CREATE TABLE logged_users(
 	login_date DATE NOT NULL,
 	FOREIGN KEY (user_id) REFERENCES users(id)
 );
-
 CREATE TABLE user_contexts(
 	user_id INTEGER,
 	state TEXT NOT NULL,
 	state_num INTEGER NOT NULL,
 	FOREIGN KEY (user_id) REFERENCES users(id)
 );
-
 CREATE TABLE orders(
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	creator_id INTEGER NOT NULL,
@@ -42,3 +39,9 @@ DELETE FROM users WHERE id = 11 LIMIT 1;
 
 UPDATE users SET name = "Артур" WHERE id = 2;
 
+
+
+DROP TABLE logged_users;
+DROP TABLE orders;
+DROP TABLE user_contexts;
+DROP TABLE users;

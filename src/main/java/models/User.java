@@ -11,6 +11,9 @@ public class User {
     /** Описание пользователя. */
     private String description;
 
+    /** логин пользователя. Уникальный для каждого пользователя */
+    private String login;
+
     /**
      * Устанавливает id, name, description в
      * -42, "default name", "default description" соответственно.
@@ -62,6 +65,19 @@ public class User {
             throw new IllegalArgumentException("description must be not null.");
         //todo тут можно прикрутить проверку на недопустимые слова. Или повыше?
         this.description = description;
+    }
+
+    /** @return логин пользователя */
+    public String getLogin() {
+        return login;
+    }
+
+    /** @param login логин пользователя не null */
+    public void setLogin(String login) {
+        if(login == null) {
+            throw new IllegalArgumentException("Invalid login. Must be not null.");
+        }
+        this.login = login;
     }
 
     @Override

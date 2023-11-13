@@ -2,7 +2,7 @@ import api.longpoll.bots.exceptions.VkApiException;
 import bots.Bot;
 import bots.TGBot;
 import bots.VkBot;
-import config.SQLiteDBconfig;
+import config.SQLDBconfig;
 import config.TGBotConfig;
 import config.VkBotConfig;
 import core.MessageHandler;
@@ -26,7 +26,8 @@ public class Main {
     /** Entry point */
     public static void main(String[] args) throws SQLException, ClassNotFoundException, TelegramApiException, VkApiException {
         // БД
-        DB db = new SQLiteDB(new SQLiteDBconfig("src/main/resources/config/dbconfig.json"));
+        DB db = new SQLiteDB(new SQLDBconfig("src/main/resources/config/dbconfig.json"));
+        db.connect();
 
         // Репозитории
         UserRepository ur = new UserRepository(db);
@@ -85,5 +86,7 @@ public class Main {
         closeOrderClientService.setMessageSender(messageSender);
 
         ((VkBot) vkBot).startPolling();
+
+        db.disconnect();
     }
 }
