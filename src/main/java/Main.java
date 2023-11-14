@@ -14,6 +14,7 @@ import core.ServiceManager;
 import core.CommandHandler;
 
 import models.Domain;
+import models.Platform;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
@@ -29,11 +30,26 @@ public class Main {
         // БД
         DB db = new SQLiteDB(new SQLDBconfig("src/main/resources/config/dbconfig.json"));
         db.connect();
-        db.clearScheme();
-        db.initScheme();
+        //db.clearScheme();
+        //db.initScheme();
 
-        LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);
-        loggingUsersRepository.saveDomain(new Domain());
+         LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);
+         Domain domain = new Domain()
+                 .loginContext(0)
+                 .requiredLogin("fenya00")
+                 .fromPlatform(Platform.VK)
+                 .idOnPlatform("12345")
+                 .verificationPlatform(Platform.TELEGRAM)
+                 .verificationCode(8191);
+         loggingUsersRepository.saveDomain(domain);
+        loggingUsersRepository.deleteDomainByFromPlatformAndIdOnPlatform(Platform.VK, "12345");
+
+
+
+
+
+
+
 
 //        // Репозитории
 //        UserRepository ur = new UserRepository(db);
@@ -92,7 +108,7 @@ public class Main {
 //        closeOrderClientService.setMessageSender(userNotifier);
 //
 //        ((VkBot) vkBot).startPolling();
-//
-//        db.disconnect();
+
+        db.disconnect();
     }
 }

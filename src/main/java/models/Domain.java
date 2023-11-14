@@ -2,6 +2,7 @@ package models;
 
 /**
  * Сущность, хранящаяся в LogginUsersRepository
+ * //todo переименовать?
  */
 public class Domain {
     /** Целое число отвечающее за номер этапа авторизации пользователя */
@@ -98,6 +99,36 @@ public class Domain {
     public void setVerificationCode(int verificationCode) {
         assert verificationCode >= 0;
         this.verificationCode = verificationCode;
+    }
+
+    public Domain loginContext(int loginContext) {
+        setLoginContext(loginContext);
+        return this;
+    }
+
+    public Domain requiredLogin(String requiredLogin) {
+        setRequiredLogin(requiredLogin);
+        return this;
+    }
+
+    public Domain fromPlatform(Platform platform) {
+        setFromPlatform(platform);
+        return this;
+    }
+
+    public Domain idOnPlatform(String idOnPlatform) {
+        setIdOnPlatform(idOnPlatform);
+        return this;
+    }
+
+    public Domain verificationPlatform(Platform verificationPlatform) {
+        setVerificationPlatform(verificationPlatform);
+        return this;
+    }
+
+    public Domain verificationCode(int verificationCode) {
+        setVerificationCode(verificationCode);
+        return this;
     }
 
     @Override
