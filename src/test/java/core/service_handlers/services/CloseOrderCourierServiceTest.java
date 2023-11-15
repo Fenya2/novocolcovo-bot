@@ -44,6 +44,8 @@ public class CloseOrderCourierServiceTest {
      */
     @Test
     public void continueSession() throws SQLException, ParseException {
+        MessageSender messageSender = Mockito.mock(MessageSender.class);
+        closeOrderCourierService.setMessageSender(messageSender);
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(
                         new UserContext(UserState.ORDER_CLOSING_COURIER,1)
@@ -84,8 +86,6 @@ public class CloseOrderCourierServiceTest {
                 ,continueSession4
         );
 
-        MessageSender messageSender = Mockito.mock(MessageSender.class);
-        closeOrderCourierService.setMessageSender(messageSender);
         Order order = new Order(1);
         Mockito.when(orderRepository.getById(11))
                 .thenReturn(order);

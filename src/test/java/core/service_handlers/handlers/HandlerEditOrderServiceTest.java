@@ -1,5 +1,6 @@
 package core.service_handlers.handlers;
 
+import bots.Bot;
 import core.service_handlers.services.EditOrderService;
 import models.Message;
 import models.User;
@@ -10,8 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import strubs.BotStrub;
 
 public class HandlerEditOrderServiceTest {
     @InjectMocks
@@ -31,7 +32,7 @@ public class HandlerEditOrderServiceTest {
     public void testHandleWhenCommandValid() {
         Message message = new Message();
         message.setUser(new User(10, "name", "description"));
-        message.setBotFrom(new BotStrub());
+        message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("/cancel");
         Assert.assertEquals(1, handlerEditOrderService.handle(message));
         message.setText("/help");
@@ -47,7 +48,7 @@ public class HandlerEditOrderServiceTest {
         Message message = new Message();
         message.setUser(new User(10, "name", "description"));
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
-        message.setBotFrom(new BotStrub());
+        message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("/some_not_valid_command");
         Assert.assertEquals(3, handlerEditOrderService.handle(message));
     }
@@ -61,7 +62,7 @@ public class HandlerEditOrderServiceTest {
         Message message = new Message();
         message.setUser(new User(10, "name", "description"));
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
-        message.setBotFrom(new BotStrub());
+        message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("some_message_not_command");
         Assert.assertEquals(2, handlerEditOrderService.handle(message));
         message.setText("451");
