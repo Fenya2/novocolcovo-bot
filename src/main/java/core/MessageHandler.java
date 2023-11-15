@@ -6,6 +6,7 @@ import db.LoggingUsersRepository;
 import db.UserContextRepository;
 import models.Domain;
 import models.Message;
+import models.Platform;
 import models.User;
 import models.UserContext;
 
@@ -43,10 +44,15 @@ public class MessageHandler {
 
     /** @see HandlerCancelOrderService */
     private final HandlerCancelOrderService handlerCancelOrderService;
-    private final HandlerAcceptOrderService handlerAcceptOrderService;
-    private final HandlerCloseOrderCourierService handlerCloseOrderCourierService;
-    private final HandlerCloseOrderClientService handlerCloseOrderClientService;
 
+    /** @see HandlerAcceptOrderService */
+    private final HandlerAcceptOrderService handlerAcceptOrderService;
+
+    /** @see HandlerCloseOrderCourierService */
+    private final HandlerCloseOrderCourierService handlerCloseOrderCourierService;
+
+    /** @see HandlerCloseOrderClientService */
+    private final HandlerCloseOrderClientService handlerCloseOrderClientService;
 
     /** Конструктор {@link MessageHandler MessageHandler}*/
     public MessageHandler(
@@ -128,10 +134,18 @@ public class MessageHandler {
                     commandHandler.handle(msg);
                     return 1;
                 }
+                case "/help": {
+                    msg.getBotFrom().sendTextMessage(
+                            msg.getUserIdOnPlatform(),
+                            "/register - зарегистрироваться в системе.\n" +
+                                    "/login - войти"
+                    );
+                    return 1;
+                }
             }
             msg.getBotFrom().sendTextMessage(
                     msg.getUserIdOnPlatform(),
-                    "отправьте /start для последующей работы."
+                    "Для пользования ботом тебе нужно зарегистрироваться. Это можно сделать командой /registration."
             );
             return 1;
         }
@@ -155,7 +169,7 @@ public class MessageHandler {
             case ORDER_CREATING -> handlerCreateOrderService.handle(msg);
             case ORDER_EDITING -> handlerEditOrderService.handle(msg);
             case ORDER_CANCELING-> handlerCancelOrderService.handle(msg);
-            case ORDER_ACCEPTING -> handlerAcceptOrderService.handle(msg);
+            case ORDER_ACCEPT -> handlerAcceptOrderService.handle(msg);
             case ORDER_CLOSING_COURIER -> handlerCloseOrderCourierService.handle(msg);
             case ORDER_CLOSING_CLIENT -> handlerCloseOrderClientService.handle(msg);
         }

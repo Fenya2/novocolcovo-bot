@@ -84,7 +84,6 @@ public class ServiceManager {
             return "Что-то пошло не так"+ e.getMessage();
         }
     }
-
     /**
      * @param message
      * @return
@@ -168,7 +167,8 @@ public class ServiceManager {
     public String showOrder(long idUser) {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
-            StringBuilder allOrderUser = new StringBuilder();
+            StringBuilder allOrderUser;
+            allOrderUser = new StringBuilder();
             for (Order s : listAllOrder) {
                 if (
                         s.getCreatorId() == idUser
@@ -208,15 +208,18 @@ public class ServiceManager {
 
      /**
       * Выбирает из списка всех заказов заказы с состоянием {@link OrderStatus#PENDING PENDING}
-      * и такие что курьер c userId не был равен {@link Order#getCreatorId()}  заказчику} и выводит их
+      * и такие что курьер c userId не был равен {@link Order#getCreatorId()}  заказчику и выводит их
       * @param userId пользователя, который хочет посмотреть список заказов
      */
     public String showPendingOrders(long userId) {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();
+            UserContext client;
             for (Order s: listAllOrder){
-                if(userId != s.getCreatorId() && s.getStatus().equals(OrderStatus.PENDING)){
+                client = userContextRepository.getUserContext(s.getId());
+                if(userId != s.getCreatorId() && s.getStatus().equals(OrderStatus.PENDING)
+                        && client.getState() == UserState.NO_STATE){
                     allOrderUser.append(
                             Long.toString(s.getId()).concat(": ")
                                     .concat(s.getDescription()).concat("\n")
@@ -224,7 +227,7 @@ public class ServiceManager {
                 }
             }
             if (allOrderUser.isEmpty())
-                return "У вас нет ни одного заказа";
+                return "Нет ни одного заказа, готового к выполнению";
             return allOrderUser.toString();
 
         } catch (SQLException | ParseException e) {
@@ -233,13 +236,13 @@ public class ServiceManager {
     }
 
     /**
-     * @param userId Добавляет пользователя с этим userId в контекст {@link UserState#ORDER_ACCEPTING ORDER_ACCEPTING}
+     * @param userId Добавляет пользователя с этим userId в контекст {@link UserState#ORDER_ACCEPT ORDER_ACCEPTING}
      * @return Выводит сообщение с просьбой ввести курьера userId заказа, который он хочется принять 
      */
     public String startAcceptOrder(long userId){
-        if (showPendingOrders(userId).equals("У вас нет ни одного заказа"))
-            return "У вас нет ни одного заказа";
-        UserContext userContext = new UserContext(UserState.ORDER_ACCEPTING);
+        if (showPendingOrders(userId).equals("Нет ни одного заказа, готового к выполнению"))
+            return "Нет ни одного заказа, готового к выполнению";
+        UserContext userContext = new UserContext(UserState.ORDER_ACCEPT);
         try {
             userContextRepository.updateUserContext(userId, userContext);
         } catch (SQLException e) {
@@ -251,15 +254,18 @@ public class ServiceManager {
 
     /**
      * Выбирает из списка всех заказов заказы с состоянием {@link OrderStatus#RUNNING RUNNING} 
-     * и такие что userId курьера = {@link Order#getCourierId()}  courierId} и выводит их
+     * и такие что userId курьера = {@link Order#getCourierId()}  courierId и выводит их
      * @param userId курьер, который хочет посмотреть свои заказы
      */
     public String showAcceptOrder(long userId) {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();
+            UserContext client;
             for (Order s: listAllOrder){
-                if(userId == s.getCourierId() && s.getStatus().equals(OrderStatus.RUNNING)){
+                client = userContextRepository.getUserContext(s.getId());
+                if(userId == s.getCourierId() && s.getStatus().equals(OrderStatus.RUNNING)
+                        && client.getState() == UserState.NO_STATE){
                     allOrderUser.append(
                             Long.toString(s.getId()).concat(": ")
                                     .concat(s.getDescription()).concat("\n")
@@ -267,7 +273,7 @@ public class ServiceManager {
                 }
             }
             if (allOrderUser.isEmpty())
-                return "У вас нет ни одного заказа";
+                return "Нет ни одного заказа, готового к выполнению";
             return allOrderUser.toString();
 
         } catch (SQLException | ParseException e) {
@@ -280,8 +286,8 @@ public class ServiceManager {
      * @return Выводит сообщение с просьбой ввести курьера userId заказа, который он хочется удалить
      */
     public String startCloseOrder(long userId) {
-        if (showAcceptOrder(userId).equals("У вас нет ни одного заказа"))
-            return "У вас нет ни одного заказа";
+        if (showAcceptOrder(userId).equals("Нет ни одного заказа, готового к выполнению"))
+            return "Нет ни одного заказа, готового к выполнению";
         UserContext userContext = new UserContext(UserState.ORDER_CLOSING_COURIER);
         try {
             userContextRepository.updateUserContext(userId, userContext);
@@ -292,4 +298,6 @@ public class ServiceManager {
 
         return "Введите заказ который хотите завершить";
     }
+
+
 }

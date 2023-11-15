@@ -29,7 +29,6 @@ public class CloseOrderCourierService {
         this.userContextRepository = userContextRepository;
     }
 
-
     /**
      * Меняет статус заказа на {@link models.OrderStatus#CLOSING CLOSING}<br>
      * Меняет контекст курьера(userId) на {@link models.UserState#NO_STATE NO_STATE} <br>
@@ -43,8 +42,8 @@ public class CloseOrderCourierService {
      */
     public String continueSession(long userId, String text) {
         try {
-            UserContext userContextCourier = userContextRepository.getUserContext(userId);
-            if (userContextCourier.getStateNum() == 0) {
+            UserContext userContext = userContextRepository.getUserContext(userId);
+            if (userContext.getStateNum() == 0) {
                 if(!validation(userId,text))
                     return "Заказ не найден. Попробуй еще раз";
 
@@ -62,14 +61,20 @@ public class CloseOrderCourierService {
                             order.getCreatorId(),
                             "Курьер хочет завершить заказ, заверши выполнение команды."
                     );
-                    return "Заказчик не может сейчас завершить заказ, попробуйте позже";
+                    return "Извини, но сейчас заказ нельзя принять.";
                 }
-                orderRepository.updateOrderStatus(idOrder, OrderStatus.CLOSING);
+                userContextRepository.updateUserContext(
+                        order.getCreatorId(),
+                        new UserContext(UserState.ORDER_CLOSING_CLIENT)
+                );
+
+                order.setStatus(OrderStatus.CLOSING);
+                orderRepository.update(order);
                 userContextRepository.updateUserContext(userId,new UserContext());
 
                 userNotifier.sendTextMessage(
                         order.getCreatorId(),
-                        "Подтвердите что ваш заказ приняли, написав \n/yes /no."
+                        "Подтвердите что ваш заказ завершен, написав \n/yes /no."
                 );
                 return "Завершение заказа отправлено на подтверждение заказчику";
             } else

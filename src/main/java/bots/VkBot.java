@@ -65,4 +65,10 @@ public class VkBot extends LongPollBot implements Bot {
                     .formatted(message, recipient_id));
         }
     }
+
+    public String getScreenName(String USER_ID) throws VkApiException{
+        return vk.users.get()
+                .setUserIds(USER_ID)
+                .execute().getResponse().get(0).getScreen_name();
+    }
 }

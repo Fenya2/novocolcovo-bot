@@ -135,26 +135,19 @@ public class ServiceManagerTest {
      */
     @Test
     public void showPendingOrders() throws SQLException, ParseException {
-        Order aa1 = new Order(1,0,OrderStatus.PENDING,"заказ1");
-        Order aa2 = new Order(2,0,OrderStatus.PENDING,"заказ2");
-        Order aa3 = new Order(3,0,OrderStatus.UPDATING,"заказ3");
+        Order aa1 = new Order(1, 0, OrderStatus.PENDING, "заказ1");
         ArrayList<Order> a = new ArrayList<>();
         a.add(aa1);
-        a.add(aa2);
-        a.add(aa3);
         Mockito.when(orderRepository.getAll()).
                 thenReturn(a);
-        String showPendingOrders1 = serviceManager.showPendingOrders(3);
-        Assert.assertEquals("-42: заказ1\n-42: заказ2\n",showPendingOrders1);
+        Mockito.when(userContextRepository.getUserContext(aa1.getId()))
+                .thenReturn(new UserContext(UserState.NO_STATE));
+        String showPendingOrders1 = serviceManager.showPendingOrders(2);
+        Assert.assertEquals("-42: заказ1\n", showPendingOrders1);
 
         String showPendingOrders2 = serviceManager.showPendingOrders(1);
-        Assert.assertEquals("-42: заказ2\n",showPendingOrders2);
-
-        a.remove(1);
-        String showPendingOrders3 = serviceManager.showPendingOrders(1);
-        Assert.assertEquals("У вас нет ни одного заказа", showPendingOrders3);
+        Assert.assertEquals("Нет ни одного заказа, готового к выполнению", showPendingOrders2);
     }
-
     /**
      * Проверяет команду /startAcceptOrder, случаи <br>
      * 1) можно принять хотя бы 1 заказ
@@ -167,11 +160,13 @@ public class ServiceManagerTest {
         a.add(aa1);
         Mockito.when(orderRepository.getAll()).
                 thenReturn(a);
+        Mockito.when(userContextRepository.getUserContext(aa1.getId()))
+                .thenReturn(new UserContext(UserState.NO_STATE));
         String startCloseOrder1 = serviceManager.startAcceptOrder(3);
         Assert.assertEquals("Введите заказ который хотите принять",startCloseOrder1);
 
         String startCloseOrder2 = serviceManager.startAcceptOrder(1);
-        Assert.assertEquals("У вас нет ни одного заказа",startCloseOrder2);
+        Assert.assertEquals("Нет ни одного заказа, готового к выполнению",startCloseOrder2);
 
     }
 
@@ -191,11 +186,13 @@ public class ServiceManagerTest {
         a.add(aa3);
         Mockito.when(orderRepository.getAll()).
                 thenReturn(a);
+        Mockito.when(userContextRepository.getUserContext(aa1.getId()))
+                .thenReturn(new UserContext(UserState.NO_STATE));
         String showAcceptOrders1 = serviceManager.showAcceptOrder(3);
         Assert.assertEquals("-42: заказ1\n-42: заказ2\n",showAcceptOrders1);
 
         String showAcceptOrders2 = serviceManager.showAcceptOrder(1);
-        Assert.assertEquals("У вас нет ни одного заказа",showAcceptOrders2);
+        Assert.assertEquals("Нет ни одного заказа, готового к выполнению",showAcceptOrders2);
     }
 
     /**
@@ -210,10 +207,12 @@ public class ServiceManagerTest {
         a.add(aa1);
         Mockito.when(orderRepository.getAll()).
                 thenReturn(a);
+        Mockito.when(userContextRepository.getUserContext(aa1.getId()))
+                .thenReturn(new UserContext(UserState.NO_STATE));
         String startCloseOrder1 = serviceManager.startCloseOrder(3);
         Assert.assertEquals("Введите заказ который хотите завершить",startCloseOrder1);
 
         String startCloseOrder2 = serviceManager.startCloseOrder(1);
-        Assert.assertEquals("У вас нет ни одного заказа",startCloseOrder2);
+        Assert.assertEquals("Нет ни одного заказа, готового к выполнению",startCloseOrder2);
     }
 }

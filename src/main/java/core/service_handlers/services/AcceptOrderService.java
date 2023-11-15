@@ -7,11 +7,12 @@ import db.UserContextRepository;
 import models.Order;
 import models.OrderStatus;
 import models.UserContext;
+import models.UserState;
 
 import java.sql.SQLException;
 import java.text.ParseException;
 
-/** Сервис для работы с контекстом {@link models.UserState#ORDER_ACCEPTING ORDER_ACCEPTING}*/
+/** Сервис для работы с контекстом {@link models.UserState#ORDER_ACCEPT ORDER_ACCEPTING}*/
 public class AcceptOrderService {
 
     /** @see UserNotifier */
@@ -30,11 +31,11 @@ public class AcceptOrderService {
     }
 
     /**
-     * Меняет у введенного курьером заказа статус на {@link models.OrderStatus#RUNNING RUNNING} <br>
+     * Меняет у введенного курьером заказа статус на {@link models.OrderStatus#ACCEPTING ACCEPTING} <br>
      * Меняет поле {@link Order#getCourierId()}  courierId} на id курьера <br>
      * Меняет контекст курьера на {@link models.UserState#NO_STATE NO_STATE}
      * Отправляет сообщение, что заказ принят или ошибку
-     * TODO так же должен отправить сообщение заказчику что его заказ приняли
+     * так же отправляет сообщение заказчику, что его заказ хотят принять
      * @param userId id курьера
      * @param text id заказа
      */
@@ -46,19 +47,22 @@ public class AcceptOrderService {
                     return "Заказ не найден. Попробуй еще раз";
 
                 long idOrder = Long.parseLong(text);
-
                 Order order = orderRepository.getById(idOrder);
                 if(order.getStatus() != OrderStatus.PENDING){
                     userNotifier.sendTextMessage(
                             order.getCreatorId(),
                             "Курьер хочет принять заказ, заверши выполнение команды."
                     );
-                    return "В этот момент заказ изменяется.";
+                    return "Извини, но сейчас заказ нельзя принять.";
                 }
+                userContextRepository.updateUserContext(
+                        order.getCreatorId(),
+                        new UserContext(UserState.ORDER_ACCEPT)
+                );
                 order.setCourierId(userId);
-                order.setStatus(OrderStatus.RUNNING);
+                order.setStatus(OrderStatus.ACCEPTING);
                 orderRepository.update(order);
-                userContextRepository.updateUserContext(userId,new UserContext());
+                userContextRepository.updateUserContext(userId, new UserContext());
 
                 userNotifier.sendTextMessage(order.getCreatorId(), "Ваш заказ %s принят".formatted(order.getDescription()));
                 return "Заказ принят";

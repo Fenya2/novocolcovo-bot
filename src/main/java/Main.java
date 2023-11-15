@@ -5,13 +5,13 @@ import bots.VkBot;
 import config.SQLDBconfig;
 import config.TGBotConfig;
 import config.VkBotConfig;
+import core.CommandHandler;
 import core.MessageHandler;
+import core.ServiceManager;
 import core.UserNotifier;
 import core.service_handlers.handlers.*;
 import core.service_handlers.services.*;
 import db.*;
-import core.ServiceManager;
-import core.CommandHandler;
 
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -97,7 +97,6 @@ public class Main {
         closeOrderClientService.setUserNotifier(userNotifier);
 
         ((VkBot) vkBot).startPolling();
-
         db.disconnect();
     }
 }

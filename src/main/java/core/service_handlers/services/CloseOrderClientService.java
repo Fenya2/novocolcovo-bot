@@ -54,7 +54,7 @@ public class CloseOrderClientService {
                 userNotifier.sendTextMessage(order.getCourierId(),"Заказ не закрыт. Свяжитесь с заказчиком");
                 return "Заказ не закрыт. Свяжитесь с курьером";
             } else {
-                return "Извините я вас не понимаю. Напиши /help";
+                return "Прости, но я не знаю, что на это ответить. Вызови команду /help";
             }
         } catch (SQLException | ParseException | DBException e) {
             return "что-то пошло не так";
