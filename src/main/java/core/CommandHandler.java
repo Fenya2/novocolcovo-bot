@@ -47,10 +47,18 @@ public class CommandHandler {
                 return 2;
             }
             case "/register" -> {
-                String answer = serviceManager.register(msg);
+                String response = serviceManager.register(msg);
                 msg.getBotFrom().sendTextMessage(
                         msg.getUserIdOnPlatform(),
-                        answer
+                        response
+                );
+                return 2;
+            }
+            case "/login" -> {
+                String response = serviceManager.login(msg);
+                msg.getBotFrom().sendTextMessage(
+                        msg.getUserIdOnPlatform(),
+                        response
                 );
                 return 2;
             }

@@ -61,4 +61,23 @@ public class UserNotifier {
     public void sendPicture(long userId, String path) {
         // todo сделать.
     }
+
+    /**
+     * Отправляет сообщение на указанную платформу указанному пользователю, если тот авторизован на
+     * ней
+     * @param platform
+     * @param userId
+     * @return true, если отправилось, иначе false.
+     */
+    public boolean sendTextMessageOnPlatformIfPossible(Platform platform,
+                                                       long userId,
+                                                       String text) throws SQLException {
+        String idnp = loggedUsersRepository.getUserIdOnPlatformByUserIdAndPlatform(userId, platform);
+        if(idnp == null) return false;
+        switch (platform) {
+            case VK -> vkBot.sendTextMessage(idnp, text);
+            case TELEGRAM -> tgBot.sendTextMessage(idnp, text);
+        }
+        return true;
+    }
 }

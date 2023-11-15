@@ -44,7 +44,7 @@ public class CloseOrderClientServiceTest {
         ).thenReturn( new Order(1));
 
         UserNotifier userNotifier = Mockito.mock(UserNotifier.class);
-        closeOrderClientService.setMessageSender(userNotifier);
+        closeOrderClientService.setUserNotifier(userNotifier);
 
         String continueSession1 = closeOrderClientService.continueSession(
                 1,"/yes"

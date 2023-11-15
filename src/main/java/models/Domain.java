@@ -2,7 +2,7 @@ package models;
 
 /**
  * Сущность, хранящаяся в LogginUsersRepository
- * //todo переименовать?
+ * todo переименовать?
  */
 public class Domain {
     /** Целое число отвечающее за номер этапа авторизации пользователя */
@@ -32,7 +32,7 @@ public class Domain {
         setFromPlatform(Platform.NO_PLATFORM);
         setIdOnPlatform("id_on_platform");
         setVerificationPlatform(Platform.NO_PLATFORM);
-        setVerificationCode(1111);
+        setVerificationCode(1000);
     }
 
     /**

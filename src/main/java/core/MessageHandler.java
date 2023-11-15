@@ -2,7 +2,9 @@ package core;
 
 import db.DBException;
 import db.LoggedUsersRepository;
+import db.LoggingUsersRepository;
 import db.UserContextRepository;
+import models.Domain;
 import models.Message;
 import models.User;
 import models.UserContext;
@@ -17,6 +19,8 @@ import java.sql.SQLException;
  * обработки
  */
 public class MessageHandler {
+
+    private final LoggingUsersRepository loggingUsersRepository;
     /** @see UserContextRepository */
     private final UserContextRepository userContextRepository;
 
@@ -25,6 +29,8 @@ public class MessageHandler {
 
     /** @see CommandHandler */
     private final CommandHandler commandHandler;
+
+    private final HandlerLoginService handlerLoginService;
 
     /** @see HandlerEditUserService */
     private final HandlerEditUserService handlerEditUserService;
@@ -44,9 +50,11 @@ public class MessageHandler {
 
     /** Конструктор {@link MessageHandler MessageHandler}*/
     public MessageHandler(
+            LoggingUsersRepository loggingUsersRepository,
             UserContextRepository userContextRepository,
             LoggedUsersRepository loggedUsersRepository,
             CommandHandler commandHandler,
+            HandlerLoginService handlerLoginService,
             HandlerEditUserService updateUserServiceHandler,
             HandlerCreateOrderService handlerCreateOrderService,
             HandlerEditOrderService handlerEditOrderService,
@@ -54,9 +62,11 @@ public class MessageHandler {
             HandlerAcceptOrderService handlerAcceptOrderService,
             HandlerCloseOrderCourierService handlerCloseOrderService,
             HandlerCloseOrderClientService handlerCloseOrderClientService) {
+        this.loggingUsersRepository = loggingUsersRepository;
         this.userContextRepository = userContextRepository;
         this.loggedUsersRepository = loggedUsersRepository;
         this.commandHandler = commandHandler;
+        this.handlerLoginService = handlerLoginService;
         this.handlerEditUserService = updateUserServiceHandler;
         this.handlerCreateOrderService = handlerCreateOrderService;
         this.handlerEditOrderService = handlerEditOrderService;
@@ -69,12 +79,34 @@ public class MessageHandler {
     /**
      * Первичный метод обработки сообщения. Если у пользователя, отправившего сообщение есть
      * контекст, направляет сообщение в соответствующий сервисный обработчик, если отправленное
-     * сообщение является командой, перенаправляет сообщение в обработчик команд. Иначе сообщает
+     * сообщение является командой, перенаправляет сообщение в обработчик команд.
+     *
+     * Если у пользователя нет контекста, но он находится в состоянии авторизации,
+     * то есть есть в таблице logging_users, то перенаправляет сообщение в обработчик авторизации.
+     *
+     * Иначе сообщает
      * пользователю, что сообщение некорректно.
      * @return 1, если сообщение написано пользователем впервые. 2, если пользователь пишет, не
      * находясь в контексте. 3, если пользователь пишет, находясь в контексте.
      */
     public int handle(Message msg) {
+        try {
+            Domain domain = loggingUsersRepository.getDomainByFromPlatformAndIdOnPlatform(
+                    msg.getPlatform(),
+                    msg.getUserIdOnPlatform()
+            );
+            if(domain != null) {
+                handlerLoginService.handle(msg, domain);
+                return 4;
+            }
+        } catch (DBException e) {
+            msg.getBotFrom().sendTextMessage(
+                    msg.getUserIdOnPlatform(),
+                    "Проблемы с доступом к базе данных " + e.getMessage()
+            );
+            return -1;
+        }
+
         User user;
         UserContext userContext;
         try {
@@ -92,7 +124,7 @@ public class MessageHandler {
 
         if(user == null) {
             switch (msg.getText()) {
-                case "/start", "/register": {
+                case "/start", "/register", "/login": {
                     commandHandler.handle(msg);
                     return 1;
                 }

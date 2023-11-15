@@ -103,6 +103,34 @@ public class UserRepository extends Repository {
     }
 
     /**
+     * Возвращает пользователя с указанным логином из базы данных.
+     * @param login идентификатор пользователя.
+     * @return {@link User}, если пользователь с переданным идентификатором существует. иначе <b>null</b>
+     * @throws SQLException
+     */
+    public User getByLogin(String login) throws DBException {
+        if (login == null)
+            throw new DBException("Некорректные параметр login. Должны быть не null");
+        String query = "SELECT id, name, description, login FROM users WHERE login = \"%s\";"
+                .formatted(login);
+        try (Statement statement = db.getStatement()) {
+            ResultSet resultSet = statement.executeQuery(query);
+            if (!resultSet.next()) {
+                return null;
+            }
+            return new User(
+                    resultSet.getLong("id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("description"),
+                    resultSet.getString("login")
+            );
+        } catch (SQLException e) {
+            UserRepository.log.error(e.toString());
+            throw new DBException("something went wrong in DB: " + e.getMessage());
+        }
+    }
+
+    /**
      * Удаляет пользователя с переданным идентификатором
      * @param id идентификатор пользователя.
      * @return <b>1</b>, если пользователь успешно удален, иначе <b>0</b>.

@@ -29,6 +29,7 @@ public class User {
      * @param id идентификатор пользователя.
      * @param name имя пользователя.
      * @param description описание пользователя.
+     * @param login логин пользователя
      */
     public User(long id, String name, String description, String login) {
         this.id = id;

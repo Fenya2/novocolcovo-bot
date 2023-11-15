@@ -80,14 +80,14 @@ public class LoggingUsersRepository extends Repository {
                 verification_platform = "%s",
                 verification_code = %d
                 WHERE
-                verification_platform = "%s" AND
+                from_platform = "%s" AND
                 id_on_platform = "%s";
                 """.formatted(
                         domain.getLoginContext(),
                         domain.getRequiredLogin(),
                         domain.getVerificationPlatform(),
                         domain.getVerificationCode(),
-                        domain.getVerificationPlatform(),
+                        domain.getFromPlatform(),
                         domain.getIdOnPlatform()
                 );
 

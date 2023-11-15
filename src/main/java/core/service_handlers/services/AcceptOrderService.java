@@ -102,7 +102,7 @@ public class AcceptOrderService {
         }
     }
 
-    public void setMessageSender(UserNotifier userNotifier) {
+    public void setUserNotifier(UserNotifier userNotifier) {
         this.userNotifier = userNotifier;
     }
 }

@@ -2,6 +2,7 @@ package core;
 
 import config.BotMessages;
 import config.services.EditUserServiceConfig;
+import core.service_handlers.services.LoginService;
 import db.*;
 import models.*;
 
@@ -26,15 +27,22 @@ public class ServiceManager {
     /** @see OrderRepository*/
     private final OrderRepository orderRepository;
 
+    /** Сервис авторизации. Не работает с контекстом, поэтому здесь */
+    private final LoginService loginService;
+
     /**Конструктор {@link ServiceManager ServiceManager} */
     public ServiceManager(LoggedUsersRepository loggedUsersRepository,
                           OrderRepository orderRepository,
                           UserRepository userRepository,
-                          UserContextRepository userContextRepository) {
+                          UserContextRepository userContextRepository,
+                          LoginService loginService
+    ) {
         this.loggedUsersRepository = loggedUsersRepository;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.userContextRepository = userContextRepository;
+
+        this.loginService = loginService;
     }
 
     /**
@@ -74,6 +82,18 @@ public class ServiceManager {
             return BotMessages.REGISTER_MESSAGE.getMessage();
         } catch (SQLException | DBException e) {
             return "Что-то пошло не так"+ e.getMessage();
+        }
+    }
+
+    /**
+     * @param message
+     * @return
+     */
+    public String login(Message message) {
+        try {
+            return loginService.startSession(message.getPlatform(), message.getUserIdOnPlatform());
+        } catch (DBException e) {
+            return "проблемы с базой данных" + e.getMessage();
         }
     }
 

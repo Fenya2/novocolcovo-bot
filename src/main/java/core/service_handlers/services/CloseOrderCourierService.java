@@ -112,7 +112,7 @@ public class CloseOrderCourierService {
         }
     }
 
-    public void setMessageSender(UserNotifier userNotifier) {
+    public void setUserNotifier(UserNotifier userNotifier) {
         this.userNotifier = userNotifier;
     }
 }

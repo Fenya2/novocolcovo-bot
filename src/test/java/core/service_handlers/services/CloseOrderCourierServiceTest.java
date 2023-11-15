@@ -42,7 +42,7 @@ public class CloseOrderCourierServiceTest {
     @Test
     public void continueSession() throws SQLException, ParseException {
         UserNotifier userNotifier = Mockito.mock(UserNotifier.class);
-        closeOrderCourierService.setMessageSender(userNotifier);
+        closeOrderCourierService.setUserNotifier(userNotifier);
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(
                         new UserContext(UserState.ORDER_CLOSING_COURIER,1)

@@ -72,7 +72,7 @@ public class AcceptOrderServiceTest {
 
 
         UserNotifier userNotifier = Mockito.mock(UserNotifier.class);
-        acceptOrderService.setMessageSender(userNotifier);
+        acceptOrderService.setUserNotifier(userNotifier);
         Mockito.when(userContextRepository.getUserContext(2))
                 .thenReturn(
                         new UserContext(UserState.ORDER_ACCEPTING,0)

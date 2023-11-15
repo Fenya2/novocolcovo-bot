@@ -8,7 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /** Класс, отвечающий за работу с таблицей logged_users базы данных.<br>
  * Позволяет опознать пользователя в системе.*/
@@ -121,6 +123,30 @@ public class LoggedUsersRepository extends Repository {
         resultSet.close();
         statement.close();
         return  userIdOnPlatform;
+    }
+
+    /**
+     * @return список платформ, с которых пользователь авторизован в программе.
+     */
+    public List<Platform> getPlatformsByUserId(long userId) throws DBException {
+        if(userId <= 0)
+            throw new DBException("Некорректный идентификатор пользователя. Должен быть больше 0");
+        String query =
+                """
+                SELECT platform FROM logged_users
+                WHERE user_id = %d
+                """.formatted(userId);
+        try(Statement statement = db.getStatement()) {
+            ResultSet resultSet = statement.executeQuery(query);
+            List<Platform> userPlatforms= new ArrayList<>();
+            while (resultSet.next())
+                userPlatforms.add(Platform.fromString(resultSet.getString("platform")));
+            return  userPlatforms;
+        } catch (SQLException e) {
+            log.error("Не удалось получить платформы пользователя с id %d\n%s"
+                    .formatted(userId, e.getMessage()));
+            throw new DBException(e.getMessage());
+        }
     }
 
     /**

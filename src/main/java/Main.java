@@ -13,8 +13,6 @@ import db.*;
 import core.ServiceManager;
 import core.CommandHandler;
 
-import models.Domain;
-import models.Platform;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
@@ -30,84 +28,75 @@ public class Main {
         // БД
         DB db = new SQLiteDB(new SQLDBconfig("src/main/resources/config/dbconfig.json"));
         db.connect();
-        //db.clearScheme();
-        //db.initScheme();
+        db.clearScheme();
+        db.initScheme();
 
-         LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);
-         Domain domain = new Domain()
-                 .loginContext(0)
-                 .requiredLogin("fenya00")
-                 .fromPlatform(Platform.VK)
-                 .idOnPlatform("12345")
-                 .verificationPlatform(Platform.TELEGRAM)
-                 .verificationCode(8191);
-         loggingUsersRepository.saveDomain(domain);
-        loggingUsersRepository.deleteDomainByFromPlatformAndIdOnPlatform(Platform.VK, "12345");
+        // Репозитории
+        LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);
+        UserRepository ur = new UserRepository(db);
+        LoggedUsersRepository lg = new LoggedUsersRepository(db,ur);
+        UserContextRepository uc = new UserContextRepository(db,ur);
+        OrderRepository or = new OrderRepository(db,ur);
 
+        // Сервисы
+        LoginService loginService = new LoginService(uc, loggingUsersRepository, ur, lg);
+        EditUserService updateUserService = new EditUserService(uc, ur);
+        CreateOrderService createOrderService = new CreateOrderService(or, uc);
+        EditOrderService editOrderService = new EditOrderService(or,uc);
+        CancelOrderService cancelOrderService = new CancelOrderService(or,uc);
+        AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc);
+        CloseOrderCourierService closeOrderCourierService = new CloseOrderCourierService(or,uc);
+        CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
 
+        // менеджер сервисов
+        ServiceManager serviceManager = new ServiceManager(lg,or,ur,uc, loginService);
 
+        // Обработчики сервисов
+        HandlerLoginService handlerLoginService = new HandlerLoginService(loginService);
+        HandlerEditUserService handlerUpdateUserService = new HandlerEditUserService(updateUserService);
+        HandlerCreateOrderService handlerCreateOrderService = new HandlerCreateOrderService(createOrderService);
+        HandlerEditOrderService handlerEditOrderService = new HandlerEditOrderService(editOrderService);
+        HandlerCancelOrderService handlerCancelOrderService = new HandlerCancelOrderService(cancelOrderService);
+        HandlerAcceptOrderService handlerAcceptOrderService = new HandlerAcceptOrderService(acceptOrderService);
+        HandlerCloseOrderCourierService handlerCloseOrderCourierService =
+                new HandlerCloseOrderCourierService(closeOrderCourierService);
+        HandlerCloseOrderClientService handlerCloseOrderClientService =
+                new HandlerCloseOrderClientService(closeOrderClientService);
 
+        // "главные" обработчики
+        CommandHandler commandHandler = new CommandHandler(serviceManager);
+        MessageHandler messageHandler = new MessageHandler(
+                loggingUsersRepository,
+                uc,
+                lg,
+                commandHandler,
+                handlerLoginService,
+                handlerUpdateUserService,
+                handlerCreateOrderService,
+                handlerEditOrderService,
+                handlerCancelOrderService,
+                handlerAcceptOrderService,
+                handlerCloseOrderCourierService,
+                handlerCloseOrderClientService
+        );
 
+        // Боты
+        TGBotConfig tgBotConfig = new TGBotConfig(System.getenv("TG_BOT_TOKEN"));
+        Bot tgBot = new TGBot(tgBotConfig, messageHandler);
+        TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+        botsApi.registerBot((LongPollingBot) tgBot);
 
+        VkBotConfig vkBotConfig = new VkBotConfig(System.getenv("VK_BOT_TOKEN"));
+        Bot vkBot = new VkBot(vkBotConfig, messageHandler);
 
+        // Доинициализация сервисов для возможности уведомлять пользователей через ботов.
+        UserNotifier userNotifier = new UserNotifier(lg, tgBot, vkBot);
+        loginService.setUserNotifier(userNotifier);
+        closeOrderCourierService.setUserNotifier(userNotifier);
+        acceptOrderService.setUserNotifier(userNotifier);
+        closeOrderClientService.setUserNotifier(userNotifier);
 
-//        // Репозитории
-//        UserRepository ur = new UserRepository(db);
-//        LoggedUsersRepository lg = new LoggedUsersRepository(db,ur);
-//        UserContextRepository uc = new UserContextRepository(db,ur);
-//        OrderRepository or = new OrderRepository(db,ur);
-//
-//        // Сервисы
-//        ServiceManager serviceManager = new ServiceManager(lg,or,ur,uc);
-//        EditUserService updateUserService = new EditUserService(uc, ur);
-//        CreateOrderService createOrderService = new CreateOrderService(or, uc);
-//        EditOrderService editOrderService = new EditOrderService(or,uc);
-//        CancelOrderService cancelOrderService = new CancelOrderService(or,uc);
-//        AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc);
-//        CloseOrderCourierService closeOrderCourierService = new CloseOrderCourierService(or,uc);
-//        CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
-//
-//        // Обработчики сервисов
-//        HandlerEditUserService handlerUpdateUserService = new HandlerEditUserService(updateUserService);
-//        HandlerCreateOrderService handlerCreateOrderService = new HandlerCreateOrderService(createOrderService);
-//        HandlerEditOrderService handlerEditOrderService = new HandlerEditOrderService(editOrderService);
-//        HandlerCancelOrderService handlerCancelOrderService = new HandlerCancelOrderService(cancelOrderService);
-//        HandlerAcceptOrderService handlerAcceptOrderService = new HandlerAcceptOrderService(acceptOrderService);
-//        HandlerCloseOrderCourierService handlerCloseOrderCourierService =
-//                new HandlerCloseOrderCourierService(closeOrderCourierService);
-//        HandlerCloseOrderClientService handlerCloseOrderClientService =
-//                new HandlerCloseOrderClientService(closeOrderClientService);
-//
-//        // "главные" обработчики
-//        CommandHandler commandHandler = new CommandHandler(serviceManager);
-//        MessageHandler messageHandler = new MessageHandler(
-//                uc,
-//                lg,
-//                commandHandler,
-//                handlerUpdateUserService,
-//                handlerCreateOrderService,
-//                handlerEditOrderService,
-//                handlerCancelOrderService,
-//                handlerAcceptOrderService,
-//                handlerCloseOrderCourierService,
-//                handlerCloseOrderClientService
-//        );
-//
-//        // Боты
-//        TGBotConfig tgBotConfig = new TGBotConfig(System.getenv("TG_BOT_TOKEN"));
-//        Bot tgBot = new TGBot(tgBotConfig, messageHandler);
-//        TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-//        botsApi.registerBot((LongPollingBot) tgBot);
-//
-//        VkBotConfig vkBotConfig = new VkBotConfig(System.getenv("VK_BOT_TOKEN"));
-//        Bot vkBot = new VkBot(vkBotConfig, messageHandler);
-//
-//        UserNotifier userNotifier = new UserNotifier(lg, tgBot, vkBot);
-//        closeOrderCourierService.setMessageSender(userNotifier);
-//        acceptOrderService.setMessageSender(userNotifier);
-//        closeOrderClientService.setMessageSender(userNotifier);
-//
-//        ((VkBot) vkBot).startPolling();
+        ((VkBot) vkBot).startPolling();
 
         db.disconnect();
     }
