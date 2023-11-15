@@ -1,17 +1,17 @@
 package core.service_handlers.handlers;
 
 import models.Message;
-import core.service_handlers.services.AcceptOrderCourierService;
+import core.service_handlers.services.AcceptOrderService;
 
 /** Обработчик контекстов {@link models.UserState#ORDER_ACCEPTING_COURIER ORDER_ACCEPTING}*/
-public class HandlerAcceptOrderCourierService {
+public class HandlerAcceptOrderService {
 
-    /** @see AcceptOrderCourierService */
-    private final AcceptOrderCourierService acceptOrderCourierService;
+    /** @see AcceptOrderService */
+    private final AcceptOrderService acceptOrderService;
 
-    /** Конструктор {@link HandlerAcceptOrderCourierService}*/
-    public HandlerAcceptOrderCourierService(AcceptOrderCourierService acceptOrderService) {
-        this.acceptOrderCourierService = acceptOrderService;
+    /** Конструктор {@link HandlerAcceptOrderService}*/
+    public HandlerAcceptOrderService(AcceptOrderService acceptOrderService) {
+        this.acceptOrderService = acceptOrderService;
     }
 
     /**Обработчик команд связаных с контекстом {@link models.UserState#ORDER_ACCEPTING_COURIER ORDER_ACCEPTING}
@@ -32,7 +32,7 @@ public class HandlerAcceptOrderCourierService {
                 return 1;
             }
             case "/cancel" -> {
-                String message = acceptOrderCourierService.cancel(msg.getUser().getId());
+                String message = acceptOrderService.cancel(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                 return 1;
             }
@@ -42,7 +42,7 @@ public class HandlerAcceptOrderCourierService {
                     msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                     return 3;
                 }
-                String message = acceptOrderCourierService.continueSession(msg.getUser().getId(),msg.getText());
+                String message = acceptOrderService.continueSession(msg.getUser().getId(),msg.getText());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                 return 2;
             }

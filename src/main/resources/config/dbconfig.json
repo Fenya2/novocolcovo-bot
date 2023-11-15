@@ -1,3 +1,11 @@
 {
-  "db_connection":"jdbc:sqlite:novocolcovo.sqlite"
+  "connection":"jdbc:sqlite:novocolcovo.sqlite",
+  "tables":[
+    "users",
+    "logged_users",
+    "user_contexts",
+    "orders",
+    "logging_users"
+  ],
+  "scheme":"CREATE TABLE logging_users(\n\tlogin_context INTEGER NOT NULL,\n\trequired_login TEXT NOT NULL,\n\tfrom_platform TEXT NOT NULL,\n\tid_on_platform TEXT NOT NULL,\n\tverification_platform TEXT NOT NULL,\n\tverification_code INTEGER NOT NULL,\n\tPRIMARY KEY(from_platform, id_on_platform)\n);\n\nCREATE TABLE users\n(\n\tid INTEGER PRIMARY KEY AUTOINCREMENT,\n\tname TEXT NOT NULL,\n\tdescription TEXT NOT NULL DEFAULT \"average novocolcovo enjoyer description\",\n\tlogin TEXT NOT NULL UNIQUE,\n\tdate_created DATE NOT NULL\n);\n\nCREATE TABLE logged_users(\n\tuser_id INTEGER,\n\tplatform TEXT NOT NULL,\n\tid_on_platform TEXT NOT NULL,\n\tlogin_date DATE NOT NULL,\n\tFOREIGN KEY (user_id) REFERENCES users(id)\n);\n\nCREATE TABLE user_contexts(\n\tuser_id INTEGER,\n\tstate TEXT NOT NULL,\n\tstate_num INTEGER NOT NULL,\n\tFOREIGN KEY (user_id) REFERENCES users(id)\n);\n\nCREATE TABLE orders(\n\tid INTEGER PRIMARY KEY AUTOINCREMENT,\n\tcreator_id INTEGER NOT NULL,\n\tcourier_id INTEGER NOT NULL,\n\tdate_created TEXT NOT NULL,\n\tdescription TEXT NOT NULL,\n\tstatus TEXT NOT NULL,\n\tFOREIGN KEY (creator_id) REFERENCES users(id)\n\tFOREIGN KEY (courier_id) REFERENCES users(id)\n);"
 }

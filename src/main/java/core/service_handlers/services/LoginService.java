@@ -1,73 +1,154 @@
 package core.service_handlers.services;
 
-import db.LoggedUsersRepository;
-import db.UserContextRepository;
-import models.Message;
+import core.UserNotifier;
+import db.*;
+import models.Domain;
+import models.Platform;
 import models.User;
-import models.UserContext;
-import models.UserState;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Random;
 
-/** Сервис для работы с контекстом {@link models.UserState#LOGGING LOGGING}*/
-public class LoginService {
+/**
+ * Особенный сервис авторизации. Особенный, потому что работает со своей таблицей, ведь
+ * изначально о ползователе ничего неизвестно.
+ */
+public class LoginService extends Service {
+    private LoggingUsersRepository loggingUsersRepository;
+    private UserRepository userRepository;
+    private LoggedUsersRepository loggedUsersRepository;
 
-    /** @see LoggedUsersRepository*/
-    private final LoggedUsersRepository loggedUsersRepository;
+    private UserNotifier userNotifier;
 
-    /** @see UserContextRepository*/
-    private final UserContextRepository userContextRepository;
-
-    /** Конструктор {@link LoginService LoginService}*/
-    public LoginService(LoggedUsersRepository loggedUsersRepository, UserContextRepository userContextRepository) {
+    public LoginService(
+            UserContextRepository userContextRepository,
+            LoggingUsersRepository loggingUsersRepository,
+            UserRepository userRepository,
+            LoggedUsersRepository loggedUsersRepository
+    ) {
+        super(userContextRepository);
+        this.loggingUsersRepository = loggingUsersRepository;
+        this.userRepository = userRepository;
         this.loggedUsersRepository = loggedUsersRepository;
-        this.userContextRepository = userContextRepository;
+    }
+
+    public void setUserNotifier(UserNotifier userNotifier) {
+        this.userNotifier = userNotifier;
     }
 
     /**
-     * Получает пользователя в платформе в которой он уже зарегистрирован.
-     * Генерирует код и сохраняет в {@link UserContext#stateNum номере состояния} контекста
-     * @param msg
-     * @return сообщение с кодом подтверждения
+     * Создает запись в таблице logging_users.
+     * @param fromPlatform платформа, с которой авторизовывается пользователь
+     * @param userIdOnPlatform id пользователя на этой платформе
      */
-    public String start(Message msg) {
-        try {
-            User user = loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
-                    msg.getPlatform(),
-                    msg.getUserIdOnPlatform()
-            );
-            //TODO нужен генератор чисел
-            String code = "1000";
-            userContextRepository.updateUserContext(
-                    user.getId(),
-                    new UserContext(UserState.LOGGING,Integer.parseInt(code))
-            );
-            return "Ваш код подтверждения: "+ code;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public String startSession(Platform fromPlatform, String userIdOnPlatform) throws DBException {
+        Domain domain = new Domain()
+                .fromPlatform(fromPlatform)
+                .idOnPlatform(userIdOnPlatform);
+        loggingUsersRepository.saveDomain(domain);
+        return "Введите ваш логин пользователя";
     }
 
     /**
-     * Проверяет правильно ли пользователь ввел код подтверждения
-     * @param msg
-     * @return
+     * Продолжает сессию с авторизующимся пользователем
+     * @return следующее сообщение.
+     * //todo раскидать свичи по приватным методам.
      */
-    public String continueSession(Message msg) {
-        long id = msg.getUser().getId();
-        String text = msg.getText();
-        try {
-            UserContext userContext = userContextRepository.getUserContext(id);
-            if (text.equals(Integer.toString(userContext.getStateNum()))){
-                loggedUsersRepository.linkUserIdAndUserPlatform(id,msg.getPlatform(),msg.getUserIdOnPlatform());
-                userContextRepository.updateUserContext(id,new UserContext());
-                return "Поздравляю, ты вошел";
+    public String continueSession(Platform fromPlatform,
+                                  String userIdOnPlatform,
+                                  String message,
+                                  Domain domain)
+            throws DBException, SQLException {
+        switch (domain.getLoginContext()) {
+            case 0: {
+                User user = userRepository.getByLogin(message);
+                if(user == null) {
+                    return "Такого логина не существует. Попробуйте еще раз.";
+                }
+
+                domain.setRequiredLogin(message);
+                domain.setLoginContext(1);
+                loggingUsersRepository.updateDomain(domain);
+
+                List<Platform> userPlatforms;
+                userPlatforms = loggedUsersRepository.getPlatformsByUserId(user.getId());
+
+                StringBuilder response = new StringBuilder(
+                        "Введите платформу, куда будет отправлен код подтверждения."
+                );
+                for(Platform platform : userPlatforms) response.append("\n/%s".formatted(platform));
+                return response.toString();
             }
-            return "Неверный код. Попробуй еще раз";
+            case 1: {
+                Platform verificationPlatform;
+                try {
+                    verificationPlatform = Platform.fromString(message.substring(1));
+                } catch (IllegalArgumentException e) {
+                    return "Платформа указана некорректно. Попробуйте еще раз.";
+                }
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+                int verificationCode = generateVerificationCode();
+
+                domain.setVerificationPlatform(verificationPlatform);
+                domain.setLoginContext(2);
+                domain.setVerificationCode(verificationCode);
+                loggingUsersRepository.updateDomain(domain);
+
+                User user = userRepository.getByLogin(domain.getRequiredLogin());
+                userNotifier.sendTextMessageOnPlatformIfPossible(
+                        verificationPlatform,
+                        user.getId(),
+                        "код подтверждения: %d".formatted(verificationCode)
+                );
+
+                return "Мы отправили 4-хзначный код на указанную платформу. Введите его, чтобы войти";
+            }
+            case 2: {
+                if(message.length() != 4) {
+                    return "Неверно. Код предсталяет из себя 4-хразрядное число в десятичной системе счисления";
+                }
+                int actualCode = 0;
+                try {
+                    actualCode = Integer.parseInt(message);
+                } catch (NumberFormatException e) {
+                    // todo добавить попытки. Либо сделать только одну...
+                    return "Формат неверен. Попробуйте еще раз.";
+                }
+                if(actualCode != domain.getVerificationCode()) {
+                    return "Код неверен. Попробуйте еще раз.";
+                }
+
+                User user = userRepository.getByLogin(domain.getRequiredLogin());
+                loggedUsersRepository.linkUserIdAndUserPlatform(
+                        user.getId(),
+                        domain.getFromPlatform(),
+                        domain.getIdOnPlatform()
+                );
+
+                loggingUsersRepository.deleteDomainByFromPlatformAndIdOnPlatform(
+                        domain.getFromPlatform(),
+                        domain.getIdOnPlatform()
+                );
+
+                return "Вы успешно авторизовались.";
+            }
         }
+        return "Неопределенное поведение";
+    }
+    private int generateVerificationCode() {
+        Random random = new Random();
+        return random.nextInt(9000) + 1000;
     }
 
+
+    @Override
+    public String endSession(long userId) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public String getHelpMessage() {
+        return null;
+    }
 }

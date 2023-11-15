@@ -1,6 +1,7 @@
 package core.service_handlers.services;
 
-import core.MessageSender;
+import core.UserNotifier;
+import db.DBException;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -13,9 +14,8 @@ import java.text.ParseException;
 
 /** Сервис для работы с контекстом {@link models.UserState#ORDER_CLOSING_COURIER ORDER_CLOSING_COURIER}**/
 public class CloseOrderCourierService {
-
-    /** @see MessageSender*/
-    private MessageSender messageSender;
+    /** @see UserNotifier */
+    private UserNotifier userNotifier;
 
     /** @see OrderRepository */
     private final OrderRepository orderRepository;
@@ -50,8 +50,14 @@ public class CloseOrderCourierService {
                 long idOrder = Long.parseLong(text);
                 Order order = orderRepository.getById(idOrder);
                 UserContext userContextClient = userContextRepository.getUserContext(order.getCreatorId());
-                if(userContextClient.getState() != UserState.NO_STATE){
-                    messageSender.sendTextMessage(
+                if(userContextClient.getState() == UserState.NO_STATE) {
+                    userContextRepository.updateUserContext(
+                            order.getCreatorId(),
+                            new UserContext(UserState.ORDER_CLOSING_CLIENT)
+                    );
+                }
+                else{
+                    userNotifier.sendTextMessage(
                             order.getCreatorId(),
                             "Курьер хочет завершить заказ, заверши выполнение команды."
                     );
@@ -66,14 +72,14 @@ public class CloseOrderCourierService {
                 orderRepository.update(order);
                 userContextRepository.updateUserContext(userId,new UserContext());
 
-                messageSender.sendTextMessage(
+                userNotifier.sendTextMessage(
                         order.getCreatorId(),
                         "Подтвердите что ваш заказ завершен, написав \n/yes /no."
                 );
                 return "Завершение заказа отправлено на подтверждение заказчику";
             } else
                 return "Выход за пределы контекста";
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException | DBException e) {
             return "что-то пошло не так";
         }
     }
@@ -111,7 +117,7 @@ public class CloseOrderCourierService {
         }
     }
 
-    public void setMessageSender(MessageSender messageSender) {
-        this.messageSender = messageSender;
+    public void setUserNotifier(UserNotifier userNotifier) {
+        this.userNotifier = userNotifier;
     }
 }

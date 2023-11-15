@@ -1,6 +1,7 @@
 package core.service_handlers.services;
 
 import config.services.EditUserServiceConfig;
+import db.DBException;
 import db.UserContextRepository;
 import db.UserRepository;
 import models.User;
@@ -32,15 +33,16 @@ public class EditUserService extends Service {
         try {
             user = ur.getById(userId);
             setEditUserContext(userId);
-        } catch (SQLException e) {
+        } catch (DBException | SQLException e) {
             return "Ошибка при обращении к базе данных." + e.getMessage();
         }
         assert user != null;
         return """
                 Ваш профиль:
+                Логин: %s
                 Имя: %s
                 Описание: %s
-                """.formatted(user.getName(), user.getDescription());
+                """.formatted(user.getLogin(), user.getName(), user.getDescription());
     }
 
     /**
@@ -70,7 +72,7 @@ public class EditUserService extends Service {
      * @param user     пользователь.
      * @return переданный пользователь с новым именем.
      */
-    public User updateUsername(String username, User user) throws SQLException {
+    public User updateUsername(String username, User user) throws DBException {
         assert username != null;
         assert user != null;
         assert user.getId() >= 0;
@@ -85,12 +87,30 @@ public class EditUserService extends Service {
      * @param description новое описание пользвоателя.
      * @param user        пользователь.
      * @return переданный пользователь с новым описанием.
-     * @throws SQLException
      */
-    public User updateDescription(String description, User user) throws SQLException {
+    public User updateDescription(String description, User user) throws DBException {
         user.setDescription(description);
         ur.updateUser(user);
         return user;
+    }
+
+    /**
+     * Обновляет в базе данных описание пользователя на указанное.
+     *
+     * @param login новый логин пользвоателя.
+     * @param user        пользователь.
+     * @return переданный пользователь с новым логином, если тот не занят. Иначе старый пользователь.
+     */
+    public boolean updateLogin(String login, User user) throws DBException {
+        if(user.getLogin().equals(login)) {
+            return  true;
+        }
+        if(!ur.isValidLogin(login)) {
+            return false;
+        }
+        user.setLogin(login);
+        ur.updateUser(user);
+        return true;
     }
 
     /**
@@ -116,6 +136,16 @@ public class EditUserService extends Service {
     }
 
     /**
+     * Устанавливает номер состояния пользователя в 3, что значит, что следующее сообщение
+     * пользователя будет содержать новый логин.
+     */
+    public UserContext setEditLoginContext(long userId) throws SQLException {
+        UserContext userContext = new UserContext(UserState.EDIT_USER, 3);
+        userContextRepository.updateUserContext(userId, userContext);
+        return userContext;
+    }
+
+    /**
      * Устанавливает номер состояния пользователя в 0 - дефолтное состояние в контексте
      * {@link UserState EDIT_USER}
      */
@@ -130,7 +160,7 @@ public class EditUserService extends Service {
      *
      * @param userId id пользователя.
      */
-    private void setEditUserContext(long userId) throws SQLException {
+    private void setEditUserContext(long userId) throws SQLException, DBException {
         UserContext userContext = new UserContext(UserState.EDIT_USER);
         super.userContextRepository.saveUserContext(userId, userContext);
     }

@@ -1,6 +1,7 @@
 package core.service_handlers.services;
 
-import core.MessageSender;
+import core.UserNotifier;
+import db.DBException;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -13,9 +14,8 @@ import java.text.ParseException;
 /** Сервис для работы с контекстом {@link models.UserState#ORDER_CLOSING_CLIENT ORDER_CLOSING_CLIENT}**/
 public class CloseOrderClientService {
 
-    /** @see MessageSender*/
-    private MessageSender messageSender;
-
+    /** @see UserNotifier */
+    private UserNotifier userNotifier;
     /** @see OrderRepository */
     private final OrderRepository orderRepository;
 
@@ -46,22 +46,22 @@ public class CloseOrderClientService {
             if (text.equals("/yes")) {
                 orderRepository.updateOrderStatus(order.getId(), OrderStatus.CLOSED);
                 userContextRepository.updateUserContext(userId,new UserContext());
-                messageSender.sendTextMessage(order.getCourierId(),"Заказ успешно закрыт");
+                userNotifier.sendTextMessage(order.getCourierId(),"Заказ успешно закрыт");
                 return "Заказ успешно закрыт";
             } else if (text.equals("/no")) {
                 orderRepository.updateOrderStatus(order.getId(), OrderStatus.NOT_CLOSED);
                 userContextRepository.updateUserContext(userId,new UserContext());
-                messageSender.sendTextMessage(order.getCourierId(),"Заказ не закрыт. Свяжитесь с заказчиком");
+                userNotifier.sendTextMessage(order.getCourierId(),"Заказ не закрыт. Свяжитесь с заказчиком");
                 return "Заказ не закрыт. Свяжитесь с курьером";
             } else {
                 return "Прости, но я не знаю, что на это ответить. Вызови команду /help";
             }
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException | DBException e) {
             return "что-то пошло не так";
         }
     }
 
-    public void setMessageSender(MessageSender messageSender) {
-        this.messageSender = messageSender;
+    public void setUserNotifier(UserNotifier userNotifier) {
+        this.userNotifier = userNotifier;
     }
 }

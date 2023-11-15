@@ -1,15 +1,15 @@
 package core;
 
+import config.BotMessages;
 import config.services.EditUserServiceConfig;
-import db.LoggedUsersRepository;
-import db.OrderRepository;
-import db.UserContextRepository;
-import db.UserRepository;
+import core.service_handlers.services.LoginService;
+import db.*;
 import models.*;
 
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 /** Главный сервис. Работает c контекстом {@link UserState#NO_STATE NO_STATE}*/
@@ -27,52 +27,75 @@ public class ServiceManager {
     /** @see OrderRepository*/
     private final OrderRepository orderRepository;
 
+    /** Сервис авторизации. Не работает с контекстом, поэтому здесь */
+    private final LoginService loginService;
+
     /**Конструктор {@link ServiceManager ServiceManager} */
     public ServiceManager(LoggedUsersRepository loggedUsersRepository,
                           OrderRepository orderRepository,
                           UserRepository userRepository,
-                          UserContextRepository userContextRepository) {
+                          UserContextRepository userContextRepository,
+                          LoginService loginService
+    ) {
         this.loggedUsersRepository = loggedUsersRepository;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.userContextRepository = userContextRepository;
+
+        this.loginService = loginService;
     }
 
     /**
      * Проверяет наличие пользователя в системе, если нет то добавляет в таблицы User и LoggedUsers
+     * и таблицу контекста, меняет контекст пользователя на EDIT_USER, чтобы он сразу мог начать
+     * настраивать аккаунт. Если пользователь пишет команду из аккаунта, сообщает об этом.
      *
      * @param msg сообщение от {@link core.MessageHandler}.
      * @return сообщение с приветствием.
      * В случае ошибки возвращает сообщение об ошибке.
      */
-    public String start(Message msg) {
-        try {
-            User user = loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
-                    msg.getPlatform(),
-                    msg.getUserIdOnPlatform()
-            );
-            if (user == null)
-                return "Для пользования ботом тебе нужно зарегистрироваться. Это можно сделать командой /registration.";
-            return "Привет \uD83D\uDC4B Команда /help поможет тебе разобраться, что здесь происходит";
-        } catch (SQLException e) {
-            return "что-то пошло не так" + e.getMessage();
+    public String register(Message msg) {
+
+        if(msg.getUser() != null) {
+            return BotMessages.REGISTER_MESSAGE_WHEN_USER_LOGIN.getMessage();
         }
-    }
-    public String startRegistrationService(Message msg) {
+
         Platform platform = msg.getPlatform();
         String userIdOnPlatform = msg.getUserIdOnPlatform();
         try {
-            User user = new User(0, "User", "Я есть user");
-            if (loggedUsersRepository.getUserByPlatformAndIdOnPlatform(platform, userIdOnPlatform) == null) {
-                User userWithID = userRepository.save(user);
-                loggedUsersRepository.linkUserIdAndUserPlatform(userWithID.getId(), platform, userIdOnPlatform);
-                userContextRepository.saveUserContext(userWithID.getId(), new UserContext(UserState.REGISTRATION));
-            }
-            return "Привет \uD83D\uDC4B Давай начнем регистрацию. Как тебя зовут?";
-        } catch (Exception e) {
+            User user = new User(
+                    0,
+                    "User",
+                    "Я есть user",
+                    "login"+new Date().getTime()
+            );
+            userRepository.save(user);
+            loggedUsersRepository.linkUserIdAndUserPlatform(
+                    user.getId(),
+                    platform,
+                    userIdOnPlatform
+            );
+            userContextRepository.saveUserContext(
+                    user.getId(),
+                    new UserContext(UserState.EDIT_USER)
+            );
+            return BotMessages.REGISTER_MESSAGE.getMessage();
+        } catch (SQLException | DBException e) {
             return "Что-то пошло не так"+ e.getMessage();
         }
     }
+    /**
+     * @param message
+     * @return
+     */
+    public String login(Message message) {
+        try {
+            return loginService.startSession(message.getPlatform(), message.getUserIdOnPlatform());
+        } catch (DBException e) {
+            return "проблемы с базой данных" + e.getMessage();
+        }
+    }
+
     /**
      * Начало создания заказа. <br>
      * Создает заказ и добавляет в таблицу order, обновляет статус у заказа
@@ -88,7 +111,7 @@ public class ServiceManager {
             UserContext userContext = new UserContext(UserState.ORDER_CREATING);
             userContextRepository.updateUserContext(idUser, userContext);
             return "Введите список продуктов";
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException | DBException e) {
             return "что-то пошло не так"+ e.getMessage();
         }
     }
@@ -213,13 +236,13 @@ public class ServiceManager {
     }
 
     /**
-     * @param userId Добавляет пользователя с этим userId в контекст {@link UserState#ORDER_ACCEPTING_COURIER ORDER_ACCEPTING}
+     * @param userId Добавляет пользователя с этим userId в контекст {@link UserState#ORDER_ACCEPT ORDER_ACCEPTING}
      * @return Выводит сообщение с просьбой ввести курьера userId заказа, который он хочется принять 
      */
     public String startAcceptOrder(long userId){
         if (showPendingOrders(userId).equals("Нет ни одного заказа, готового к выполнению"))
             return "Нет ни одного заказа, готового к выполнению";
-        UserContext userContext = new UserContext(UserState.ORDER_ACCEPTING_COURIER);
+        UserContext userContext = new UserContext(UserState.ORDER_ACCEPT);
         try {
             userContextRepository.updateUserContext(userId, userContext);
         } catch (SQLException e) {

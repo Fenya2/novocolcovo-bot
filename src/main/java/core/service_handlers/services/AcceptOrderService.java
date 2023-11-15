@@ -1,6 +1,7 @@
 package core.service_handlers.services;
 
-import core.MessageSender;
+import core.UserNotifier;
+import db.DBException;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -11,11 +12,11 @@ import models.UserState;
 import java.sql.SQLException;
 import java.text.ParseException;
 
-/** Сервис для работы с контекстом {@link models.UserState#ORDER_ACCEPTING_COURIER ORDER_ACCEPTING}*/
-public class AcceptOrderCourierService {
+/** Сервис для работы с контекстом {@link models.UserState#ORDER_ACCEPT ORDER_ACCEPTING}*/
+public class AcceptOrderService {
 
-    /** @see MessageSender*/
-    private MessageSender messageSender;
+    /** @see UserNotifier */
+    private UserNotifier userNotifier;
 
     /** @see OrderRepository */
     private final OrderRepository orderRepository;
@@ -23,8 +24,8 @@ public class AcceptOrderCourierService {
     /** @see UserContextRepository */
     private final UserContextRepository userContextRepository;
 
-    /** Конструктор {@link AcceptOrderCourierService}*/
-    public AcceptOrderCourierService(OrderRepository orderRepository, UserContextRepository userContextRepository) {
+    /** Конструктор {@link AcceptOrderService}*/
+    public AcceptOrderService(OrderRepository orderRepository, UserContextRepository userContextRepository) {
         this.orderRepository = orderRepository;
         this.userContextRepository = userContextRepository;
     }
@@ -47,9 +48,8 @@ public class AcceptOrderCourierService {
 
                 long idOrder = Long.parseLong(text);
                 Order order = orderRepository.getById(idOrder);
-                UserContext userContextClient = userContextRepository.getUserContext(order.getCreatorId());
-                if(userContextClient.getState() != UserState.NO_STATE){
-                    messageSender.sendTextMessage(
+                if(order.getStatus() != OrderStatus.PENDING){
+                    userNotifier.sendTextMessage(
                             order.getCreatorId(),
                             "Курьер хочет принять заказ, заверши выполнение команды."
                     );
@@ -57,21 +57,18 @@ public class AcceptOrderCourierService {
                 }
                 userContextRepository.updateUserContext(
                         order.getCreatorId(),
-                        new UserContext(UserState.ORDER_ACCEPTING_CLIENT)
+                        new UserContext(UserState.ORDER_ACCEPT)
                 );
                 order.setCourierId(userId);
                 order.setStatus(OrderStatus.ACCEPTING);
                 orderRepository.update(order);
                 userContextRepository.updateUserContext(userId, new UserContext());
 
-                messageSender.sendTextMessage(
-                        order.getCreatorId(),
-                        "Подтвердите, что вы готовы отдать курьеру заказ, напив \n/yes /no"
-                );
-                return "Принятие заказа отправлено на подтверждение заказчику";
+                userNotifier.sendTextMessage(order.getCreatorId(), "Ваш заказ %s принят".formatted(order.getDescription()));
+                return "Заказ принят";
             } else
                 return "Выход за пределы контекста";
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException | DBException e) {
             return "что-то пошло не так";
         }
     }
@@ -109,7 +106,7 @@ public class AcceptOrderCourierService {
         }
     }
 
-    public void setMessageSender(MessageSender messageSender) {
-        this.messageSender = messageSender;
+    public void setUserNotifier(UserNotifier userNotifier) {
+        this.userNotifier = userNotifier;
     }
 }

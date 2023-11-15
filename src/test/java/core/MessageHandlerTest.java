@@ -2,6 +2,7 @@ package core;
 
 import bots.Bot;
 import core.service_handlers.handlers.*;
+import db.DBException;
 import db.LoggedUsersRepository;
 import db.UserContextRepository;
 import models.*;
@@ -33,7 +34,7 @@ public class MessageHandlerTest {
     @Mock
     private HandlerCancelOrderService handlerCancelOrderService;
     @Mock
-    private HandlerAcceptOrderCourierService handlerAcceptOrderService;
+    private HandlerAcceptOrderService handlerAcceptOrderService;
     @Mock
     private HandlerCloseOrderCourierService handlerCloseOrderCourierService;
     @Mock
@@ -48,7 +49,7 @@ public class MessageHandlerTest {
      * Проверяет логику метода handle, когда пользователь пишет впервые.
      */
     @Test
-    public void testHandleWhenFirstUserMessageSended() throws SQLException {
+    public void testHandleWhenFirstUserMessageSended() throws SQLException, DBException {
         Message message = new Message();
         message.setBotFrom(Mockito.mock(Bot.class));
         Mockito.when(
@@ -66,7 +67,7 @@ public class MessageHandlerTest {
      * (платформа telegram)
      */
     @Test
-    public void testHandleWhenFirstUserMessageSendedAndItIsStartMessage() throws SQLException {
+    public void testHandleWhenFirstUserMessageSendedAndItIsStartMessage() throws SQLException, DBException {
         Message message = new Message();
         message.setPlatform(Platform.TELEGRAM);
         message.setText("/start");
@@ -85,7 +86,7 @@ public class MessageHandlerTest {
      * Проверяет лоику метода, когда пользователь, отправивший сообщение имеет какой-то контекст.
      */
     @Test
-    public void testHandleWhenUserHaveContext() throws SQLException {
+    public void testHandleWhenUserHaveContext() throws SQLException, DBException {
         Message message = new Message();
         message.setText("some context text. want to create order.");
         message.setUserIdOnPlatform("some id on some platform(telegram).");
@@ -105,7 +106,7 @@ public class MessageHandlerTest {
 
     /** проверяет работу метода, когда пользователь, написавший сообщение не имеет контекста */
     @Test
-    public void testHandleWhenUserHaveNoContext() throws SQLException {
+    public void testHandleWhenUserHaveNoContext() throws SQLException, DBException {
         Message message = new Message();
         message.setText("some context text. want to create order.");
         message.setUserIdOnPlatform("some id on some platform (telegram).");

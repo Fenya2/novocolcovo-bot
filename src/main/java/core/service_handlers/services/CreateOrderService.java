@@ -1,11 +1,13 @@
 package core.service_handlers.services;
 
+import db.DBException;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
 import models.OrderStatus;
 import models.UserContext;
 
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import java.sql.SQLException;
 import java.text.ParseException;
 
@@ -45,7 +47,7 @@ public class CreateOrderService {
                 return "Заказ создан";
             } else
                 return "Выход за пределы контекста";
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException | DBException e) {
             return "что-то пошло не так";
         }
     }

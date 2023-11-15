@@ -1,6 +1,5 @@
 package core.service_handlers.handlers;
 
-import core.MessageSender;
 import core.service_handlers.services.CloseOrderCourierService;
 import models.Message;
 

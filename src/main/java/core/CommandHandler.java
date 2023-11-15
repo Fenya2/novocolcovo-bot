@@ -1,5 +1,6 @@
 package core;
 
+import config.BotMessages;
 import models.Message;
 
 /**
@@ -35,28 +36,34 @@ public class CommandHandler {
         }
         switch (msg.getText()) {
             case "/start" -> {
-                String startMessage = serviceManager.start(msg);
-                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
+                if(msg.getUser() == null) {
+                    msg.getBotFrom().sendTextMessage(
+                            msg.getUserIdOnPlatform(),
+                            BotMessages.START_MESSAGE.getMessage()
+                    );
+                    return 2;
+                }
+                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), BotMessages.HELP_MESSAGE.getMessage());
+                return 2;
+            }
+            case "/register" -> {
+                String response = serviceManager.register(msg);
+                msg.getBotFrom().sendTextMessage(
+                        msg.getUserIdOnPlatform(),
+                        response
+                );
+                return 2;
+            }
+            case "/login" -> {
+                String response = serviceManager.login(msg);
+                msg.getBotFrom().sendTextMessage(
+                        msg.getUserIdOnPlatform(),
+                        response
+                );
                 return 2;
             }
             case "/help" -> {
-                String message = """
-                        /profile - информация о профиле, настройка профиля.
-                        /create_order - создать заказ.
-                        /edit_order - изменить заказ.
-                        /cancel_order - удалить заказ.
-                        /show_order - посмотреть список созданных заказов.
-                        /show_pending_orders - вывести список всех заказов, доступных для принятия.
-                        /accept_order - принять заказ. Прежде чем принимать заказ, посмотрите список заказов(доступных для принятия), вызвав команду /show_pending_orders).
-                        /show_accept_order - вывести список принятых заказов.
-                        /close_order - завершить заказ.
-                        """;
-                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
-                return 2;
-            }
-            case "/registration" -> {
-                String startMessage = serviceManager.startRegistrationService(msg);
-                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
+                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), BotMessages.HELP_MESSAGE.getMessage());
                 return 2;
             }
             case "/profile" -> {

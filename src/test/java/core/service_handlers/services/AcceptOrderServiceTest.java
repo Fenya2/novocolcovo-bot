@@ -1,6 +1,6 @@
 package core.service_handlers.services;
 
-import core.MessageSender;
+import core.UserNotifier;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -19,14 +19,14 @@ import java.sql.SQLException;
 import java.text.ParseException;
 
 
-/**Класс тестирующий {@link AcceptOrderCourierService AcceptOrderService}*/
+/**Класс тестирующий {@link AcceptOrderService AcceptOrderService}*/
 public class AcceptOrderServiceTest {
     @Before
     public void init() {
         MockitoAnnotations.openMocks(this);
     }
     @InjectMocks
-    private AcceptOrderCourierService acceptOrderService;
+    private AcceptOrderService acceptOrderService;
     @Mock
     private UserContextRepository userContextRepository;
     @Mock
@@ -71,8 +71,8 @@ public class AcceptOrderServiceTest {
         Assert.assertEquals("Заказ не найден. Попробуй еще раз",continueSession3);
 
 
-        MessageSender messageSender = Mockito.mock(MessageSender.class);
-        acceptOrderService.setMessageSender(messageSender);
+        UserNotifier userNotifier = Mockito.mock(UserNotifier.class);
+        acceptOrderService.setUserNotifier(userNotifier);
         Mockito.when(userContextRepository.getUserContext(2))
                 .thenReturn(
                         new UserContext(UserState.ORDER_ACCEPTING_COURIER,0)
