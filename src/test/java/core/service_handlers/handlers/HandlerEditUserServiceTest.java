@@ -31,7 +31,7 @@ public class HandlerEditUserServiceTest {
     @Test
     public void testHandleWhenCommandValid() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
+        message.setUser(new User(10, "name", "description", "login"));
         message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("/show_profile");
         Assert.assertEquals(1, handlerEditUserService.handle(message));
@@ -44,7 +44,7 @@ public class HandlerEditUserServiceTest {
     @Test
     public void testHandleWhenMessageTextLinkedToContext() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
+        message.setUser(new User(10, "name", "description", "login"));
         message.setUserContext(new UserContext(UserState.EDIT_USER, 1));
         message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("new_username");
@@ -60,7 +60,7 @@ public class HandlerEditUserServiceTest {
     @Test
     public void testHandleWhenMessageTextHaveNoContext() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
+        message.setUser(new User(10, "name", "description", "login"));
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
         message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("do something stupid.");
@@ -74,7 +74,7 @@ public class HandlerEditUserServiceTest {
     @Test
     public void testHandleWhenMessageIsNotValidCommand() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
+        message.setUser(new User(10, "name", "description", "login"));
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
         message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("/some_not_valid_command");

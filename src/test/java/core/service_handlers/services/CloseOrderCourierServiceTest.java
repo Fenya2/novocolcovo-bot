@@ -1,6 +1,6 @@
 package core.service_handlers.services;
 
-import core.MessageSender;
+import core.UserNotifier;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -13,12 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.matchers.Or;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-
-import static org.junit.Assert.*;
 
 /**Класс тестирующий {@link CloseOrderCourierService CloseOrderCourierService}*/
 public class CloseOrderCourierServiceTest {
@@ -44,8 +41,8 @@ public class CloseOrderCourierServiceTest {
      */
     @Test
     public void continueSession() throws SQLException, ParseException {
-        MessageSender messageSender = Mockito.mock(MessageSender.class);
-        closeOrderCourierService.setMessageSender(messageSender);
+        UserNotifier userNotifier = Mockito.mock(UserNotifier.class);
+        closeOrderCourierService.setUserNotifier(userNotifier);
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(
                         new UserContext(UserState.ORDER_CLOSING_COURIER,1)
@@ -82,7 +79,7 @@ public class CloseOrderCourierServiceTest {
                 );
         String continueSession4 = closeOrderCourierService.continueSession(2,"11");
         Assert.assertEquals(
-                "Заказчик не может сейчас завершить заказ, попробуйте позже"
+                "Извини, но сейчас заказ нельзя принять."
                 ,continueSession4
         );
 

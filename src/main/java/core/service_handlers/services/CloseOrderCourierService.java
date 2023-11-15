@@ -1,6 +1,7 @@
 package core.service_handlers.services;
 
-import core.MessageSender;
+import core.UserNotifier;
+import db.DBException;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -13,8 +14,8 @@ import java.text.ParseException;
 
 /** Сервис для работы с контекстом {@link models.UserState#ORDER_CLOSING_COURIER ORDER_CLOSING_COURIER}**/
 public class CloseOrderCourierService {
-    /** @see MessageSender*/
-    private MessageSender messageSender;
+    /** @see UserNotifier */
+    private UserNotifier userNotifier;
 
     /** @see OrderRepository */
     private final OrderRepository orderRepository;
@@ -27,7 +28,6 @@ public class CloseOrderCourierService {
         this.orderRepository = orderRepository;
         this.userContextRepository = userContextRepository;
     }
-
 
     /**
      * Меняет статус заказа на {@link models.OrderStatus#CLOSING CLOSING}<br>
@@ -42,8 +42,8 @@ public class CloseOrderCourierService {
      */
     public String continueSession(long userId, String text) {
         try {
-            UserContext userContextCourier = userContextRepository.getUserContext(userId);
-            if (userContextCourier.getStateNum() == 0) {
+            UserContext userContext = userContextRepository.getUserContext(userId);
+            if (userContext.getStateNum() == 0) {
                 if(!validation(userId,text))
                     return "Заказ не найден. Попробуй еще раз";
 
@@ -57,23 +57,29 @@ public class CloseOrderCourierService {
                     );
                 }
                 else{
-                    messageSender.sendTextMessage(
+                    userNotifier.sendTextMessage(
                             order.getCreatorId(),
                             "Курьер хочет завершить заказ, заверши выполнение команды."
                     );
-                    return "Заказчик не может сейчас завершить заказ, попробуйте позже";
+                    return "Извини, но сейчас заказ нельзя принять.";
                 }
-                orderRepository.updateOrderStatus(idOrder, OrderStatus.CLOSING);
+                userContextRepository.updateUserContext(
+                        order.getCreatorId(),
+                        new UserContext(UserState.ORDER_CLOSING_CLIENT)
+                );
+
+                order.setStatus(OrderStatus.CLOSING);
+                orderRepository.update(order);
                 userContextRepository.updateUserContext(userId,new UserContext());
 
-                messageSender.sendTextMessage(
+                userNotifier.sendTextMessage(
                         order.getCreatorId(),
-                        "Подтвердите что ваш заказ приняли, написав \n/yes /no."
+                        "Подтвердите что ваш заказ завершен, написав \n/yes /no."
                 );
                 return "Завершение заказа отправлено на подтверждение заказчику";
             } else
                 return "Выход за пределы контекста";
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException | DBException e) {
             return "что-то пошло не так";
         }
     }
@@ -111,7 +117,7 @@ public class CloseOrderCourierService {
         }
     }
 
-    public void setMessageSender(MessageSender messageSender) {
-        this.messageSender = messageSender;
+    public void setUserNotifier(UserNotifier userNotifier) {
+        this.userNotifier = userNotifier;
     }
 }

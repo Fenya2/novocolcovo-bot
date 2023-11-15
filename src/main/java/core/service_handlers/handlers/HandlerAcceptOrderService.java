@@ -3,7 +3,7 @@ package core.service_handlers.handlers;
 import models.Message;
 import core.service_handlers.services.AcceptOrderService;
 
-/** Обработчик контекстов {@link models.UserState#ORDER_ACCEPTING ORDER_ACCEPTING}*/
+/** Обработчик контекстов {@link models.UserState#ORDER_ACCEPT ORDER_ACCEPT}*/
 public class HandlerAcceptOrderService {
 
     /** @see AcceptOrderService */
@@ -14,7 +14,7 @@ public class HandlerAcceptOrderService {
         this.acceptOrderService = acceptOrderService;
     }
 
-    /**Обработчик команд связаных с контекстом {@link models.UserState#ORDER_ACCEPTING ORDER_ACCEPTING}
+    /**Обработчик команд связаных с контекстом {@link models.UserState#ORDER_ACCEPT ORDER_ACCEPT}
      * @return 1, если текст сообщения - корректная команда, которую можно обработать
      * 2, если текст сообщения не команда и будет обрабатываеться сервисом,
      * 3, если текст является некорректной командой или не привязан к какому-либо внутреннему

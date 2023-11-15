@@ -1,6 +1,6 @@
 package core.service_handlers.services;
 
-import core.MessageSender;
+import core.UserNotifier;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -44,14 +44,14 @@ public class AcceptOrderServiceTest {
     public void continueSession() throws SQLException, ParseException {
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(
-                        new UserContext(UserState.ORDER_ACCEPTING,1)
+                        new UserContext(UserState.ORDER_ACCEPTING_COURIER,1)
                 );
         String continueSession0 = acceptOrderService.continueSession(1,"1");
         Assert.assertEquals("Выход за пределы контекста",continueSession0);
 
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(
-                        new UserContext(UserState.ORDER_ACCEPTING,0)
+                        new UserContext(UserState.ORDER_ACCEPTING_COURIER,0)
                 );
         String continueSession1 = acceptOrderService.continueSession(
                 1,"2k3gokgh9kewokec"
@@ -71,22 +71,24 @@ public class AcceptOrderServiceTest {
         Assert.assertEquals("Заказ не найден. Попробуй еще раз",continueSession3);
 
 
-        MessageSender messageSender = Mockito.mock(MessageSender.class);
-        acceptOrderService.setMessageSender(messageSender);
+        UserNotifier userNotifier = Mockito.mock(UserNotifier.class);
+        acceptOrderService.setUserNotifier(userNotifier);
         Mockito.when(userContextRepository.getUserContext(2))
                 .thenReturn(
-                        new UserContext(UserState.ORDER_ACCEPTING,0)
+                        new UserContext(UserState.ORDER_ACCEPTING_COURIER,0)
                 );
         Mockito.when(orderRepository.getById(11))
                 .thenReturn(new Order(1));
 
         String continueSession4 = acceptOrderService.continueSession(2,"11");
-        Assert.assertEquals("В этот момент заказ изменяется.",continueSession4);
+        Assert.assertEquals("Извини, но сейчас заказ нельзя принять.",continueSession4);
 
         Mockito.when(orderRepository.getById(11))
                 .thenReturn(new Order(1,1, OrderStatus.PENDING,"any"));
+        Mockito.when(userContextRepository.getUserContext(1))
+                .thenReturn(new UserContext(UserState.NO_STATE));
 
         String continueSession5 = acceptOrderService.continueSession(2,"11");
-        Assert.assertEquals("Заказ принят",continueSession5);
+        Assert.assertEquals("Принятие заказа отправлено на подтверждение заказчику",continueSession5);
     }
 }

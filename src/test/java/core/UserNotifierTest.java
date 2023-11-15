@@ -3,7 +3,6 @@ package core;
 import bots.Bot;
 import db.LoggedUsersRepository;
 import models.Platform;
-import models.User;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,9 +13,9 @@ import org.mockito.MockitoAnnotations;
 
 import java.sql.SQLException;
 
-public class MessageSenderTest {
+public class UserNotifierTest {
     @InjectMocks
-    private MessageSender messageSender;
+    private UserNotifier userNotifier;
 
     @Mock
     private LoggedUsersRepository loggedUsersRepository;
@@ -38,6 +37,6 @@ public class MessageSenderTest {
         String idOnPlatform = "user id on telegram platform.";
         Mockito.when(loggedUsersRepository.getUserIdOnPlatformByUserIdAndPlatform(userId, platform))
                 .thenReturn(idOnPlatform);
-        Assert.assertTrue(messageSender.sendTextMessage(userId, "some text"));
+        Assert.assertTrue(userNotifier.sendTextMessage(userId, "some text"));
     }
 }

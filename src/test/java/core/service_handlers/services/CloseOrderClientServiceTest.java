@@ -1,6 +1,6 @@
 package core.service_handlers.services;
 
-import core.MessageSender;
+import core.UserNotifier;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -15,8 +15,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-
-import static org.junit.Assert.*;
 
 /**Класс тестирующий {@link CloseOrderClientService CloseOrderClientService}*/
 public class CloseOrderClientServiceTest {
@@ -45,8 +43,8 @@ public class CloseOrderClientServiceTest {
                 1, OrderStatus.CLOSING)
         ).thenReturn( new Order(1));
 
-        MessageSender messageSender = Mockito.mock(MessageSender.class);
-        closeOrderClientService.setMessageSender(messageSender);
+        UserNotifier userNotifier = Mockito.mock(UserNotifier.class);
+        closeOrderClientService.setUserNotifier(userNotifier);
 
         String continueSession1 = closeOrderClientService.continueSession(
                 1,"/yes"
@@ -65,7 +63,7 @@ public class CloseOrderClientServiceTest {
                 1,"any"
         );
         Assert.assertEquals(
-                "Извините я вас не понимаю. Напиши /help",
+                "Прости, но я не знаю, что на это ответить. Вызови команду /help",
                 continueSession3
         );
     }

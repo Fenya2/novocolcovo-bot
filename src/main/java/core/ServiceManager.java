@@ -1,15 +1,15 @@
 package core;
 
+import config.BotMessages;
 import config.services.EditUserServiceConfig;
-import db.LoggedUsersRepository;
-import db.OrderRepository;
-import db.UserContextRepository;
-import db.UserRepository;
+import core.service_handlers.services.LoginService;
+import db.*;
 import models.*;
 
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 /** Главный сервис. Работает c контекстом {@link UserState#NO_STATE NO_STATE}*/
@@ -27,55 +27,70 @@ public class ServiceManager {
     /** @see OrderRepository*/
     private final OrderRepository orderRepository;
 
+    /** Сервис авторизации. Не работает с контекстом, поэтому здесь */
+    private final LoginService loginService;
+
     /**Конструктор {@link ServiceManager ServiceManager} */
     public ServiceManager(LoggedUsersRepository loggedUsersRepository,
                           OrderRepository orderRepository,
                           UserRepository userRepository,
-                          UserContextRepository userContextRepository) {
+                          UserContextRepository userContextRepository,
+                          LoginService loginService
+    ) {
         this.loggedUsersRepository = loggedUsersRepository;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.userContextRepository = userContextRepository;
-    }
 
-    /**
-     * Выводит приветственное сообщение
-     * @param msg сообщение от {@link core.MessageHandler}.
-     * @return сообщение с приветствием.
-     * В случае ошибки возвращает сообщение об ошибке.
-     */
-    public String start(Message msg) {
-        Platform platform = msg.getPlatform();
-        String userIdOnPlatform = msg.getUserIdOnPlatform();
-        try {
-            if (loggedUsersRepository.getUserByPlatformAndIdOnPlatform(platform, userIdOnPlatform) == null)
-                return "Привет пожалуйста, зарегистрируйся с помощью команды /registration";
-        } catch (SQLException e) {
-            return "Что-то пошло не так"+ e.getMessage();
-        }
-        return "Привет, команда /help поможет тебе разобраться что тут происходит";
+        this.loginService = loginService;
     }
 
     /**
      * Проверяет наличие пользователя в системе, если нет то добавляет в таблицы User и LoggedUsers
+     * и таблицу контекста, меняет контекст пользователя на EDIT_USER, чтобы он сразу мог начать
+     * настраивать аккаунт. Если пользователь пишет команду из аккаунта, сообщает об этом.
      *
      * @param msg сообщение от {@link core.MessageHandler}.
      * @return сообщение с приветствием.
      * В случае ошибки возвращает сообщение об ошибке.
      */
-    public String startRegistration(Message msg) {
+    public String register(Message msg) {
+
+        if(msg.getUser() != null) {
+            return BotMessages.REGISTER_MESSAGE_WHEN_USER_LOGIN.getMessage();
+        }
+
         Platform platform = msg.getPlatform();
         String userIdOnPlatform = msg.getUserIdOnPlatform();
         try {
-            User user = new User(0, "User", "Я есть user");
-            if (loggedUsersRepository.getUserByPlatformAndIdOnPlatform(platform, userIdOnPlatform) == null) {
-                User userWithID = userRepository.save(user);
-                loggedUsersRepository.linkUserIdAndUserPlatform(userWithID.getId(), platform, userIdOnPlatform);
-                userContextRepository.saveUserContext(userWithID.getId(), new UserContext(UserState.REGISTRATION));
-            }
-            return "Привет, давай начнем регистрацию. Как тебя зовут?";
-        } catch (Exception e) {
+            User user = new User(
+                    0,
+                    "User",
+                    "Я есть user",
+                    "login"+new Date().getTime()
+            );
+            userRepository.save(user);
+            loggedUsersRepository.linkUserIdAndUserPlatform(
+                    user.getId(),
+                    platform,
+                    userIdOnPlatform
+            );
+            userContextRepository.saveUserContext(
+                    user.getId(),
+                    new UserContext(UserState.EDIT_USER)
+            );
+            return BotMessages.REGISTER_MESSAGE.getMessage();
+        } catch (SQLException | DBException e) {
             return "Что-то пошло не так"+ e.getMessage();
+        }
+    }
+    /**
+     */
+    public String login(Message message) {
+        try {
+            return loginService.startSession(message.getPlatform(), message.getUserIdOnPlatform());
+        } catch (DBException e) {
+            return "проблемы с базой данных" + e.getMessage();
         }
     }
 
@@ -94,7 +109,7 @@ public class ServiceManager {
             UserContext userContext = new UserContext(UserState.ORDER_CREATING);
             userContextRepository.updateUserContext(idUser, userContext);
             return "Введите список продуктов";
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException | DBException e) {
             return "что-то пошло не так"+ e.getMessage();
         }
     }
@@ -150,7 +165,8 @@ public class ServiceManager {
     public String showOrder(long idUser) {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
-            StringBuilder allOrderUser = new StringBuilder();
+            StringBuilder allOrderUser;
+            allOrderUser = new StringBuilder();
             for (Order s : listAllOrder) {
                 if (
                         s.getCreatorId() == idUser
@@ -190,15 +206,18 @@ public class ServiceManager {
 
      /**
       * Выбирает из списка всех заказов заказы с состоянием {@link OrderStatus#PENDING PENDING}
-      * и такие что курьер c userId не был равен {@link Order#getCreatorId()}  заказчику} и выводит их
+      * и такие что курьер c userId не был равен {@link Order#getCreatorId()}  заказчику и выводит их
       * @param userId пользователя, который хочет посмотреть список заказов
      */
     public String showPendingOrders(long userId) {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();
+            UserContext client;
             for (Order s: listAllOrder){
-                if(userId != s.getCreatorId() && s.getStatus().equals(OrderStatus.PENDING)){
+                client = userContextRepository.getUserContext(s.getId());
+                if(userId != s.getCreatorId() && s.getStatus().equals(OrderStatus.PENDING)
+                        && client.getState() == UserState.NO_STATE){
                     allOrderUser.append(
                             Long.toString(s.getId()).concat(": ")
                                     .concat(s.getDescription()).concat("\n")
@@ -206,7 +225,7 @@ public class ServiceManager {
                 }
             }
             if (allOrderUser.isEmpty())
-                return "У вас нет ни одного заказа";
+                return "Нет ни одного заказа, готового к выполнению";
             return allOrderUser.toString();
 
         } catch (SQLException | ParseException e) {
@@ -215,13 +234,13 @@ public class ServiceManager {
     }
 
     /**
-     * @param userId Добавляет пользователя с этим userId в контекст {@link UserState#ORDER_ACCEPTING ORDER_ACCEPTING}
+     * @param userId Добавляет пользователя с этим userId в контекст {@link UserState#ORDER_ACCEPT ORDER_ACCEPTING}
      * @return Выводит сообщение с просьбой ввести курьера userId заказа, который он хочется принять 
      */
     public String startAcceptOrder(long userId){
-        if (showPendingOrders(userId).equals("У вас нет ни одного заказа"))
-            return "У вас нет ни одного заказа";
-        UserContext userContext = new UserContext(UserState.ORDER_ACCEPTING);
+        if (showPendingOrders(userId).equals("Нет ни одного заказа, готового к выполнению"))
+            return "Нет ни одного заказа, готового к выполнению";
+        UserContext userContext = new UserContext(UserState.ORDER_ACCEPT);
         try {
             userContextRepository.updateUserContext(userId, userContext);
         } catch (SQLException e) {
@@ -233,15 +252,18 @@ public class ServiceManager {
 
     /**
      * Выбирает из списка всех заказов заказы с состоянием {@link OrderStatus#RUNNING RUNNING} 
-     * и такие что userId курьера = {@link Order#getCourierId()}  courierId} и выводит их
+     * и такие что userId курьера = {@link Order#getCourierId()}  courierId и выводит их
      * @param userId курьер, который хочет посмотреть свои заказы
      */
     public String showAcceptOrder(long userId) {
         try {
             ArrayList<Order> listAllOrder = orderRepository.getAll();
             StringBuilder allOrderUser = new StringBuilder();
+            UserContext client;
             for (Order s: listAllOrder){
-                if(userId == s.getCourierId() && s.getStatus().equals(OrderStatus.RUNNING)){
+                client = userContextRepository.getUserContext(s.getId());
+                if(userId == s.getCourierId() && s.getStatus().equals(OrderStatus.RUNNING)
+                        && client.getState() == UserState.NO_STATE){
                     allOrderUser.append(
                             Long.toString(s.getId()).concat(": ")
                                     .concat(s.getDescription()).concat("\n")
@@ -249,7 +271,7 @@ public class ServiceManager {
                 }
             }
             if (allOrderUser.isEmpty())
-                return "У вас нет ни одного заказа";
+                return "Нет ни одного заказа, готового к выполнению";
             return allOrderUser.toString();
 
         } catch (SQLException | ParseException e) {
@@ -262,8 +284,8 @@ public class ServiceManager {
      * @return Выводит сообщение с просьбой ввести курьера userId заказа, который он хочется удалить
      */
     public String startCloseOrder(long userId) {
-        if (showAcceptOrder(userId).equals("У вас нет ни одного заказа"))
-            return "У вас нет ни одного заказа";
+        if (showAcceptOrder(userId).equals("Нет ни одного заказа, готового к выполнению"))
+            return "Нет ни одного заказа, готового к выполнению";
         UserContext userContext = new UserContext(UserState.ORDER_CLOSING_COURIER);
         try {
             userContextRepository.updateUserContext(userId, userContext);

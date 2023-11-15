@@ -1,5 +1,6 @@
 package core.service_handlers.services;
 
+import db.DBException;
 import db.UserContextRepository;
 import db.UserRepository;
 import models.User;
@@ -31,7 +32,7 @@ public class EditUserServiceTest {
 
     /** Считаем, что сохранение в базу данных работает идеально. */
     @BeforeEach
-    public void beforeEach() throws SQLException {
+    public void beforeEach() throws SQLException, DBException {
         MockitoAnnotations.openMocks(this);
         Mockito.when(userRepository.updateUser(Mockito.any()))
                 .thenReturn(1);
@@ -41,8 +42,8 @@ public class EditUserServiceTest {
 
     /** Принимает новое имя и пользователя, возвращает пользователя с новым именем. */
     @Test
-    public void testUpdateUsername() throws SQLException {
-        User user = new User(1, "name", "description");
+    public void testUpdateUsername() throws SQLException, DBException {
+        User user = new User(1, "name", "description", "login");
         editUserService.updateUsername("new_name", user);
         Assert.assertEquals("new_name" , user.getName());
     }
@@ -52,8 +53,8 @@ public class EditUserServiceTest {
      * возвращает пользователя с новым описанием.
      */
     @Test
-    public void testUpdateDescription() throws SQLException {
-        User user = new User(1, "name", "description");
+    public void testUpdateDescription() throws SQLException, DBException {
+        User user = new User(1, "name", "description", "login");
         editUserService.updateDescription("new_description", user);
         Assert.assertEquals("new_description", user.getDescription());
     }
@@ -94,11 +95,12 @@ public class EditUserServiceTest {
 
     /** Возвращает приветственное сообщение. */
     @Test
-    public void testGenerateProfileMessage() throws SQLException {
+    public void testGenerateProfileMessage() throws SQLException, DBException {
         Mockito.when(userRepository.getById(10))
-                .thenReturn(new User(10, "name of 10 user", "10 description"));
+                .thenReturn(new User(10, "name of 10 user", "10 description", "10 login"));
         Assert.assertEquals("""
                 Ваш профиль:
+                Логин: 10 login
                 Имя: name of 10 user
                 Описание: 10 description
                 """, editUserService.generateProfileMessage(10));
