@@ -79,10 +79,9 @@ public class VkBot extends LongPollBot implements Bot {
     }
 
     /**
-     * Возвращает доменное имя пользователя на платформе, по которому его легко найти.
-     * null, если произошла ошибка.
+     * Возвращает доменное имя пользователя на платформе, по которому его легко найти. Если
+     * какая-то ошибка - null (cm лог.)
      */
-    @Override
     public String getDomainByUserIdOnPlatform(String userIdOnPlatform) {
         URL url;
         JSONObject jo;

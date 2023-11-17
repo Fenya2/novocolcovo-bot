@@ -23,11 +23,11 @@ public class VkBotConfig {
     private final Map<String, String> apiMethods;
 
     /**
-     * @param envVarName переменная окружения, хранящая токен.
+     * @param token токен бота.
      * @param configFilePath путь к файлу конфигурации
      */
-    public VkBotConfig(String envVarName, String configFilePath) {
-        this.token = envVarName;
+    public VkBotConfig(String token, String configFilePath) {
+        this.token = token;
         String str;
         try {
             str = FileUtils.readFileToString(new File(configFilePath), StandardCharsets.UTF_8);

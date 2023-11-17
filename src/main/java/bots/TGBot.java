@@ -2,7 +2,9 @@ package bots;
 
 import core.MessageHandler;
 import models.Message;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
@@ -11,12 +13,19 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import config.TGBotConfig;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+
 /** Класс для связи с telegram через бот. */
 public class TGBot extends TelegramLongPollingBot implements Bot {
 
     private static final Logger log = Logger.getLogger(TGBot.class.getName());
     /** Конфигурация для работы с ботом. */
-    TGBotConfig botConfig;
+    TGBotConfig config;
     /** Обработчик сообщений */
     MessageHandler messageHandler;
 
@@ -26,14 +35,14 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
      */
     public TGBot(TGBotConfig botConfig, MessageHandler messageHandler) {
         super(botConfig.getToken());
-        this.botConfig = botConfig;
+        this.config = botConfig;
         this.messageHandler = messageHandler;
     }
 
     /** Возвращает имя бота, указанное в конфигурационном файле бота. */
     @Override
     public String getBotUsername() {
-        return botConfig.getName();
+        return config.getName();
     }
 
     /** Метод, вызывающийся, когда пользователь как-то взаимодействует с ботом. */
@@ -77,9 +86,31 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
         }
     }
 
-    @Override
+    /**
+     * По id пользователя на платформе возвращает его домен (тег)
+     * @param userIdOnPlatform
+     * @return
+     */
     public String getDomainByUserIdOnPlatform(String userIdOnPlatform) {
-        return null;
+        URL url;
+        JSONObject jo;
+        try {
+            url = new URL(
+                    config.getApiMethods().get("getDomainByUserIdOnPlatform")
+                            .formatted(config.getToken(), userIdOnPlatform, userIdOnPlatform)
+            );
+            URLConnection con = url.openConnection();
+            HttpsURLConnection https = (HttpsURLConnection) con;
+            https.setRequestMethod("POST");
+            jo = new JSONObject(IOUtils.toString(url, StandardCharsets.UTF_8));
+            return jo.getJSONObject("result").getJSONObject("user").getString("username");
+        } catch (MalformedURLException e) {
+            log.error("Неправильный url\n%s".formatted(e.getMessage()));
+            return null;
+        } catch (IOException e) {
+            log.error("Ошибка ввода-вывода\n%s".formatted(e.getMessage()));
+            return null;
+        }
     }
 
     public void sendSticker(String recipientId, String stickerToken) throws TelegramApiException {

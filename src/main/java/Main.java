@@ -84,7 +84,7 @@ public class Main {
         );
 
         // Боты
-        TGBotConfig tgBotConfig = new TGBotConfig(System.getenv("TG_BOT_TOKEN"));
+        TGBotConfig tgBotConfig = new TGBotConfig(System.getenv("TG_BOT_TOKEN"), "src/main/resources/config/tgbotconfig.json");
         Bot tgBot = new TGBot(tgBotConfig, messageHandler);
         TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
         botsApi.registerBot((LongPollingBot) tgBot);
@@ -98,6 +98,11 @@ public class Main {
         closeOrderCourierService.setUserNotifier(userNotifier);
         acceptOrderService.setUserNotifier(userNotifier);
         closeOrderClientService.setUserNotifier(userNotifier);
+
+
+
+        System.out.println(((VkBot) vkBot).getDomainByUserIdOnPlatform("417956163"));
+        System.out.println(((TGBot) tgBot).getDomainByUserIdOnPlatform("517043435"));
 
         ((VkBot) vkBot).startPolling();
         db.disconnect();
