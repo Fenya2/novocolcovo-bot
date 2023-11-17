@@ -93,7 +93,7 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
      */
     public String getDomainByUserIdOnPlatform(String userIdOnPlatform) {
         URL url;
-        JSONObject jo;
+        JSONObject jo = null;
         try {
             url = new URL(
                     config.getApiMethods().get("getDomainByUserIdOnPlatform")
@@ -106,11 +106,14 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
             return jo.getJSONObject("result").getJSONObject("user").getString("username");
         } catch (MalformedURLException e) {
             log.error("Неправильный url\n%s".formatted(e.getMessage()));
-            return null;
         } catch (IOException e) {
             log.error("Ошибка ввода-вывода\n%s".formatted(e.getMessage()));
-            return null;
+        } catch (Exception e) {
+            log.error("Непредвиденная ошибка. Возможно у пользователя скрыт username\n%s"
+                    .formatted(
+                    e.getMessage()));
         }
+        return null;
     }
 
     public void sendSticker(String recipientId, String stickerToken) throws TelegramApiException {

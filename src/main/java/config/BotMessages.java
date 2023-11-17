@@ -28,7 +28,9 @@ public enum BotMessages {
             """
     ),
 
-    REGISTER_MESSAGE_WHEN_USER_LOGIN("Вы уже зарегистрированы.");
+    REGISTER_MESSAGE_WHEN_USER_LOGIN("Вы уже зарегистрированы."),
+
+    LOGIN_MESSAGE_WHEN_USER_LOGIN("Вы уже вошли в систему.");
 
 
     private String message;

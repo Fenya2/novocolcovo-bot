@@ -83,7 +83,7 @@ public class LoginService extends Service {
             case 1: {
                 Platform verificationPlatform;
                 try {
-                    verificationPlatform = Platform.fromString(message.substring(1));
+                    verificationPlatform = Platform.valueOf(message.substring(1));
                 } catch (IllegalArgumentException e) {
                     return "Платформа указана некорректно. Попробуйте еще раз.";
                 }
@@ -106,7 +106,7 @@ public class LoginService extends Service {
             }
             case 2: {
                 if(message.length() != 4) {
-                    return "Неверно. Код предсталяет из себя 4-хразрядное число в десятичной системе счисления";
+                    return "Неверный код. Попробуйте еще раз";
                 }
                 int actualCode = 0;
                 try {
@@ -136,11 +136,18 @@ public class LoginService extends Service {
         }
         return "Неопределенное поведение";
     }
+
+    /**
+     * Отменяет процесс авторизации пользователя.
+     */
+    public void cancelSession(Platform fromPlatform, String userIdOnPlatform) throws DBException {
+        loggingUsersRepository.deleteDomainByFromPlatformAndIdOnPlatform(fromPlatform, userIdOnPlatform);
+    }
+
     private int generateVerificationCode() {
         Random random = new Random();
         return random.nextInt(9000) + 1000;
     }
-
 
     @Override
     public String endSession(long userId) throws SQLException {

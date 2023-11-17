@@ -13,6 +13,7 @@ import core.service_handlers.handlers.*;
 import core.service_handlers.services.*;
 import db.*;
 
+import models.Platform;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -31,8 +32,8 @@ public class Main {
         // БД
         DB db = new SQLiteDB(new SQLDBconfig("src/main/resources/config/dbconfig.json"));
         db.connect();
-//        db.clearScheme();
-        //db.initScheme();
+        db.clearScheme();
+        db.initScheme();
 
         // Репозитории
         LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);
@@ -93,16 +94,11 @@ public class Main {
         Bot vkBot = new VkBot(vkBotConfig, messageHandler);
 
         // Доинициализация сервисов для возможности уведомлять пользователей через ботов.
-        UserNotifier userNotifier = new UserNotifier(lg, tgBot, vkBot);
+        UserNotifier userNotifier = new UserNotifier(lg,(TGBot) tgBot,(VkBot) vkBot);
         loginService.setUserNotifier(userNotifier);
         closeOrderCourierService.setUserNotifier(userNotifier);
         acceptOrderService.setUserNotifier(userNotifier);
         closeOrderClientService.setUserNotifier(userNotifier);
-
-
-
-        System.out.println(((VkBot) vkBot).getDomainByUserIdOnPlatform("417956163"));
-        System.out.println(((TGBot) tgBot).getDomainByUserIdOnPlatform("517043435"));
 
         ((VkBot) vkBot).startPolling();
         db.disconnect();
