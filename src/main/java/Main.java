@@ -13,12 +13,15 @@ import core.service_handlers.handlers.*;
 import core.service_handlers.services.*;
 import db.*;
 
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 
+import java.net.http.HttpClient;
 import java.sql.SQLException;
 
 /** Main class */
@@ -28,8 +31,8 @@ public class Main {
         // БД
         DB db = new SQLiteDB(new SQLDBconfig("src/main/resources/config/dbconfig.json"));
         db.connect();
-        db.clearScheme();
-        db.initScheme();
+//        db.clearScheme();
+        //db.initScheme();
 
         // Репозитории
         LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);
@@ -86,7 +89,7 @@ public class Main {
         TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
         botsApi.registerBot((LongPollingBot) tgBot);
 
-        VkBotConfig vkBotConfig = new VkBotConfig(System.getenv("VK_BOT_TOKEN"));
+        VkBotConfig vkBotConfig = new VkBotConfig(System.getenv("VK_BOT_TOKEN"), "src/main/resources/config/vkbotconfig.json");
         Bot vkBot = new VkBot(vkBotConfig, messageHandler);
 
         // Доинициализация сервисов для возможности уведомлять пользователей через ботов.

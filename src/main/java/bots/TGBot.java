@@ -13,6 +13,7 @@ import config.TGBotConfig;
 
 /** Класс для связи с telegram через бот. */
 public class TGBot extends TelegramLongPollingBot implements Bot {
+
     private static final Logger log = Logger.getLogger(TGBot.class.getName());
     /** Конфигурация для работы с ботом. */
     TGBotConfig botConfig;
@@ -74,6 +75,11 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
             log.warn("can't send message with text %s to telegram user with id \"%s\""
                     .formatted(text, userIdOnPlatform));
         }
+    }
+
+    @Override
+    public String getDomainByUserIdOnPlatform(String userIdOnPlatform) {
+        return null;
     }
 
     public void sendSticker(String recipientId, String stickerToken) throws TelegramApiException {
