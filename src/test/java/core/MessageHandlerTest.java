@@ -4,6 +4,7 @@ import bots.Bot;
 import core.service_handlers.handlers.*;
 import db.DBException;
 import db.LoggedUsersRepository;
+import db.LoggingUsersRepository;
 import db.UserContextRepository;
 import models.*;
 import org.junit.Assert;
@@ -23,6 +24,8 @@ public class MessageHandlerTest {
     private UserContextRepository userContextRepository;
     @Mock
     private LoggedUsersRepository loggedUsersRepository;
+    @Mock
+    private LoggingUsersRepository loggingUsersRepository;
     @Mock
     private CommandHandler commandHandler;
     @Mock
@@ -67,7 +70,7 @@ public class MessageHandlerTest {
      * (платформа telegram)
      */
     @Test
-    public void testHandleWhenFirstUserMessageSendedAndItIsStartMessage() throws SQLException, DBException {
+    public void testHandleWhenFirstUserMessageSentAndItIsStartMessage() throws SQLException, DBException {
         Message message = new Message();
         message.setPlatform(Platform.TELEGRAM);
         message.setText("/start");

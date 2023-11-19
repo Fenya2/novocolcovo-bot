@@ -29,8 +29,7 @@ public class CommandHandler {
      */
     public int handle(Message msg) {
         if (msg.getText().charAt(0) != '/') {
-            String message =
-                    "Прости, но я не знаю, что на это ответить. Вызови команду /help";
+            String message = "Прости, но я не знаю, что на это ответить. Вызови команду /help";
             msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
             return 1;
         }

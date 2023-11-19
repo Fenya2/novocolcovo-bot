@@ -85,10 +85,12 @@ public class ServiceManager {
         }
     }
     /**
-     * @param message
-     * @return
      */
     public String login(Message message) {
+        if(message.getUser() != null) {
+            return BotMessages.LOGIN_MESSAGE_WHEN_USER_LOGIN.getMessage();
+        }
+
         try {
             return loginService.startSession(message.getPlatform(), message.getUserIdOnPlatform());
         } catch (DBException e) {
@@ -264,8 +266,7 @@ public class ServiceManager {
             UserContext client;
             for (Order s: listAllOrder){
                 client = userContextRepository.getUserContext(s.getId());
-                if(userId == s.getCourierId() && s.getStatus().equals(OrderStatus.RUNNING)
-                        && client.getState() == UserState.NO_STATE){
+                if(userId == s.getCourierId() && s.getStatus().equals(OrderStatus.RUNNING)){
                     allOrderUser.append(
                             Long.toString(s.getId()).concat(": ")
                                     .concat(s.getDescription()).concat("\n")

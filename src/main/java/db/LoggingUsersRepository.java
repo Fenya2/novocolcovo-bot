@@ -154,9 +154,9 @@ public class LoggingUsersRepository extends Repository {
             Domain domain = new Domain()
                     .loginContext(resultSet.getInt("login_context"))
                     .requiredLogin(resultSet.getString("required_login"))
-                    .fromPlatform(Platform.fromString(resultSet.getString("from_platform")))
+                    .fromPlatform(Platform.valueOf(resultSet.getString("from_platform")))
                     .idOnPlatform(resultSet.getString("id_on_platform"))
-                    .verificationPlatform(Platform.fromString(resultSet.getString("verification_platform")))
+                    .verificationPlatform(Platform.valueOf(resultSet.getString("verification_platform")))
                     .verificationCode(resultSet.getInt("verification_code"));
             return domain;
         } catch (SQLException e) {

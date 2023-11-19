@@ -1,12 +1,8 @@
 package core.service_handlers.services;
 
 import core.UserNotifier;
-import db.OrderRepository;
-import db.UserContextRepository;
-import models.Order;
-import models.OrderStatus;
-import models.UserContext;
-import models.UserState;
+import db.*;
+import models.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,27 +27,22 @@ public class AcceptOrderServiceTest {
     private UserContextRepository userContextRepository;
     @Mock
     private OrderRepository orderRepository;
-
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private LoggedUsersRepository loggedUsersRepository;
     /**
      * Тестирует случаи: <br>
-     * 1)Невалидный контекст
-     * 2)Невалидный номер заказа
-     * 3)Заказа не существует
-     * 4)Заказ принадлежит курьеру
-     * 5)Все отработало как надо
+     * 1)Невалидный номер заказа
+     * 2)Заказа не существует
+     * 3)Заказ принадлежит курьеру
+     * 4)Все отработало как надо
      */
     @Test
-    public void continueSession() throws SQLException, ParseException {
+    public void continueSession() throws SQLException, ParseException, DBException {
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(
-                        new UserContext(UserState.ORDER_ACCEPTING_COURIER,1)
-                );
-        String continueSession0 = acceptOrderService.continueSession(1,"1");
-        Assert.assertEquals("Выход за пределы контекста",continueSession0);
-
-        Mockito.when(userContextRepository.getUserContext(1))
-                .thenReturn(
-                        new UserContext(UserState.ORDER_ACCEPTING_COURIER,0)
+                        new UserContext(UserState.ORDER_ACCEPT,0)
                 );
         String continueSession1 = acceptOrderService.continueSession(
                 1,"2k3gokgh9kewokec"
@@ -75,20 +66,32 @@ public class AcceptOrderServiceTest {
         acceptOrderService.setUserNotifier(userNotifier);
         Mockito.when(userContextRepository.getUserContext(2))
                 .thenReturn(
-                        new UserContext(UserState.ORDER_ACCEPTING_COURIER,0)
+                        new UserContext(UserState.ORDER_ACCEPT,0)
                 );
         Mockito.when(orderRepository.getById(11))
                 .thenReturn(new Order(1));
+        Mockito.when(userRepository.getById(1))
+                .thenReturn(new User());
 
         String continueSession4 = acceptOrderService.continueSession(2,"11");
-        Assert.assertEquals("Извини, но сейчас заказ нельзя принять.",continueSession4);
+        Assert.assertEquals("Заказ номер -42\n" +
+                "Создан: default name\n" +
+                "Описание заказчика: default description\n" +
+                "Описание заказа: default description\n" +
+                "Введите еще раз номер заказа, для подтверждения принятия заказа.Либо команду" +
+                " /cancel для выхода из контекста принятия заказа.",continueSession4);
 
         Mockito.when(orderRepository.getById(11))
                 .thenReturn(new Order(1,1, OrderStatus.PENDING,"any"));
         Mockito.when(userContextRepository.getUserContext(1))
                 .thenReturn(new UserContext(UserState.NO_STATE));
 
+        Mockito.when(userRepository.getById(2))
+                .thenReturn(new User());
         String continueSession5 = acceptOrderService.continueSession(2,"11");
-        Assert.assertEquals("Принятие заказа отправлено на подтверждение заказчику",continueSession5);
+        Assert.assertEquals("Заказ принят. Контакты для связи с заказчиком:\n" +
+                "\n" +
+                "TELEGRAM: null\n" +
+                "VK: null",continueSession5);
     }
 }
