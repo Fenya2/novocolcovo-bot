@@ -69,7 +69,7 @@ public class AcceptOrderServiceTest {
                         new UserContext(UserState.ORDER_ACCEPT,0)
                 );
         Mockito.when(orderRepository.getById(11))
-                .thenReturn(new Order(1));
+                .thenReturn(new Order(1,1,OrderStatus.PENDING,""));
         Mockito.when(userRepository.getById(1))
                 .thenReturn(new User());
 
@@ -77,7 +77,7 @@ public class AcceptOrderServiceTest {
         Assert.assertEquals("Заказ номер -42\n" +
                 "Создан: default name\n" +
                 "Описание заказчика: default description\n" +
-                "Описание заказа: default description\n" +
+                "Описание заказа: \n" +
                 "Введите еще раз номер заказа, для подтверждения принятия заказа.Либо команду" +
                 " /cancel для выхода из контекста принятия заказа.",continueSession4);
 

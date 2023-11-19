@@ -1,6 +1,8 @@
 package core;
 
 import bots.Bot;
+import bots.TGBot;
+import bots.VkBot;
 import db.LoggedUsersRepository;
 import models.Platform;
 import org.junit.Assert;
@@ -20,7 +22,10 @@ public class UserNotifierTest {
     @Mock
     private LoggedUsersRepository loggedUsersRepository;
     @Mock
-    private Bot telegramBot;
+    private TGBot telegramBot;
+
+    @Mock
+    private VkBot vkBot;
 
     @Before
     public void init() {

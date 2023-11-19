@@ -4,6 +4,7 @@ import core.UserNotifier;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
+import models.OrderStatus;
 import models.UserContext;
 import models.UserState;
 import org.junit.Assert;
@@ -72,7 +73,7 @@ public class CloseOrderCourierServiceTest {
         Assert.assertEquals("Заказ не найден. Попробуй еще раз",continueSession3);
 
         Mockito.when(orderRepository.getById(11))
-                .thenReturn(new Order(1));
+                .thenReturn(new Order(1,2, OrderStatus.RUNNING,"dsf"));
         Mockito.when(userContextRepository.getUserContext(2))
                 .thenReturn(
                         new UserContext(UserState.ORDER_CLOSING_COURIER,0)
@@ -83,7 +84,7 @@ public class CloseOrderCourierServiceTest {
                 ,continueSession4
         );
 
-        Order order = new Order(1);
+        Order order = new Order(1,1,OrderStatus.RUNNING,"");
         Mockito.when(orderRepository.getById(11))
                 .thenReturn(order);
         Mockito.when(userContextRepository.getUserContext(order.getCreatorId()))
