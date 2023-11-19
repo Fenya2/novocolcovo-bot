@@ -140,7 +140,7 @@ public class LoggedUsersRepository extends Repository {
             ResultSet resultSet = statement.executeQuery(query);
             List<Platform> userPlatforms= new ArrayList<>();
             while (resultSet.next())
-                userPlatforms.add(Platform.fromString(resultSet.getString("platform")));
+                userPlatforms.add(Platform.valueOf(resultSet.getString("platform")));
             return  userPlatforms;
         } catch (SQLException e) {
             log.error("Не удалось получить платформы пользователя с id %d\n%s"

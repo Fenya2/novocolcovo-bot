@@ -1,10 +1,7 @@
 package core.service_handlers.services;
 
 import core.UserNotifier;
-import db.DBException;
-import db.OrderRepository;
-import db.UserContextRepository;
-import db.UserRepository;
+import db.*;
 import models.*;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,7 +29,8 @@ public class AcceptOrderServiceTest {
     private OrderRepository orderRepository;
     @Mock
     private UserRepository userRepository;
-
+    @Mock
+    private LoggedUsersRepository loggedUsersRepository;
     /**
      * Тестирует случаи: <br>
      * 1)Невалидный номер заказа

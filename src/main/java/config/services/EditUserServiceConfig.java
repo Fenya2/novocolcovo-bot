@@ -38,15 +38,7 @@ public enum EditUserServiceConfig {
         this.str = str;
     }
 
-    EditUserServiceConfig(int contextNum) {
-        this.contextNum = contextNum;
-    }
-
     public String getStr() {
         return str;
-    }
-
-    public int getContextNum() {
-        return contextNum;
     }
 }

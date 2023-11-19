@@ -1,6 +1,8 @@
 package core;
 
 import bots.Bot;
+import bots.TGBot;
+import bots.VkBot;
 import db.LoggedUsersRepository;
 import models.Platform;
 
@@ -14,16 +16,16 @@ public class UserNotifier {
     private final LoggedUsersRepository loggedUsersRepository;
 
     /** Список доступных ботов, связянных с платформами. */
-    private final Bot tgBot;
-    private final Bot vkBot;
+    private final VkBot vkBot;
+    private final TGBot tgBot;
 
     /**
      * @param loggedUsersRepository таблица с залогинившимися пользователями
      * @param telegramBot телеграм бот
      */
     public UserNotifier(LoggedUsersRepository loggedUsersRepository,
-                        Bot telegramBot,
-                        Bot vkBot
+                        TGBot telegramBot,
+                        VkBot vkBot
     ) {
         this.loggedUsersRepository = loggedUsersRepository;
         this.tgBot = telegramBot;
@@ -82,11 +84,18 @@ public class UserNotifier {
     }
 
     /**
-     * Возвращает имя пользователя на указанной платформе. Если пользователь не авторизован
-     * на этой платформе в данный момент, то возвращает null.
+     * Возвращает имя пользователя на указанной платформе. Если имя не получается узнать,
+     * возвращает null.
      */
-    public String getUserDomainOnPlatform(Platform platform, long userId) {
+    public String getUserDomainOnPlatform(Platform platform, String userIdOnPlatform) {
+        switch (platform) {
+            case TELEGRAM -> {
+                return tgBot.getDomainByUserIdOnPlatform(userIdOnPlatform);
+            }
+            case VK -> {
+                return vkBot.getDomainByUserIdOnPlatform(userIdOnPlatform);
+            }
+        }
         return null;
     }
-
 }

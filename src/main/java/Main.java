@@ -44,7 +44,7 @@ public class Main {
         CreateOrderService createOrderService = new CreateOrderService(or, uc);
         EditOrderService editOrderService = new EditOrderService(or,uc);
         CancelOrderService cancelOrderService = new CancelOrderService(or,uc);
-        AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc, ur);
+        AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc, ur, lg);
         CloseOrderCourierService closeOrderCourierService = new CloseOrderCourierService(or,uc);
         CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
 
@@ -81,16 +81,16 @@ public class Main {
         );
 
         // Боты
-        TGBotConfig tgBotConfig = new TGBotConfig(System.getenv("TG_BOT_TOKEN"));
+        TGBotConfig tgBotConfig = new TGBotConfig(System.getenv("TG_BOT_TOKEN"), "src/main/resources/config/tgbotconfig.json");
         Bot tgBot = new TGBot(tgBotConfig, messageHandler);
         TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
         botsApi.registerBot((LongPollingBot) tgBot);
 
-        VkBotConfig vkBotConfig = new VkBotConfig(System.getenv("VK_BOT_TOKEN"));
+        VkBotConfig vkBotConfig = new VkBotConfig(System.getenv("VK_BOT_TOKEN"), "src/main/resources/config/vkbotconfig.json");
         Bot vkBot = new VkBot(vkBotConfig, messageHandler);
 
         // Доинициализация сервисов для возможности уведомлять пользователей через ботов.
-        UserNotifier userNotifier = new UserNotifier(lg, tgBot, vkBot);
+        UserNotifier userNotifier = new UserNotifier(lg,(TGBot) tgBot,(VkBot) vkBot);
         loginService.setUserNotifier(userNotifier);
         closeOrderCourierService.setUserNotifier(userNotifier);
         acceptOrderService.setUserNotifier(userNotifier);

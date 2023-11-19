@@ -1,0 +1,7 @@
+{
+  "name":"novocolcovo_bot",
+  "platform": "VK",
+  "api_methods": {
+    "getDomainByUserIdOnPlatform": "https://api.vk.com/method/users.get?v=5.131&access_token=%s&user_ids=%s&fields=domain"
+  }
+}

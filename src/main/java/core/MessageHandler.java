@@ -144,7 +144,10 @@ public class MessageHandler {
             }
             msg.getBotFrom().sendTextMessage(
                     msg.getUserIdOnPlatform(),
-                    "Для пользования ботом тебе нужно зарегистрироваться. Это можно сделать командой /register."
+                    """
+                            Для пользования ботом тебе нужно зарегистрироваться или войти.
+                            /register - зарегистрироваться в системе.
+                            /login - войти"""
             );
             return 1;
         }

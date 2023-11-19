@@ -70,7 +70,7 @@ public class MessageHandlerTest {
      * (платформа telegram)
      */
     @Test
-    public void testHandleWhenFirstUserMessageSendedAndItIsStartMessage() throws SQLException, DBException {
+    public void testHandleWhenFirstUserMessageSentAndItIsStartMessage() throws SQLException, DBException {
         Message message = new Message();
         message.setPlatform(Platform.TELEGRAM);
         message.setText("/start");

@@ -1,10 +1,7 @@
 package core.service_handlers.services;
 
 import core.UserNotifier;
-import db.DBException;
-import db.OrderRepository;
-import db.UserContextRepository;
-import db.UserRepository;
+import db.*;
 import models.*;
 
 import java.sql.SQLException;
@@ -25,11 +22,15 @@ public class AcceptOrderService {
     /** @see db.UserRepository */
     private final UserRepository userRepository;
 
+    /** @see db.LoggedUsersRepository */
+    private final LoggedUsersRepository loggedUsersRepository;
+
     /** Конструктор {@link AcceptOrderService}*/
-    public AcceptOrderService(OrderRepository orderRepository, UserContextRepository userContextRepository, UserRepository userRepository) {
+    public AcceptOrderService(OrderRepository orderRepository, UserContextRepository userContextRepository, UserRepository userRepository, LoggedUsersRepository loggedUsersRepository) {
         this.orderRepository = orderRepository;
         this.userContextRepository = userContextRepository;
         this.userRepository = userRepository;
+        this.loggedUsersRepository = loggedUsersRepository;
     }
 
     /**
@@ -66,7 +67,7 @@ public class AcceptOrderService {
                 }
                 case 1->{
                     UserContext userContextClient = userContextRepository.getUserContext(order.getCreatorId());
-                    if(userContextClient.getState() != UserState.NO_STATE ){
+                    if(userContextClient.getState() != UserState.NO_STATE){
                         userNotifier.sendTextMessage(
                                 order.getCreatorId(),
                                 "Курьер хочет принять заказ, заверши выполнение команды."
@@ -86,17 +87,22 @@ public class AcceptOrderService {
                             .formatted(order.getDescription(),courier.getName(),courier.getDescription());
 
                     StringBuilder mesClient = new StringBuilder(str);
+                    String idOnPlatform;
                     for (Platform platform: Platform.values()){
+                        idOnPlatform = loggedUsersRepository.
+                                getUserIdOnPlatformByUserIdAndPlatform(order.getCourierId(),platform);
                         if (platform==Platform.NO_PLATFORM) continue;
-                        String name = userNotifier.getUserDomainOnPlatform(platform,order.getCourierId());
+                        String name = userNotifier.getUserDomainOnPlatform(platform,idOnPlatform);
                         mesClient.append("\n").append(platform).append(": ").append(name);
                     }
                     userNotifier.sendTextMessage(order.getCreatorId(), mesClient.toString());
 
                     StringBuilder mesCourier = new StringBuilder("Заказ принят. Контакты для связи с заказчиком:\n");
                     for (Platform platform: Platform.values()){
+                        idOnPlatform = loggedUsersRepository.
+                                getUserIdOnPlatformByUserIdAndPlatform(order.getCreatorId(),platform);
                         if (platform==Platform.NO_PLATFORM) continue;
-                        String name = userNotifier.getUserDomainOnPlatform(platform,order.getCreatorId());
+                        String name = userNotifier.getUserDomainOnPlatform(platform,idOnPlatform);
                         mesCourier.append("\n").append(platform).append(": ").append(name);
                     }
                     return mesCourier.toString();
@@ -122,9 +128,10 @@ public class AcceptOrderService {
         if (order == null)
             return false;
 
-        if (userId==order.getCreatorId()) {
+        if (userId==order.getCreatorId())
             return false;
-        }
+        if(order.getStatus()!=OrderStatus.PENDING)
+            return false;
         return true;
     }
 

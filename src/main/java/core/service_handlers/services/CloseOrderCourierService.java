@@ -98,9 +98,11 @@ public class CloseOrderCourierService {
         if (order == null)
             return false;
 
-        if (userId==order.getCreatorId()) {
+        if (userId==order.getCreatorId())
             return false;
-        }
+        if (order.getStatus()!=OrderStatus.RUNNING)
+            return false;
+
         return true;
     }
 
