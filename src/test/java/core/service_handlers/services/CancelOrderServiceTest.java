@@ -58,7 +58,7 @@ public class CancelOrderServiceTest {
         Assert.assertEquals("Заказ не найден или выполняется курьером. Попробуй еще раз", continueCancelOrder3);
 
         Mockito.when(orderRepository.getById(11254))
-                .thenReturn(new Order(1));
+                .thenReturn(new Order(1,12,OrderStatus.PENDING,"d"));
         Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, OrderStatus.PENDING))
                 .thenReturn(null);
         String continueCancelOrder4 = cancelOrderService.continueSession(1, "11254");

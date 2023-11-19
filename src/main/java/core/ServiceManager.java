@@ -262,8 +262,7 @@ public class ServiceManager {
             UserContext client;
             for (Order s: listAllOrder){
                 client = userContextRepository.getUserContext(s.getId());
-                if(userId == s.getCourierId() && s.getStatus().equals(OrderStatus.RUNNING)
-                        && client.getState() == UserState.NO_STATE){
+                if(userId == s.getCourierId() && s.getStatus().equals(OrderStatus.RUNNING)){
                     allOrderUser.append(
                             Long.toString(s.getId()).concat(": ")
                                     .concat(s.getDescription()).concat("\n")

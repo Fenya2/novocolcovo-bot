@@ -80,4 +80,13 @@ public class UserNotifier {
         }
         return true;
     }
+
+    /**
+     * Возвращает имя пользователя на указанной платформе. Если пользователь не авторизован
+     * на этой платформе в данный момент, то возвращает null.
+     */
+    public String getUserDomainOnPlatform(Platform platform, long userId) {
+        return null;
+    }
+
 }
