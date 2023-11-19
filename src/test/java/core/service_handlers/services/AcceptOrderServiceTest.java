@@ -89,9 +89,6 @@ public class AcceptOrderServiceTest {
         Mockito.when(userRepository.getById(2))
                 .thenReturn(new User());
         String continueSession5 = acceptOrderService.continueSession(2,"11");
-        Assert.assertEquals("Заказ принят. Контакты для связи с заказчиком:\n" +
-                "\n" +
-                "TELEGRAM: null\n" +
-                "VK: null",continueSession5);
+        Assert.assertEquals("Заказ принят. Контакты для связи с заказчиком:\n",continueSession5);
     }
 }

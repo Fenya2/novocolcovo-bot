@@ -29,6 +29,8 @@ public class MessageHandlerTest {
     @Mock
     private CommandHandler commandHandler;
     @Mock
+    private HandlerLoginService handlerLoginService;
+    @Mock
     private HandlerEditUserService handlerEditUserService;
     @Mock
     private HandlerCreateOrderService handlerCreateOrderService;
@@ -56,10 +58,10 @@ public class MessageHandlerTest {
         Message message = new Message();
         message.setBotFrom(Mockito.mock(Bot.class));
         Mockito.when(
-                loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
-                        Mockito.any(),
-                        Mockito.any()
-                )
+                        loggedUsersRepository.getUserByPlatformAndIdOnPlatform(
+                                Mockito.any(),
+                                Mockito.any()
+                        )
                 )
                 .thenReturn(null); // нет пользователя, который указан в сообщении.
         Assert.assertEquals(1, messageHandler.handle(message));
@@ -103,11 +105,13 @@ public class MessageHandlerTest {
                 message.getUserIdOnPlatform()
         )).thenReturn(user);
         Mockito.when(userContextRepository.getUserContext(user.getId()))
-                        .thenReturn(userContext);
+                .thenReturn(userContext);
         Assert.assertEquals(3, messageHandler.handle(message));
     }
 
-    /** проверяет работу метода, когда пользователь, написавший сообщение не имеет контекста */
+    /**
+     * Проверяет работу метода, когда пользователь, написавший сообщение не имеет контекста
+     */
     @Test
     public void testHandleWhenUserHaveNoContext() throws SQLException, DBException {
         Message message = new Message();
@@ -125,5 +129,20 @@ public class MessageHandlerTest {
         Mockito.when(userContextRepository.getUserContext(user.getId()))
                 .thenReturn(userContext);
         Assert.assertEquals(2, messageHandler.handle(message));
+    }
+
+    /**
+     * Проверяет случай, кодга пользователь находится в контексте авторизации
+     */
+    @Test
+    public void testHandleWhenUserInAuthContext() throws DBException {
+        Message message = new Message();
+        message.setText("some context text. want to create order.");
+        message.setUserIdOnPlatform("some id on some platform (telegram).");
+        message.setPlatform(Platform.TELEGRAM);
+        message.setBotFrom(Mockito.mock(Bot.class));
+        Mockito.when(loggingUsersRepository.getDomainByFromPlatformAndIdOnPlatform(message.getPlatform(), message.getUserIdOnPlatform()))
+                .thenReturn(Mockito.mock(Domain.class)); // возвращает не null
+        Assert.assertEquals(4, messageHandler.handle(message));
     }
 }
