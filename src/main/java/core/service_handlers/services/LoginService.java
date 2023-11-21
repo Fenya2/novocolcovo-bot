@@ -15,10 +15,15 @@ import java.util.Random;
  * изначально о ползователе ничего неизвестно.
  */
 public class LoginService extends Service {
+
+    /** @see LoggingUsersRepository */
     private LoggingUsersRepository loggingUsersRepository;
+    /** @see UserRepository */
     private UserRepository userRepository;
+    /** @see LoggedUsersRepository */
     private LoggedUsersRepository loggedUsersRepository;
 
+    /** @see UserNotifier */
     private UserNotifier userNotifier;
 
     public LoginService(
@@ -33,6 +38,9 @@ public class LoginService extends Service {
         this.loggedUsersRepository = loggedUsersRepository;
     }
 
+    /**
+     * Устанавливает объект, через который будут отправляться сообщения пользователю на другие платформы.
+     */
     public void setUserNotifier(UserNotifier userNotifier) {
         this.userNotifier = userNotifier;
     }
@@ -53,7 +61,7 @@ public class LoginService extends Service {
     /**
      * Продолжает сессию с авторизующимся пользователем
      * @return следующее сообщение.
-     * //todo раскидать свичи по приватным методам.
+     * // TODO раскидать свичи по приватным методам.
      */
     public String continueSession(Platform fromPlatform,
                                   String userIdOnPlatform,
@@ -86,6 +94,7 @@ public class LoginService extends Service {
                     verificationPlatform = Platform.valueOf(message.substring(1));
                 } catch (IllegalArgumentException e) {
                     return "Платформа указана некорректно. Попробуйте еще раз.";
+                    // TODO может вписать платформу, которая не будет указана, но тогда и сообщение не отправится
                 }
 
                 int verificationCode = generateVerificationCode();
@@ -113,10 +122,10 @@ public class LoginService extends Service {
                     actualCode = Integer.parseInt(message);
                 } catch (NumberFormatException e) {
                     // todo добавить попытки. Либо сделать только одну...
-                    return "Формат неверен. Попробуйте еще раз.";
+                    return "Неверный код. Попробуйте еще раз";
                 }
                 if(actualCode != domain.getVerificationCode()) {
-                    return "Код неверен. Попробуйте еще раз.";
+                    return "Неверный код. Попробуйте еще раз";
                 }
 
                 User user = userRepository.getByLogin(domain.getRequiredLogin());
@@ -144,6 +153,9 @@ public class LoginService extends Service {
         loggingUsersRepository.deleteDomainByFromPlatformAndIdOnPlatform(fromPlatform, userIdOnPlatform);
     }
 
+    /**
+     * Генерирует код подтверждения
+     */
     private int generateVerificationCode() {
         Random random = new Random();
         return random.nextInt(9000) + 1000;

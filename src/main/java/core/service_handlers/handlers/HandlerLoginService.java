@@ -11,8 +11,12 @@ import java.sql.SQLException;
  * Обработчик сервиса авторизации
  */
 public class HandlerLoginService {
+    /** @see LoginService */
     private LoginService loginService;
 
+    /**
+     * @param loginService Сервис авторизации
+     */
     public HandlerLoginService(LoginService loginService) {
         this.loginService = loginService;
     }

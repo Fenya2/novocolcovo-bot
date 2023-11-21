@@ -28,8 +28,8 @@ public class Main {
         // БД
         DB db = new SQLiteDB(new SQLDBconfig("src/main/resources/config/dbconfig.json"));
         db.connect();
-//        db.clearScheme();
-//        db.initScheme();
+        db.clearScheme();
+        db.initScheme();
 
         // Репозитории
         LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);

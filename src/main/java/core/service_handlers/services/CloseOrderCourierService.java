@@ -44,7 +44,7 @@ public class CloseOrderCourierService {
         try {
             UserContext userContext = userContextRepository.getUserContext(userId);
             if (userContext.getStateNum() == 0) {
-                if(!validation(userId,text))
+                if(!validation(userId, text))
                     return "Заказ не найден. Попробуй еще раз";
 
                 long idOrder = Long.parseLong(text);
