@@ -1,5 +1,6 @@
 package core.service_handlers.services;
 
+import db.DBException;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -31,7 +32,7 @@ public class EditOrderService {
      * @param text id заказа
      * @return true/false может/не может принять введенный заказ
      */
-    private boolean validation(long userId, String text) throws SQLException, ParseException {
+    private boolean validation(long userId, String text) throws SQLException, ParseException, DBException {
         if (!text.chars().allMatch(Character::isDigit) || text.length() > 18)
             return false;
         long idOrder = Long.parseLong(text);
@@ -81,15 +82,15 @@ public class EditOrderService {
                     order.setDescription(text);
                     orderRepository.update(order);
                     orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
-                    userContextRepository.updateUserContext(userId,new UserContext());
+                    userContextRepository.updateUserContext(userId, new UserContext());
                     return "Заказ изменен";
                 }
                 default -> {
                     return "Выход за пределы контекста";
                 }
             }
-        } catch (SQLException | ParseException e) {
-            return "что-то пошлое не так";
+        } catch (SQLException | ParseException | DBException e) {
+            return "что-то пошлое не так" + e.getMessage();
         }
     }
 

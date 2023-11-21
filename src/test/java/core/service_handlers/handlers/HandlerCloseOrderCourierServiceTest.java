@@ -1,5 +1,6 @@
 package core.service_handlers.handlers;
 
+import bots.Bot;
 import core.service_handlers.services.CloseOrderCourierService;
 import models.Message;
 import models.User;
@@ -10,8 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import strubs.BotStrub;
 
 public class HandlerCloseOrderCourierServiceTest {
     @InjectMocks
@@ -30,8 +31,8 @@ public class HandlerCloseOrderCourierServiceTest {
     @Test
     public void testHandleWhenCommandValid() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
-        message.setBotFrom(new BotStrub());
+        message.setUser(new User(10, "name", "description", "login"));
+        message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("/cancel");
         Assert.assertEquals(1, handlerCloseOrderCourierService.handle(message));
         message.setText("/help");
@@ -45,9 +46,9 @@ public class HandlerCloseOrderCourierServiceTest {
     @Test
     public void testHandleWhenMessageIsNotValidCommand() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
+        message.setUser(new User(10, "name", "description", "login"));
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
-        message.setBotFrom(new BotStrub());
+        message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("/some_not_valid_command");
         Assert.assertEquals(3, handlerCloseOrderCourierService.handle(message));
     }
@@ -59,9 +60,9 @@ public class HandlerCloseOrderCourierServiceTest {
     @Test
     public void testHandleWhenMessageIsNotCommand() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
+        message.setUser(new User(10, "name", "description", "login"));
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
-        message.setBotFrom(new BotStrub());
+        message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("some_message_not_command");
         Assert.assertEquals(2, handlerCloseOrderCourierService.handle(message));
         message.setText("120");

@@ -39,7 +39,7 @@ public class OrderRepository extends Repository{
      * или {@link Order#getCreatorId()}  идентификатором создателя} некорректен, id заказа выставляется
      * в -1.
      */
-    public Order save(Order order) throws SQLException {
+    public Order save(Order order) throws SQLException, DBException {
         if(userRepository.getById(order.getCreatorId()) == null) {
             order.setId(-1);
             return order;
@@ -136,7 +136,7 @@ public class OrderRepository extends Repository{
      * -1, если заказ с заданным идентификатором не существует.
      * 0, если идентификаторы создателя или доставщика некорректны.
      */
-    public int update(Order order) throws SQLException, ParseException {
+    public int update(Order order) throws SQLException, ParseException, DBException {
         if(getById(order.getId()) == null) {
             return -1;
         }
@@ -234,7 +234,7 @@ public class OrderRepository extends Repository{
      * Обновляет статус у заказа на новый
      * @return вовзращает 1 при удачно обновлении и 0 иначе
      */
-    public int updateOrderStatus(long orderId, OrderStatus orderStatus) throws SQLException, ParseException {
+    public int updateOrderStatus(long orderId, OrderStatus orderStatus) throws SQLException, ParseException, DBException {
         Order order = getById(orderId);
         if(order == null) {
             return 0;

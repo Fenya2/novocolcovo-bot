@@ -43,7 +43,7 @@ public class HandlerCloseOrderClientService {
                     msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                     return 3;
                 }
-                String message = "Прости, но я не знаю, что на это ответить. Вызови команду /help ";
+                String message = "Прости, но я не знаю, что на это ответить. Вызови команду /help";
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                 return 2;
             }

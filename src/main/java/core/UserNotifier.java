@@ -1,6 +1,8 @@
 package core;
 
 import bots.Bot;
+import bots.TGBot;
+import bots.VkBot;
 import db.LoggedUsersRepository;
 import models.Platform;
 
@@ -9,20 +11,25 @@ import java.sql.SQLException;
 /**
  * Класс для отправки сообщений другим пользоваетелям.
  */
-public class MessageSender {
+public class UserNotifier {
     /** @see LoggedUsersRepository */
     private final LoggedUsersRepository loggedUsersRepository;
 
     /** Список доступных ботов, связянных с платформами. */
-    private final Bot telegramBot;
+    private final VkBot vkBot;
+    private final TGBot tgBot;
 
     /**
      * @param loggedUsersRepository таблица с залогинившимися пользователями
      * @param telegramBot телеграм бот
      */
-    public MessageSender(LoggedUsersRepository loggedUsersRepository, Bot telegramBot) {
+    public UserNotifier(LoggedUsersRepository loggedUsersRepository,
+                        TGBot telegramBot,
+                        VkBot vkBot
+    ) {
         this.loggedUsersRepository = loggedUsersRepository;
-        this.telegramBot = telegramBot;
+        this.tgBot = telegramBot;
+        this.vkBot = vkBot;
     }
 
     /**
@@ -39,7 +46,8 @@ public class MessageSender {
             idonp = loggedUsersRepository.getUserIdOnPlatformByUserIdAndPlatform(userId, platform);
             if(idonp == null) continue;
             switch (platform) {
-                case TELEGRAM -> telegramBot.sendTextMessage(idonp, text);
+                case TELEGRAM -> tgBot.sendTextMessage(idonp, text);
+                case VK -> vkBot.sendTextMessage(idonp, text);
             }
             flag = true;
         }
@@ -53,6 +61,41 @@ public class MessageSender {
      * @param path путь к картинке на устройстве.
      */
     public void sendPicture(long userId, String path) {
-        // todo сделать.
+        // TODO сделать.
+    }
+
+    /**
+     * Отправляет сообщение на указанную платформу указанному пользователю, если тот авторизован на
+     * ней
+     * @param platform
+     * @param userId
+     * @return true, если отправилось, иначе false.
+     */
+    public boolean sendTextMessageOnPlatformIfPossible(Platform platform,
+                                                       long userId,
+                                                       String text) throws SQLException {
+        String idnp = loggedUsersRepository.getUserIdOnPlatformByUserIdAndPlatform(userId, platform);
+        if(idnp == null) return false;
+        switch (platform) {
+            case VK -> vkBot.sendTextMessage(idnp, text);
+            case TELEGRAM -> tgBot.sendTextMessage(idnp, text);
+        }
+        return true;
+    }
+
+    /**
+     * Возвращает имя пользователя на указанной платформе. Если имя не получается узнать,
+     * возвращает null.
+     */
+    public String getUserDomainOnPlatform(Platform platform, String userIdOnPlatform) {
+        switch (platform) {
+            case TELEGRAM -> {
+                return tgBot.getDomainByUserIdOnPlatform(userIdOnPlatform);
+            }
+            case VK -> {
+                return vkBot.getDomainByUserIdOnPlatform(userIdOnPlatform);
+            }
+        }
+        return null;
     }
 }

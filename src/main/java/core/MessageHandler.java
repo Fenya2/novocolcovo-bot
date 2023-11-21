@@ -1,7 +1,10 @@
 package core;
 
+import db.DBException;
 import db.LoggedUsersRepository;
+import db.LoggingUsersRepository;
 import db.UserContextRepository;
+import models.Domain;
 import models.Message;
 import models.User;
 import models.UserContext;
@@ -16,6 +19,8 @@ import java.sql.SQLException;
  * обработки
  */
 public class MessageHandler {
+
+    private final LoggingUsersRepository loggingUsersRepository;
     /** @see UserContextRepository */
     private final UserContextRepository userContextRepository;
 
@@ -24,6 +29,8 @@ public class MessageHandler {
 
     /** @see CommandHandler */
     private final CommandHandler commandHandler;
+
+    private final HandlerLoginService handlerLoginService;
 
     /** @see HandlerEditUserService */
     private final HandlerEditUserService handlerEditUserService;
@@ -36,16 +43,23 @@ public class MessageHandler {
 
     /** @see HandlerCancelOrderService */
     private final HandlerCancelOrderService handlerCancelOrderService;
-    private final HandlerAcceptOrderService handlerAcceptOrderService;
-    private final HandlerCloseOrderCourierService handlerCloseOrderCourierService;
-    private final HandlerCloseOrderClientService handlerCloseOrderClientService;
 
+    /** @see HandlerAcceptOrderService */
+    private final HandlerAcceptOrderService handlerAcceptOrderService;
+
+    /** @see HandlerCloseOrderCourierService */
+    private final HandlerCloseOrderCourierService handlerCloseOrderCourierService;
+
+    /** @see HandlerCloseOrderClientService */
+    private final HandlerCloseOrderClientService handlerCloseOrderClientService;
 
     /** Конструктор {@link MessageHandler MessageHandler}*/
     public MessageHandler(
+            LoggingUsersRepository loggingUsersRepository,
             UserContextRepository userContextRepository,
             LoggedUsersRepository loggedUsersRepository,
             CommandHandler commandHandler,
+            HandlerLoginService handlerLoginService,
             HandlerEditUserService updateUserServiceHandler,
             HandlerCreateOrderService handlerCreateOrderService,
             HandlerEditOrderService handlerEditOrderService,
@@ -53,9 +67,11 @@ public class MessageHandler {
             HandlerAcceptOrderService handlerAcceptOrderService,
             HandlerCloseOrderCourierService handlerCloseOrderService,
             HandlerCloseOrderClientService handlerCloseOrderClientService) {
+        this.loggingUsersRepository = loggingUsersRepository;
         this.userContextRepository = userContextRepository;
         this.loggedUsersRepository = loggedUsersRepository;
         this.commandHandler = commandHandler;
+        this.handlerLoginService = handlerLoginService;
         this.handlerEditUserService = updateUserServiceHandler;
         this.handlerCreateOrderService = handlerCreateOrderService;
         this.handlerEditOrderService = handlerEditOrderService;
@@ -68,12 +84,35 @@ public class MessageHandler {
     /**
      * Первичный метод обработки сообщения. Если у пользователя, отправившего сообщение есть
      * контекст, направляет сообщение в соответствующий сервисный обработчик, если отправленное
-     * сообщение является командой, перенаправляет сообщение в обработчик команд. Иначе сообщает
+     * сообщение является командой, перенаправляет сообщение в обработчик команд.
+     * <p>
+     * Если у пользователя нет контекста, но он находится в состоянии авторизации,
+     * то есть в таблице logging_users, то перенаправляет сообщение в обработчик авторизации.
+     * <p>
+     * Иначе сообщает
      * пользователю, что сообщение некорректно.
      * @return 1, если сообщение написано пользователем впервые. 2, если пользователь пишет, не
      * находясь в контексте. 3, если пользователь пишет, находясь в контексте.
+     * 4, если пользователь находится в особенном контексте авторизации.
      */
     public int handle(Message msg) {
+        try {
+            Domain domain = loggingUsersRepository.getDomainByFromPlatformAndIdOnPlatform(
+                    msg.getPlatform(),
+                    msg.getUserIdOnPlatform()
+            );
+            if(domain != null) {
+                handlerLoginService.handle(msg, domain);
+                return 4;
+            }
+        } catch (DBException e) {
+            msg.getBotFrom().sendTextMessage(
+                    msg.getUserIdOnPlatform(),
+                    "Проблемы с доступом к базе данных " + e.getMessage()
+            );
+            return -1;
+        }
+
         User user;
         UserContext userContext;
         try {
@@ -81,7 +120,7 @@ public class MessageHandler {
                     msg.getPlatform(),
                     msg.getUserIdOnPlatform()
             );
-        } catch (SQLException e) {
+        } catch (SQLException | DBException e) {
             msg.getBotFrom().sendTextMessage(
                     msg.getUserIdOnPlatform(),
                     "Проблемы с доступом к базе данных " + e.getMessage()
@@ -90,13 +129,26 @@ public class MessageHandler {
         }
 
         if(user == null) {
-            if (msg.getText().equals("/start")) {
-                commandHandler.handle(msg);
-                return 1;
+            switch (msg.getText()) {
+                case "/start", "/register", "/login": {
+                    commandHandler.handle(msg);
+                    return 1;
+                }
+                case "/help": {
+                    msg.getBotFrom().sendTextMessage(
+                            msg.getUserIdOnPlatform(),
+                            "/register - зарегистрироваться в системе.\n" +
+                                    "/login - войти"
+                    );
+                    return 1;
+                }
             }
             msg.getBotFrom().sendTextMessage(
                     msg.getUserIdOnPlatform(),
-                    "отправьте /start для последующей работы."
+                    """
+                            Для пользования ботом тебе нужно зарегистрироваться или войти.
+                            /register - зарегистрироваться в системе.
+                            /login - войти"""
             );
             return 1;
         }
@@ -120,7 +172,7 @@ public class MessageHandler {
             case ORDER_CREATING -> handlerCreateOrderService.handle(msg);
             case ORDER_EDITING -> handlerEditOrderService.handle(msg);
             case ORDER_CANCELING-> handlerCancelOrderService.handle(msg);
-            case ORDER_ACCEPTING -> handlerAcceptOrderService.handle(msg);
+            case ORDER_ACCEPT -> handlerAcceptOrderService.handle(msg);
             case ORDER_CLOSING_COURIER -> handlerCloseOrderCourierService.handle(msg);
             case ORDER_CLOSING_CLIENT -> handlerCloseOrderClientService.handle(msg);
         }

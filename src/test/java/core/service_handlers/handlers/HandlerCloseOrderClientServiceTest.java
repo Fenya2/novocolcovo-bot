@@ -1,5 +1,6 @@
 package core.service_handlers.handlers;
 
+import bots.Bot;
 import core.service_handlers.services.CloseOrderClientService;
 import models.Message;
 import models.User;
@@ -10,8 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import strubs.BotStrub;
 
 public class HandlerCloseOrderClientServiceTest {
     @InjectMocks
@@ -30,8 +31,8 @@ public class HandlerCloseOrderClientServiceTest {
     @Test
     public void testHandleWhenCommandValid() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
-        message.setBotFrom(new BotStrub());
+        message.setUser(new User(10, "name", "description", "login"));
+        message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("/help");
         Assert.assertEquals(1, handlerCloseOrderClientService.handle(message));
     }
@@ -43,9 +44,9 @@ public class HandlerCloseOrderClientServiceTest {
     @Test
     public void testHandleWhenMessageIsNotValidCommand() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
+        message.setUser(new User(10, "name", "description", "login"));
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
-        message.setBotFrom(new BotStrub());
+        message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("/some_not_valid_command");
         Assert.assertEquals(3, handlerCloseOrderClientService.handle(message));
         message.setText("/cancel");
@@ -59,9 +60,9 @@ public class HandlerCloseOrderClientServiceTest {
     @Test
     public void testHandleWhenMessageIsNotCommand() {
         Message message = new Message();
-        message.setUser(new User(10, "name", "description"));
+        message.setUser(new User(10, "name", "description", "login"));
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
-        message.setBotFrom(new BotStrub());
+        message.setBotFrom(Mockito.mock(Bot.class));
         message.setText("/yes");
         Assert.assertEquals(2, handlerCloseOrderClientService.handle(message));
         message.setText("/no");

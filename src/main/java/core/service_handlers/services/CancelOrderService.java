@@ -1,5 +1,6 @@
 package core.service_handlers.services;
 
+import db.DBException;
 import db.OrderRepository;
 import db.UserContextRepository;
 import models.Order;
@@ -30,14 +31,14 @@ public class CancelOrderService {
      * @param text id заказа
      * @return true/false может/не может принять введенный заказ
      */
-    private boolean validation(long userId, String text) throws SQLException, ParseException {
+    private boolean validation(long userId, String text) throws SQLException, ParseException, DBException {
         if (!text.chars().allMatch(Character::isDigit) || text.length() > 18)
             return false;
         long idOrder = Long.parseLong(text);
         Order order = orderRepository.getById(idOrder);
         if (order == null)
             return false;
-        if(!(order.getStatus().equals(OrderStatus.NO_STATUS) || order.getStatus().equals(OrderStatus.PENDING)))
+        if(!order.getStatus().equals(OrderStatus.PENDING))
            return false;
         orderRepository.updateOrderStatus(order.getId(), OrderStatus.UPDATING);
         Order orderCheck = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
@@ -70,7 +71,7 @@ public class CancelOrderService {
                 return "Заказ удален";
             } else
                 return "Выход за пределы контекста";
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException | DBException e) {
             return "что-то пошло не так";
         }
     }

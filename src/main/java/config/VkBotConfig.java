@@ -11,29 +11,22 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * Класс конфига телеграм бота /TODO очень похож на конфиг вк бота, мб имеем смысл унаследоваться.
- */
-public class TGBotConfig {
-    /**
-     * Имя бота
-     */
+public class VkBotConfig {
+    /** Имя бота */
     private final String name;
-    /**
-     * Токен бота
-     */
+    /** токен для взаимодействия с ботом */
     private final String token;
-    /**
-     * Платформа, на которой бот работает
-     */
+    /** Платформа, на которой работает бот */
     private final Platform platform;
 
+    /** Map, хранящий post запросы к vk api. */
     private final Map<String, String> apiMethods;
 
     /**
-     * @param token токен бота
+     * @param token токен бота.
+     * @param configFilePath путь к файлу конфигурации
      */
-    public TGBotConfig(String token, String configFilePath) {
+    public VkBotConfig(String token, String configFilePath) {
         this.token = token;
         String str;
         try {
@@ -56,23 +49,17 @@ public class TGBotConfig {
         }
     }
 
-    /**
-     * Возвращает имя бота
-     */
+    /** @return имя бота */
     public String getName() {
         return name;
     }
 
-    /**
-     * Возвращает токен бота
-     */
+    /** @return токен бота */
     public String getToken() {
         return token;
     }
 
-    /**
-     * Возвращает платформу, на которой работает бот.
-     */
+    /** @return платформа, на которой работает бот */
     public Platform getPlatform() {
         return platform;
     }

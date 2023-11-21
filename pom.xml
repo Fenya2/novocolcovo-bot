@@ -41,6 +41,14 @@
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.9</version>
         </dependency>
+
+        <!-- https://github.com/yvasyliev/java-vk-bots-long-poll-api библиотека для работы с vk -->
+        <dependency>
+            <groupId>com.github.yvasyliev</groupId>
+            <artifactId>java-vk-bots-longpoll-api</artifactId>
+            <version>4.1.8</version>
+        </dependency>
+
         <!-- тесты -->
         <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
@@ -62,7 +70,7 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.42.0.0</version>
         </dependency>
-        <!-- Чтение конфига -->
+        <!-- Чтение конфига, работа c api платформ -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -72,6 +80,12 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.13.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/log4j/log4j логирование-->
         <dependency>

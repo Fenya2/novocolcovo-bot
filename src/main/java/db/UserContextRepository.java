@@ -29,7 +29,7 @@ public class UserContextRepository extends Repository{
      * <b>-1</b>, если контекст при взаимодействии с пользователем уже существует.
      * <b>-2</b>, если пользователя с переданным идентификатором не существует.
      */
-    public int saveUserContext(long userId, UserContext userContext) throws SQLException {
+    public int saveUserContext(long userId, UserContext userContext) throws SQLException, DBException {
         if(userRepository.getById(userId) == null) {
             return -2;
         }

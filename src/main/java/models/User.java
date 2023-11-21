@@ -11,6 +11,9 @@ public class User {
     /** Описание пользователя. */
     private String description;
 
+    /** логин пользователя. Уникальный для каждого пользователя */
+    private String login;
+
     /**
      * Устанавливает id, name, description в
      * -42, "default name", "default description" соответственно.
@@ -19,17 +22,20 @@ public class User {
         id = -42;
         name = "default name";
         description = "default description";
+        login = "default login";
     }
 
     /**
      * @param id идентификатор пользователя.
      * @param name имя пользователя.
      * @param description описание пользователя.
+     * @param login логин пользователя
      */
-    public User(long id, String name, String description) {
+    public User(long id, String name, String description, String login) {
         this.id = id;
         setName(name);
         setDescription(description);
+        setLogin(login);
     }
     public long getId() {
         return id;
@@ -64,12 +70,26 @@ public class User {
         this.description = description;
     }
 
+    /** @return логин пользователя */
+    public String getLogin() {
+        return login;
+    }
+
+    /** @param login логин пользователя не null */
+    public void setLogin(String login) {
+        if(login == null) {
+            throw new IllegalArgumentException("Invalid login. Must be not null.");
+        }
+        this.login = login;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", login='" + login + '\'' +
                 '}';
     }
 }
