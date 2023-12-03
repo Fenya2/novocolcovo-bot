@@ -41,22 +41,6 @@ public class Main {
         UserContextRepository uc = new UserContextRepository(db,ur);
         OrderRepository or = new OrderRepository(db,ur);
         UserRateRepository uRateRepository = new UserRateRepository(db);
-
-        ur.save(new User(1, "name", "description", "login"));
-        uRateRepository.save(1);
-        List<Long> res = uRateRepository.getRateSumAndNumOfOrders(1);
-
-        System.out.println(res.get(0));
-        System.out.println(res.get(1));
-
-        uRateRepository.updateRate(1, 42, 69);
-
-        res = uRateRepository.getRateSumAndNumOfOrders(1);
-
-        System.out.println(res.get(0));
-        System.out.println(res.get(1));
-        
-        uRateRepository.delete(1);
         
         // Сервисы
         LoginService loginService = new LoginService(uc, loggingUsersRepository, ur, lg);
@@ -67,6 +51,7 @@ public class Main {
         AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc, ur, lg);
         CloseOrderCourierService closeOrderCourierService = new CloseOrderCourierService(or,uc);
         CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
+        RateUserService rateUserService = new RateUserService(uc, uRateRepository);
 
         // менеджер сервисов
         ServiceManager serviceManager = new ServiceManager(lg,or,ur,uc, loginService);
@@ -82,6 +67,8 @@ public class Main {
                 new HandlerCloseOrderCourierService(closeOrderCourierService);
         HandlerCloseOrderClientService handlerCloseOrderClientService =
                 new HandlerCloseOrderClientService(closeOrderClientService);
+        HandlerRateUserService handlerRateUserService = new HandlerRateUserService(rateUserService);
+
 
         // "главные" обработчики
         CommandHandler commandHandler = new CommandHandler(serviceManager);
@@ -97,7 +84,8 @@ public class Main {
                 handlerCancelOrderService,
                 handlerAcceptOrderService,
                 handlerCloseOrderCourierService,
-                handlerCloseOrderClientService
+                handlerCloseOrderClientService,
+                handlerRateUserService
         );
 
         // Боты

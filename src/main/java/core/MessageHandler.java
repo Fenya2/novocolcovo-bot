@@ -53,6 +53,8 @@ public class MessageHandler {
     /** @see HandlerCloseOrderClientService */
     private final HandlerCloseOrderClientService handlerCloseOrderClientService;
 
+    private final HandlerRateUserService handlerRateUserService;
+
     /** Конструктор {@link MessageHandler MessageHandler}*/
     public MessageHandler(
             LoggingUsersRepository loggingUsersRepository,
@@ -66,7 +68,8 @@ public class MessageHandler {
             HandlerCancelOrderService handlerCancelOrderService,
             HandlerAcceptOrderService handlerAcceptOrderService,
             HandlerCloseOrderCourierService handlerCloseOrderService,
-            HandlerCloseOrderClientService handlerCloseOrderClientService) {
+            HandlerCloseOrderClientService handlerCloseOrderClientService,
+            HandlerRateUserService handlerRateUserService) {
         this.loggingUsersRepository = loggingUsersRepository;
         this.userContextRepository = userContextRepository;
         this.loggedUsersRepository = loggedUsersRepository;
@@ -79,6 +82,7 @@ public class MessageHandler {
         this.handlerAcceptOrderService = handlerAcceptOrderService;
         this.handlerCloseOrderCourierService = handlerCloseOrderService;
         this.handlerCloseOrderClientService = handlerCloseOrderClientService;
+        this.handlerRateUserService = handlerRateUserService;
     }
 
     /**
@@ -175,6 +179,7 @@ public class MessageHandler {
             case ORDER_ACCEPT -> handlerAcceptOrderService.handle(msg);
             case ORDER_CLOSING_COURIER -> handlerCloseOrderCourierService.handle(msg);
             case ORDER_CLOSING_CLIENT -> handlerCloseOrderClientService.handle(msg);
+            case RATE_ANOTHER_USER -> handlerRateUserService.handle(msg);
         }
         return 3;
     }
