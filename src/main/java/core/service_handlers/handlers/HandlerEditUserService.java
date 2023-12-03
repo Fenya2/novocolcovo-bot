@@ -88,6 +88,10 @@ public class HandlerEditUserService {
                         msg.getUserIdOnPlatform(),
                         text
                 );
+                msg.getBotFrom().sendMainMenu(
+                        msg.getUserIdOnPlatform(),
+                        "Вы попали в главное меню. Выберите действие"
+                );
                 return 1;
             }
 

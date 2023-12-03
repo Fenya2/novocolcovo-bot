@@ -79,6 +79,14 @@ public class VkBot extends LongPollBot implements Bot {
     }
 
     /**
+     * Заглушка
+     */
+    @Override
+    public void sendMainMenu(String recipient_id, String message) {
+        sendTextMessage(recipient_id,message);
+    }
+
+    /**
      * Возвращает доменное имя пользователя на платформе, по которому его легко найти. Если
      * какая-то ошибка - null (cm лог.)
      */

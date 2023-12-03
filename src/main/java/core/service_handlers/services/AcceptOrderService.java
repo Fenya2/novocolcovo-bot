@@ -91,7 +91,7 @@ public class AcceptOrderService {
                     for (Platform platform: Platform.values()){
                         idOnPlatform = loggedUsersRepository.
                                 getUserIdOnPlatformByUserIdAndPlatform(order.getCourierId(),platform);
-                        if (platform==Platform.NO_PLATFORM) continue;
+                        if (platform==Platform.NO_PLATFORM||idOnPlatform == null) continue;
                         String name = userNotifier.getUserDomainOnPlatform(platform,idOnPlatform);
                         mesClient.append("\n").append(platform).append(": ").append(name);
                     }
@@ -101,7 +101,7 @@ public class AcceptOrderService {
                     for (Platform platform: Platform.values()){
                         idOnPlatform = loggedUsersRepository.
                                 getUserIdOnPlatformByUserIdAndPlatform(order.getCreatorId(),platform);
-                        if (platform==Platform.NO_PLATFORM) continue;
+                        if (platform==Platform.NO_PLATFORM||idOnPlatform == null) continue;
                         String name = userNotifier.getUserDomainOnPlatform(platform,idOnPlatform);
                         mesCourier.append("\n").append(platform).append(": ").append(name);
                     }

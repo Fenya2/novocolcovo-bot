@@ -34,17 +34,27 @@ public class HandlerCancelOrderService {
             case "/cancel" -> {
                 String message = cancelOrderService.cancel(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+                msg.getBotFrom().sendMainMenu(
+                        msg.getUserIdOnPlatform(),
+                        "Вы попали в главное меню. Выберите действие"
+                );
                 return 1;
             }
 
             default -> {
-                if (msg.getText().charAt(0) == '/'){
+                if (msg.getText().charAt(0) == '/') {
                     String message = "Прости, но я не знаю, что на это ответить. Вызови команду /help ";
                     msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                     return 3;
                 }
-                String message = cancelOrderService.continueSession(msg.getUser().getId(),msg.getText());
+                String message = cancelOrderService.continueSession(msg.getUser().getId(), msg.getText());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+                if (message.equals("Заказ удален")){
+                    msg.getBotFrom().sendMainMenu(
+                            msg.getUserIdOnPlatform(),
+                            "Вы попали в главное меню. Выберите действие"
+                    );
+                }
                 return 2;
             }
         }

@@ -34,6 +34,10 @@ public class HandlerAcceptOrderService {
             case "/cancel" -> {
                 String message = acceptOrderService.cancel(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+                msg.getBotFrom().sendMainMenu(
+                        msg.getUserIdOnPlatform(),
+                        "Вы попали в главное меню. Выберите действие"
+                );
                 return 1;
             }
             default -> {
@@ -44,6 +48,12 @@ public class HandlerAcceptOrderService {
                 }
                 String message = acceptOrderService.continueSession(msg.getUser().getId(),msg.getText());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
+                if (msg.getUserContext().getStateNum()==1){
+                    msg.getBotFrom().sendMainMenu(
+                            msg.getUserIdOnPlatform(),
+                            "Вы попали в главное меню. Выберите действие"
+                    );
+                }
                 return 2;
             }
         }
