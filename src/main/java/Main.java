@@ -12,6 +12,7 @@ import core.UserNotifier;
 import core.service_handlers.handlers.*;
 import core.service_handlers.services.*;
 import db.*;
+import models.User;
 
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -20,6 +21,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 
 import java.sql.SQLException;
+import java.util.List;
 
 /** Main class */
 public class Main {
@@ -31,13 +33,31 @@ public class Main {
         db.clearScheme();
         db.initScheme();
 
+
         // Репозитории
         LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);
         UserRepository ur = new UserRepository(db);
         LoggedUsersRepository lg = new LoggedUsersRepository(db,ur);
         UserContextRepository uc = new UserContextRepository(db,ur);
         OrderRepository or = new OrderRepository(db,ur);
+        UserRateRepository uRateRepository = new UserRateRepository(db);
 
+        ur.save(new User(1, "name", "description", "login"));
+        uRateRepository.save(1);
+        List<Long> res = uRateRepository.getRateSumAndNumOfOrders(1);
+
+        System.out.println(res.get(0));
+        System.out.println(res.get(1));
+
+        uRateRepository.updateRate(1, 42, 69);
+
+        res = uRateRepository.getRateSumAndNumOfOrders(1);
+
+        System.out.println(res.get(0));
+        System.out.println(res.get(1));
+        
+        uRateRepository.delete(1);
+        
         // Сервисы
         LoginService loginService = new LoginService(uc, loggingUsersRepository, ur, lg);
         EditUserService updateUserService = new EditUserService(uc, ur);
