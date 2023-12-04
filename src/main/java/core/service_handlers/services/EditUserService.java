@@ -16,9 +16,11 @@ import java.sql.SQLException;
  */
 public class EditUserService extends Service {
     private UserRepository ur;
+    private RateUserService rateUserService;
 
-    public EditUserService(UserContextRepository ucr, UserRepository ur) {
+    public EditUserService(UserContextRepository ucr, UserRepository ur, RateUserService rateUserService) {
         super(ucr);
+        this.rateUserService = rateUserService;
         this.ur = ur;
     }
 
@@ -30,9 +32,11 @@ public class EditUserService extends Service {
     public String generateProfileMessage(long userId) {
         assert userId >= 0;
         User user;
+        double userRate;
         try {
             user = ur.getById(userId);
             setEditUserContext(userId);
+            userRate = rateUserService.getUserRate(userId);
         } catch (DBException | SQLException e) {
             return "Ошибка при обращении к базе данных." + e.getMessage();
         }
@@ -42,7 +46,8 @@ public class EditUserService extends Service {
                 Логин: %s
                 Имя: %s
                 Описание: %s
-                """.formatted(user.getLogin(), user.getName(), user.getDescription());
+                Рейтинг: %.2f
+                """.formatted(user.getLogin(), user.getName(), user.getDescription(), userRate);
     }
 
     /**

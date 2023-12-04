@@ -6,7 +6,6 @@ import java.util.List;
 import db.DBException;
 import db.UserContextRepository;
 import db.UserRateRepository;
-import db.UserRepository;
 import models.UserContext;
 import models.UserState;
 
@@ -39,7 +38,13 @@ public class RateUserService extends Service {
     }
 
     public double getUserRate(long userId) throws DBException {
+        if (!userRateRepository.haveUser(userId)) {
+            userRateRepository.save(userId);
+        }
         List<Long> rate = userRateRepository.getRateSumAndNumOfOrders(userId);
+        if (rate.get(1) == 0) {
+            return 0.0;
+        }
         return Math.round(rate.get(0) / rate.get(1));
     }
 

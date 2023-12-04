@@ -12,7 +12,6 @@ import core.UserNotifier;
 import core.service_handlers.handlers.*;
 import core.service_handlers.services.*;
 import db.*;
-import models.User;
 
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -21,7 +20,6 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 
 import java.sql.SQLException;
-import java.util.List;
 
 /** Main class */
 public class Main {
@@ -33,7 +31,6 @@ public class Main {
         db.clearScheme();
         db.initScheme();
 
-
         // Репозитории
         LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);
         UserRepository ur = new UserRepository(db);
@@ -44,14 +41,14 @@ public class Main {
         
         // Сервисы
         LoginService loginService = new LoginService(uc, loggingUsersRepository, ur, lg);
-        EditUserService updateUserService = new EditUserService(uc, ur);
+        RateUserService rateUserService = new RateUserService(uc, uRateRepository);
+        EditUserService updateUserService = new EditUserService(uc, ur, rateUserService);
         CreateOrderService createOrderService = new CreateOrderService(or, uc);
         EditOrderService editOrderService = new EditOrderService(or,uc);
         CancelOrderService cancelOrderService = new CancelOrderService(or,uc);
         AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc, ur, lg);
         CloseOrderCourierService closeOrderCourierService = new CloseOrderCourierService(or,uc);
         CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
-        RateUserService rateUserService = new RateUserService(uc, uRateRepository);
 
         // менеджер сервисов
         ServiceManager serviceManager = new ServiceManager(lg,or,ur,uc, loginService);
