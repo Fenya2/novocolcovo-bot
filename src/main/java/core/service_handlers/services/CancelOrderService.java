@@ -74,7 +74,6 @@ public class CancelOrderService {
                 Order order = orderRepository.getById(idOrder);
                 System.out.println(order.getStatus().toString());
                 if (order.getStatus() == OrderStatus.UPDATING){
-                    System.out.println("_____");
                     userNotifier.sendTextMessage(
                             order.getCourierId(),
                             "Заказчик отменил заказ %s %s".formatted(order.getId(),order.getDescription())

@@ -19,7 +19,7 @@ public class CloseOrderCourierService {
 
     /** @see OrderRepository */
     private final OrderRepository orderRepository;
-ы
+
     /** @see UserContextRepository */
     private final UserContextRepository userContextRepository;
 
@@ -70,13 +70,13 @@ public class CloseOrderCourierService {
 
                 order.setStatus(OrderStatus.CLOSING);
                 orderRepository.update(order);
-                userContextRepository.updateUserContext(userId,new UserContext());
+                userContextRepository.updateUserContext(userId,new UserContext(UserState.RATE_ANOTHER_USER, (int) order.getCreatorId()));
 
                 userNotifier.sendTextMessage(
                         order.getCreatorId(),
                         "Подтвердите что ваш заказ завершен, написав \n/yes /no."
                 );
-                return "Завершение заказа отправлено на подтверждение заказчику";
+                return "Завершение заказа отправлено на подтверждение заказчику.";
             } else
                 return "Выход за пределы контекста";
         } catch (SQLException | ParseException | DBException e) {

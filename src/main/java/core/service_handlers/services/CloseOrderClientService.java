@@ -7,6 +7,7 @@ import db.UserContextRepository;
 import models.Order;
 import models.OrderStatus;
 import models.UserContext;
+import models.UserState;
 
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -45,7 +46,7 @@ public class CloseOrderClientService {
             Order order = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.CLOSING);
             if (text.equals("/yes")) {
                 orderRepository.updateOrderStatus(order.getId(), OrderStatus.CLOSED);
-                userContextRepository.updateUserContext(userId,new UserContext());
+                userContextRepository.updateUserContext(userId,new UserContext(UserState.RATE_ANOTHER_USER, (int) order.getCourierId()));
                 userNotifier.sendTextMessage(order.getCourierId(),"Заказ успешно закрыт");
                 return "Заказ успешно закрыт";
             } else if (text.equals("/no")) {

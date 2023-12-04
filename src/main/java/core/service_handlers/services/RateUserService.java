@@ -45,7 +45,7 @@ public class RateUserService extends Service {
         if (rate.get(1) == 0) {
             return 0.0;
         }
-        return Math.round(rate.get(0) / rate.get(1));
+        return (double) rate.get(0) / (double) rate.get(1);
     }
 
     @Override

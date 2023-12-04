@@ -28,8 +28,8 @@ public class Main {
         // БД
         DB db = new SQLiteDB(new SQLDBconfig("src/main/resources/config/dbconfig.json"));
         db.connect();
-//        db.clearScheme();
-//        db.initScheme();
+        //db.clearScheme();
+        //db.initScheme();
 
         // Репозитории
         LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);
@@ -46,7 +46,7 @@ public class Main {
         CreateOrderService createOrderService = new CreateOrderService(or, uc);
         EditOrderService editOrderService = new EditOrderService(or,uc);
         CancelOrderService cancelOrderService = new CancelOrderService(or,uc);
-        AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc, ur, lg);
+        AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc, ur, lg, rateUserService);
         CloseOrderCourierService closeOrderCourierService = new CloseOrderCourierService(or,uc);
         CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
 

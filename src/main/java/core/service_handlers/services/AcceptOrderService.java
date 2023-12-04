@@ -24,13 +24,16 @@ public class AcceptOrderService {
 
     /** @see db.LoggedUsersRepository */
     private final LoggedUsersRepository loggedUsersRepository;
+    /** @see  RateUserService*/
+    private final RateUserService rateUserService;
 
     /** Конструктор {@link AcceptOrderService}*/
-    public AcceptOrderService(OrderRepository orderRepository, UserContextRepository userContextRepository, UserRepository userRepository, LoggedUsersRepository loggedUsersRepository) {
+    public AcceptOrderService(OrderRepository orderRepository, UserContextRepository userContextRepository, UserRepository userRepository, LoggedUsersRepository loggedUsersRepository, RateUserService rateUserService) {
         this.orderRepository = orderRepository;
         this.userContextRepository = userContextRepository;
         this.userRepository = userRepository;
         this.loggedUsersRepository = loggedUsersRepository;
+        this.rateUserService = rateUserService;
     }
 
     /**
@@ -59,11 +62,11 @@ public class AcceptOrderService {
                             "Заказ номер %s\n" +
                             "Создан: %s\n" +
                             "Описание заказчика: %s\n" +
-//TODO                      "Рейтинг: %s\n" +
+                            "Рейтинг: %.2f\n" +
                             "Описание заказа: %s\n" +
                             "Введите еще раз номер заказа, для подтверждения принятия заказа." +
                             "Либо команду /cancel для выхода из контекста принятия заказа.",
-                            order.getId(), client.getName(), client.getDescription(), order.getDescription());
+                            order.getId(), client.getName(), client.getDescription(), rateUserService.getUserRate(client.getId()), order.getDescription());
                     return str;
                 }
                 case 1->{
@@ -84,13 +87,13 @@ public class AcceptOrderService {
 
 
                     User courier = userRepository.getById(userId);
-                    String str = "Ваш заказ (%s) %s принят курьером (%s %s). Контакты для связи с курьером:\n"
+                    String str = "Ваш заказ (%s) %s принят курьером (%s, %s, %.2f). Контакты для связи с курьером:\n"
                             .formatted(
                                     order.getId(),
                                     order.getDescription(),
                                     courier.getName(),
-                                    courier.getDescription()
-                                    //TODO рейтинг
+                                    courier.getDescription(),
+                                    rateUserService.getUserRate(courier.getId())
                             );
 
                     StringBuilder mesClient = new StringBuilder(str);

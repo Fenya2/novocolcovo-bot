@@ -24,6 +24,8 @@ public class EditUserServiceTest {
     private UserRepository userRepository;
     @Mock
     private UserContextRepository userContextRepository;
+    @Mock
+    private RateUserService rateUserService;
 
     @Before
     public void init() {
@@ -103,6 +105,7 @@ public class EditUserServiceTest {
                 Логин: 10 login
                 Имя: name of 10 user
                 Описание: 10 description
+                Рейтинг: 0.00
                 """, editUserService.generateProfileMessage(10));
     }
 

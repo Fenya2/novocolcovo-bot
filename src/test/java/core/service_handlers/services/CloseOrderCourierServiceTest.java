@@ -91,7 +91,7 @@ public class CloseOrderCourierServiceTest {
                 .thenReturn(new UserContext());
         String continueSession5 = closeOrderCourierService.continueSession(2,"11");
         Assert.assertEquals(
-                "Завершение заказа отправлено на подтверждение заказчику"
+                "Завершение заказа отправлено на подтверждение заказчику."
                 ,continueSession5
         );
 
