@@ -59,6 +59,7 @@ public class AcceptOrderService {
                             "Заказ номер %s\n" +
                             "Создан: %s\n" +
                             "Описание заказчика: %s\n" +
+//TODO                      "Рейтинг: %s\n" +
                             "Описание заказа: %s\n" +
                             "Введите еще раз номер заказа, для подтверждения принятия заказа." +
                             "Либо команду /cancel для выхода из контекста принятия заказа.",
@@ -83,14 +84,21 @@ public class AcceptOrderService {
 
 
                     User courier = userRepository.getById(userId);
-                    String str = "Ваш заказ %s принят курьером (%s %s). Контакты для связи с курьером:\n"
-                            .formatted(order.getDescription(),courier.getName(),courier.getDescription());
+                    String str = "Ваш заказ (%s) %s принят курьером (%s %s). Контакты для связи с курьером:\n"
+                            .formatted(
+                                    order.getId(),
+                                    order.getDescription(),
+                                    courier.getName(),
+                                    courier.getDescription()
+                                    //TODO рейтинг
+                            );
 
                     StringBuilder mesClient = new StringBuilder(str);
                     String idOnPlatform;
                     for (Platform platform: Platform.values()){
                         idOnPlatform = loggedUsersRepository.
                                 getUserIdOnPlatformByUserIdAndPlatform(order.getCourierId(),platform);
+
                         if (platform==Platform.NO_PLATFORM || idOnPlatform == null) continue;
                         String name = userNotifier.getUserDomainOnPlatform(platform,idOnPlatform);
                         mesClient.append("\n").append(platform).append(": ").append(name);
@@ -101,6 +109,7 @@ public class AcceptOrderService {
                     for (Platform platform: Platform.values()){
                         idOnPlatform = loggedUsersRepository.
                                 getUserIdOnPlatformByUserIdAndPlatform(order.getCreatorId(),platform);
+
                         if (platform==Platform.NO_PLATFORM || idOnPlatform == null) continue;
                         String name = userNotifier.getUserDomainOnPlatform(platform,idOnPlatform);
                         mesCourier.append("\n").append(platform).append(": ").append(name);

@@ -28,8 +28,8 @@ public class Main {
         // БД
         DB db = new SQLiteDB(new SQLDBconfig("src/main/resources/config/dbconfig.json"));
         db.connect();
-        db.clearScheme();
-        db.initScheme();
+//        db.clearScheme();
+//        db.initScheme();
 
         // Репозитории
         LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);
@@ -95,6 +95,7 @@ public class Main {
         closeOrderCourierService.setUserNotifier(userNotifier);
         acceptOrderService.setUserNotifier(userNotifier);
         closeOrderClientService.setUserNotifier(userNotifier);
+        cancelOrderService.setUserNotifier(userNotifier);
 
         ((VkBot) vkBot).startPolling();
         db.disconnect();

@@ -80,6 +80,7 @@ public class EditOrderService {
                 case 1 -> {
                     Order order = orderRepository.getOrderByIdUserAndStatus(userId, OrderStatus.UPDATING);
                     order.setDescription(text);
+                    userContext.incrementStateNum();
                     orderRepository.update(order);
                     orderRepository.updateOrderStatus(order.getId(), OrderStatus.PENDING);
                     userContextRepository.updateUserContext(userId, new UserContext());
