@@ -43,6 +43,8 @@ public class CommandHandlerTest {
         Assert.assertEquals(2, commandHandler.handle(message));
         message.setText("/register");
         Assert.assertEquals(2, commandHandler.handle(message));
+        message.setText("/login");
+        Assert.assertEquals(2, commandHandler.handle(message));
     }
 
     /** Проверяет работу handle, когда в переденном сообщении - некорректная команда. */

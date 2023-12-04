@@ -98,7 +98,7 @@ public class TGBot extends TelegramLongPollingBot implements Bot {
                     messageHandler.handle(message);
                 }
                 case "SHOW_PENDING_BUTTON" -> {
-                    message.setText("/show_pending_order");
+                    message.setText("/show_pending_orders");
                     messageHandler.handle(message);
                 }
                 case "ACCEPT_BUTTON" -> {

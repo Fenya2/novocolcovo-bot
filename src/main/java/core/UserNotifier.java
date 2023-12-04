@@ -61,7 +61,7 @@ public class UserNotifier {
      * @param path путь к картинке на устройстве.
      */
     public void sendPicture(long userId, String path) {
-        // todo сделать.
+        // TODO сделать.
     }
 
     /**
