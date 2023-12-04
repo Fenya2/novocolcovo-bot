@@ -28,13 +28,15 @@ public class RateUserService extends Service {
      * 
      * @param userId  id пользователя
      * @param newRate новый рейтинг, который получил пользователь
+     * @return новая рейтинговая сумма
      */
-    public void updateUserRate(long userId, long newRate) throws DBException {
+    public long updateUserRate(long userId, long newRate) throws DBException {
         if (!userRateRepository.haveUser(userId)) {
             userRateRepository.save(userId);
         }
         List<Long> oldRate = userRateRepository.getRateSumAndNumOfOrders(userId);
         userRateRepository.updateRate(userId, oldRate.get(0) + newRate, oldRate.get(1) + 1);
+        return oldRate.get(0) + newRate;
     }
 
     public double getUserRate(long userId) throws DBException {

@@ -14,7 +14,10 @@ public class HandlerRateUserService {
     }
 
     /**
-     * Обрабатывает
+     * Обрабатывает сообщение, предназначенное соответсвующему сервису.
+     * Возврашает 1, если пришла команда, 2, если сообщение ушло сервису,
+     * -1, если отправленное сообщение некорректно.
+     * -2, если произошла ошибка со стороны сервиса.
      * @param message
      */
     public int handle(Message message) {
@@ -23,7 +26,7 @@ public class HandlerRateUserService {
                 message.getUserIdOnPlatform(),
                 rateUserService.getHelpMessage()
             );
-            return -1;
+            return 1;
         }
         long newRate = 1;
 
@@ -52,6 +55,6 @@ public class HandlerRateUserService {
             );
             return -1;
         }
-        return 1;
+        return 2;
     }
 }

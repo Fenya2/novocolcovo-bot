@@ -64,7 +64,10 @@ public class UserRateRepository extends Repository{
         }
     }
 
-    public void updateRate(long userId, long rateSum, long numOfOrders) throws DBException {
+    /**
+     * Обновляет рейтинг пользователя.
+     */
+    public int updateRate(long userId, long rateSum, long numOfOrders) throws DBException {
         if(!haveUser(userId))
             throw new DBException("пользователя %d нет в таблице");
         String query = "UPDATE users_rate SET rate_sum=%d, num_of_orders=%d WHERE user_id=%d".formatted(rateSum, numOfOrders, userId);
@@ -75,6 +78,7 @@ public class UserRateRepository extends Repository{
             log.error("Не удалось обновить таблицу рейтинга, пользователь %d.\n%s".formatted(userId, e.getMessage()));
             throw new DBException(e.getMessage());
         }
+        return 0;
     }
 
     /**

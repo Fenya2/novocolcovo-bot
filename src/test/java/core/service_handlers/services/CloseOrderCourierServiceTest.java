@@ -94,6 +94,5 @@ public class CloseOrderCourierServiceTest {
                 "Завершение заказа отправлено на подтверждение заказчику."
                 ,continueSession5
         );
-
     }
 }
