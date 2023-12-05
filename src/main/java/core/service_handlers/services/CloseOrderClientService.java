@@ -51,7 +51,7 @@ public class CloseOrderClientService {
                 return "Заказ успешно закрыт";
             } else if (text.equals("/no")) {
                 orderRepository.updateOrderStatus(order.getId(), OrderStatus.NOT_CLOSED);
-                userContextRepository.updateUserContext(userId,new UserContext());
+                userContextRepository.updateUserContext(userId,new UserContext(UserState.RATE_ANOTHER_USER, (int) order.getCourierId()));
                 userNotifier.sendTextMessage(order.getCourierId(),"Заказ не закрыт. Свяжитесь с заказчиком");
                 return "Заказ не закрыт. Свяжитесь с курьером";
             } else {

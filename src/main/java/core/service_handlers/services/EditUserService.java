@@ -46,8 +46,9 @@ public class EditUserService extends Service {
                 Логин: %s
                 Имя: %s
                 Описание: %s
-                Рейтинг: %.2f
-                """.formatted(user.getLogin(), user.getName(), user.getDescription(), userRate);
+                Рейтинг: %s
+                """.formatted(user.getLogin(), user.getName(), user.getDescription(),
+                (userRate+"0").substring(0,4));
     }
 
     /**
