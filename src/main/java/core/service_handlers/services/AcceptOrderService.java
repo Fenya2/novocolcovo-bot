@@ -62,11 +62,11 @@ public class AcceptOrderService {
                             "Заказ номер %s\n" +
                             "Создан: %s\n" +
                             "Описание заказчика: %s\n" +
-                            "Рейтинг: %.2f\n" +
+                            "Рейтинг: %s\n" +
                             "Описание заказа: %s\n" +
                             "Введите еще раз номер заказа, для подтверждения принятия заказа." +
                             "Либо команду /cancel для выхода из контекста принятия заказа.",
-                            order.getId(), client.getName(), client.getDescription(), rateUserService.getUserRate(client.getId()), order.getDescription());
+                            order.getId(), client.getName(), client.getDescription(), (rateUserService.getUserRate(client.getId())+"0").substring(0,4), order.getDescription());
                     return str;
                 }
                 case 1->{
