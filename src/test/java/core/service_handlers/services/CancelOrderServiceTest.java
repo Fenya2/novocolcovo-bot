@@ -47,22 +47,22 @@ public class CancelOrderServiceTest {
                 .thenReturn(userContext);
 
         String continueCancelOrder1 = cancelOrderService.continueSession(1, "no digit");
-        Assert.assertEquals("Заказ не найден или выполняется курьером. Попробуй еще раз", continueCancelOrder1);
+        Assert.assertEquals("Заказ не найден. Попробуй еще раз", continueCancelOrder1);
 
         String continueCancelOrder2 = cancelOrderService.continueSession(1, "1234567891234567899");
-        Assert.assertEquals("Заказ не найден или выполняется курьером. Попробуй еще раз", continueCancelOrder2);
+        Assert.assertEquals("Заказ не найден. Попробуй еще раз", continueCancelOrder2);
 
         Mockito.when(orderRepository.getById(0))
                 .thenReturn(null);
         String continueCancelOrder3 = cancelOrderService.continueSession(1, "123456789");
-        Assert.assertEquals("Заказ не найден или выполняется курьером. Попробуй еще раз", continueCancelOrder3);
+        Assert.assertEquals("Заказ не найден. Попробуй еще раз", continueCancelOrder3);
 
         Mockito.when(orderRepository.getById(11254))
                 .thenReturn(new Order(1,12,OrderStatus.PENDING,"d"));
         Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, OrderStatus.PENDING))
                 .thenReturn(null);
         String continueCancelOrder4 = cancelOrderService.continueSession(1, "11254");
-        Assert.assertEquals("Заказ не найден или выполняется курьером. Попробуй еще раз", continueCancelOrder4);
+        Assert.assertEquals("Заказ не найден. Попробуй еще раз", continueCancelOrder4);
 
         Mockito.when(orderRepository.getOrderByIdUserAndStatus(1, OrderStatus.UPDATING))
                 .thenReturn(new Order(1));

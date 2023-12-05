@@ -63,11 +63,19 @@ public class CommandHandler {
             }
             case "/help" -> {
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), BotMessages.HELP_MESSAGE.getMessage());
+                msg.getBotFrom().sendMainMenu(
+                        msg.getUserIdOnPlatform(),
+                        "Вы попали в главное меню. Выберите действие"
+                );
                 return 2;
             }
             case "/profile" -> {
                 String startMessage = serviceManager.startEditUserService(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
+                msg.getBotFrom().sendMainMenu(
+                        msg.getUserIdOnPlatform(),
+                        "Вы попали в главное меню. Выберите действие"
+                );
                 return 2;
             }
             case "/create_order" -> {
@@ -88,21 +96,39 @@ public class CommandHandler {
             case "/show_order" -> {
                 String startMessage = serviceManager.showOrder(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
+                msg.getBotFrom().sendMainMenu(
+                        msg.getUserIdOnPlatform(),
+                        "Вы попали в главное меню. Выберите действие"
+                );
                 return 2;
             }
             case "/show_pending_orders" -> {
                 String startMessage = serviceManager.showPendingOrders(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
+                msg.getBotFrom().sendMainMenu(
+                        msg.getUserIdOnPlatform(),
+                        "Вы попали в главное меню. Выберите действие"
+                );
                 return 2;
             }
             case "/accept_order" -> {
                 String startMessage = serviceManager.startAcceptOrder(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
+                if (serviceManager.showPendingOrders(msg.getUser().getId()).equals(startMessage))
+                    msg.getBotFrom().sendMainMenu(
+                            msg.getUserIdOnPlatform(),
+                            "Вы попали в главное меню. Выберите действие"
+                    );
                 return 2;
             }
+
             case "/show_accept_order" -> {
                 String startMessage = serviceManager.showAcceptOrder(msg.getUser().getId());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), startMessage);
+                msg.getBotFrom().sendMainMenu(
+                        msg.getUserIdOnPlatform(),
+                        "Вы попали в главное меню. Выберите действие"
+                );
                 return 2;
             }
             case "/close_order" -> {

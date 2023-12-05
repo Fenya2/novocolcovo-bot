@@ -28,8 +28,8 @@ public class Main {
         // БД
         DB db = new SQLiteDB(new SQLDBconfig("src/main/resources/config/dbconfig.json"));
         db.connect();
-        db.clearScheme();
-        db.initScheme();
+        //db.clearScheme();
+        //db.initScheme();
 
         // Репозитории
         LoggingUsersRepository loggingUsersRepository = new LoggingUsersRepository(db);
@@ -37,14 +37,16 @@ public class Main {
         LoggedUsersRepository lg = new LoggedUsersRepository(db,ur);
         UserContextRepository uc = new UserContextRepository(db,ur);
         OrderRepository or = new OrderRepository(db,ur);
-
+        UserRateRepository uRateRepository = new UserRateRepository(db);
+        
         // Сервисы
         LoginService loginService = new LoginService(uc, loggingUsersRepository, ur, lg);
-        EditUserService updateUserService = new EditUserService(uc, ur);
+        RateUserService rateUserService = new RateUserService(uc, uRateRepository);
+        EditUserService updateUserService = new EditUserService(uc, ur, rateUserService);
         CreateOrderService createOrderService = new CreateOrderService(or, uc);
         EditOrderService editOrderService = new EditOrderService(or,uc);
         CancelOrderService cancelOrderService = new CancelOrderService(or,uc);
-        AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc, ur, lg);
+        AcceptOrderService acceptOrderService = new AcceptOrderService(or,uc, ur, lg, rateUserService);
         CloseOrderCourierService closeOrderCourierService = new CloseOrderCourierService(or,uc);
         CloseOrderClientService closeOrderClientService = new CloseOrderClientService(or,uc);
 
@@ -62,6 +64,8 @@ public class Main {
                 new HandlerCloseOrderCourierService(closeOrderCourierService);
         HandlerCloseOrderClientService handlerCloseOrderClientService =
                 new HandlerCloseOrderClientService(closeOrderClientService);
+        HandlerRateUserService handlerRateUserService = new HandlerRateUserService(rateUserService);
+
 
         // "главные" обработчики
         CommandHandler commandHandler = new CommandHandler(serviceManager);
@@ -77,7 +81,8 @@ public class Main {
                 handlerCancelOrderService,
                 handlerAcceptOrderService,
                 handlerCloseOrderCourierService,
-                handlerCloseOrderClientService
+                handlerCloseOrderClientService,
+                handlerRateUserService
         );
 
         // Боты
@@ -95,6 +100,7 @@ public class Main {
         closeOrderCourierService.setUserNotifier(userNotifier);
         acceptOrderService.setUserNotifier(userNotifier);
         closeOrderClientService.setUserNotifier(userNotifier);
+        cancelOrderService.setUserNotifier(userNotifier);
 
         ((VkBot) vkBot).startPolling();
         db.disconnect();

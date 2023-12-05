@@ -31,6 +31,8 @@ public class AcceptOrderServiceTest {
     private UserRepository userRepository;
     @Mock
     private LoggedUsersRepository loggedUsersRepository;
+    @Mock
+    private RateUserService rateUserService;
     /**
      * Тестирует случаи: <br>
      * 1)Невалидный номер заказа
@@ -73,14 +75,16 @@ public class AcceptOrderServiceTest {
         Mockito.when(userRepository.getById(1))
                 .thenReturn(new User());
 
+
+
         String continueSession4 = acceptOrderService.continueSession(2,"11");
         Assert.assertEquals("Заказ номер -42\n" +
                 "Создан: default name\n" +
                 "Описание заказчика: default description\n" +
+                "Рейтинг: 0.00\n" +
                 "Описание заказа: \n" +
                 "Введите еще раз номер заказа, для подтверждения принятия заказа.Либо команду" +
                 " /cancel для выхода из контекста принятия заказа.",continueSession4);
-
         Mockito.when(orderRepository.getById(11))
                 .thenReturn(new Order(1,1, OrderStatus.PENDING,"any"));
         Mockito.when(userContextRepository.getUserContext(1))
