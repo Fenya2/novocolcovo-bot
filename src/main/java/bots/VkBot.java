@@ -83,7 +83,7 @@ public class VkBot extends LongPollBot implements Bot {
      */
     @Override
     public void sendMainMenu(String recipient_id, String message) {
-        sendTextMessage(recipient_id,message);
+        //sendTextMessage(recipient_id,message);
     }
 
     /**

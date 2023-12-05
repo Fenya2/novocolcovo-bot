@@ -1,6 +1,5 @@
 package core;
 
-import bots.Bot;
 import bots.TGBot;
 import bots.VkBot;
 import db.LoggedUsersRepository;

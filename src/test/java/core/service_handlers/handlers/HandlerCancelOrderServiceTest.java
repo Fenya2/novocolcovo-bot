@@ -63,8 +63,10 @@ public class HandlerCancelOrderServiceTest {
         message.setUser(new User(10, "name", "description", "login"));
         message.setUserContext(new UserContext(UserState.EDIT_USER, 0));
         message.setBotFrom(Mockito.mock(Bot.class));
+        Mockito.when(cancelOrderService.continueSession(10, "some_message_not_command")).thenReturn("Заказ удален");
         message.setText("some_message_not_command");
         Assert.assertEquals(2, handlerCancelOrderService.handle(message));
+        Mockito.when(cancelOrderService.continueSession(10, "72")).thenReturn("Заказ удален");
         message.setText("72");
         Assert.assertEquals(2, handlerCancelOrderService.handle(message));
     }

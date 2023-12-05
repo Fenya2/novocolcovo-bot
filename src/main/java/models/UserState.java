@@ -17,5 +17,7 @@ public enum UserState {
     /** Пользователь(исполнитель) находится внутри выполнения команды /close_order */
     ORDER_CLOSING_COURIER,
     /** Пользователь(заказчик) находится внутри выполнения команды /accept_order */
-    ORDER_CLOSING_CLIENT
+    ORDER_CLOSING_CLIENT,
+    /** Пользователь выставляет рейтинг другому пользователю */
+    RATE_ANOTHER_USER
 }

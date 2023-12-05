@@ -50,7 +50,6 @@ public class HandlerCloseOrderCourierService {
                 }
                 String message = closeOrderCourierService.continueSession(msg.getUser().getId(),msg.getText());
                 msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
-                msg.getBotFrom().sendTextMessage(msg.getUserIdOnPlatform(), message);
                 if (msg.getUserContext().getStateNum()==1){
                     msg.getBotFrom().sendMainMenu(
                             msg.getUserIdOnPlatform(),
